@@ -1,1 +1,3 @@
-int getNum();
+namespace nsm {
+    void createWindow();
+}

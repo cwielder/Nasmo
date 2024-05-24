@@ -2,7 +2,7 @@
 #include <nsm/test.h>
 
 int main() {
-    std::cout << getNum() << std::endl;
+    nsm::createWindow();
 
     return 0;
 }

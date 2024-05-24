@@ -12,12 +12,13 @@ project "Nasmo"
     defines "NSM_INTERNAL"
 
     links {
-        
+        "GLFW"
     }
 
     includedirs {
         "include",
-        
+
+        "vendor/glfw/include",
     }
 
     libdirs {
@@ -82,5 +83,5 @@ project "Nasmo"
         }
 
 group "Dependencies"
-    
+    include "vendor/glfw"
 group ""

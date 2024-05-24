@@ -1,0 +1,3 @@
+[submodule "Nasmo/vendor/glfw"]
+	path = Nasmo/vendor/glfw
+	url = https://github.com/TheCherno/glfw.git

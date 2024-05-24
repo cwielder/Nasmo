@@ -10,13 +10,18 @@ project "Sandbox"
     debugdir "../workdir"
 
     links {
-        "Nasmo"
+        "Nasmo",
+
+        -- TODO: Automate
+        "GLFW",
     }
 
     includedirs {
         "include",
         "../Nasmo/include",
 
+        -- TODO: Automate
+        "../Nasmo/vendor/glfw/include",
     }
 
     files {
