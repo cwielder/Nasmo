@@ -40,3 +40,4 @@ UpgradeLog.htm
 *.sln
 *.vcxproj
 *.user
+.vscode/settings.json
