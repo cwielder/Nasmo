@@ -28,7 +28,6 @@ Makefile
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
 **/bin/**
@@ -36,3 +35,8 @@ Makefile
 # Local files
 compile.sh
 run.sh
+/.vs
+UpgradeLog.htm
+*.sln
+*.vcxproj
+*.user
