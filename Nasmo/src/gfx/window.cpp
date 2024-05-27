@@ -2,6 +2,15 @@
 
 #include <nsm/gfx/opengl.h>
 
+        static void glErrorCallback(GLenum, GLenum, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*) {
+            switch (severity) {
+                case GL_DEBUG_SEVERITY_HIGH: std::printf("%s\n", message); break;
+                case GL_DEBUG_SEVERITY_MEDIUM: std::printf("%s\n", message); break;
+                case GL_DEBUG_SEVERITY_LOW: std::printf("%s\n", message); break;
+                case GL_DEBUG_SEVERITY_NOTIFICATION: std::printf("%s\n", message); break;
+            }
+        }
+
 nsm::Window::Window(const WindowInfo& info)
     : mHandle(nullptr)
 {
@@ -48,7 +57,13 @@ nsm::Window::Window(const WindowInfo& info)
 
     glfwMakeContextCurrent(mHandle);
 
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+
+    #ifdef NSM_DEBUG
+        glDebugMessageCallback(&glErrorCallback, nullptr);
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    #endif
 }
 
 nsm::Window::~Window() {

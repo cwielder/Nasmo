@@ -8,7 +8,7 @@
 
 namespace nsm {
 
-    class Window {
+    class Window final {
     public:
         enum class WindowType {
             Windowed,
