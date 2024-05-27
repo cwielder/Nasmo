@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <nsm/gfx/opengl.h>
+#include <nsm/debug/assert.h>
 
 namespace nsm {
 
@@ -16,7 +17,7 @@ namespace nsm {
         : id(GL_NONE)
     {
         auto compile = [=](const std::string& source) -> u32 {
-            //dbg::trace("Compiling shader: ", path.c_str(), "...");
+            nsm::trace("Compiling shader: ", path.c_str(), "...");
 
             const u32 shader = glCreateShader(static_cast<GLenum>(type));
             const char* src = source.c_str();
@@ -33,7 +34,7 @@ namespace nsm {
                 std::vector<char> error(length);
                 glGetShaderInfoLog(shader, length, &length, error.data());
 
-                //NSM_ASSERT(false, "Shader compilation failed: ", error.data());
+                NSM_ASSERT(false, "Shader compilation failed: ", error.data());
             }
 
             return shader;
@@ -47,7 +48,7 @@ namespace nsm {
         }
 
         std::ifstream file(path);
-        //NSM_ASSERT(file.is_open(), "Failed to open shader file: ", path.c_str());
+        NSM_ASSERT(file.is_open(), "Failed to open shader file: ", path.c_str());
 
         const std::string shader(std::istreambuf_iterator<char>{file}, {});
         this->id = compile(shader);
@@ -160,7 +161,7 @@ namespace nsm {
     i32 ShaderProgram::getLocation(const std::string& name) const {
         auto location = mUniformLocations.find(name);
 
-        //NSM_ASSERT(location != mUniformLocations.end(), "Uniform location not found: ", name.c_str());
+        NSM_ASSERT(location != mUniformLocations.end(), "Uniform location not found: ", name.c_str());
         
         return location->second;
     }
@@ -194,7 +195,7 @@ namespace nsm {
             std::vector<char> error(length);
             glGetProgramInfoLog(program, length, &length, error.data());
 
-            //NSM_ASSERT(false, "Shader program linking failed: ", error.data());
+            NSM_ASSERT(false, "Shader program linking failed: ", error.data());
         }
 
         glDetachShader(program, vsh.id);

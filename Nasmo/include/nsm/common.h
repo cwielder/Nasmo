@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstring>
 
 using u8 = uint8_t;
 using u16 = uint16_t;
@@ -27,3 +28,13 @@ static_assert(sizeof(i64) == 8, "i64 is not 8 bytes");
 
 static_assert(sizeof(f32) == 4, "f32 is not 4 bytes");
 static_assert(sizeof(f64) == 8, "f64 is not 8 bytes");
+
+#ifdef _MSC_VER
+    #define NSM_BREAKPOINT __debugbreak
+#elif defined(__GNUC__)
+    #define NSM_BREAKPOINT __builtin_trap
+#elif defined(__clang__)
+    #define NSM_BREAKPOINT __builtin_debugtrap
+#endif
+
+#define NSM_FILENAME (std::strrchr(__FILE__, '\\') ? std::strrchr(__FILE__, '\\') + 1 : __FILE__)

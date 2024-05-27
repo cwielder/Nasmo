@@ -1,15 +1,16 @@
 #include <nsm/gfx/window.h>
 
 #include <nsm/gfx/opengl.h>
+#include <nsm/debug/log.h>
 
-        static void glErrorCallback(GLenum, GLenum, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*) {
-            switch (severity) {
-                case GL_DEBUG_SEVERITY_HIGH: std::printf("%s\n", message); break;
-                case GL_DEBUG_SEVERITY_MEDIUM: std::printf("%s\n", message); break;
-                case GL_DEBUG_SEVERITY_LOW: std::printf("%s\n", message); break;
-                case GL_DEBUG_SEVERITY_NOTIFICATION: std::printf("%s\n", message); break;
-            }
-        }
+static void glErrorCallback(GLenum, GLenum, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*) {
+    switch (severity) {
+        case GL_DEBUG_SEVERITY_HIGH: nsm::error(message); break;
+        case GL_DEBUG_SEVERITY_MEDIUM: nsm::warn(message); break;
+        case GL_DEBUG_SEVERITY_LOW: nsm::info(message); break;
+        case GL_DEBUG_SEVERITY_NOTIFICATION: nsm::trace(message); break;
+    }
+}
 
 nsm::Window::Window(const WindowInfo& info)
     : mHandle(nullptr)

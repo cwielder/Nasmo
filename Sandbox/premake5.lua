@@ -40,7 +40,8 @@ project "Sandbox"
     filter "system:windows"
         systemversion "latest"
         defines {
-            "NSM_PLATFORM_WINDOWS"
+            "NSM_PLATFORM_WINDOWS",
+            "_CRT_SECURE_NO_WARNINGS",
         }
     
     filter "configurations:Debug"
