@@ -38,6 +38,6 @@ run.sh
 /.vs
 UpgradeLog.htm
 *.sln
-*.vcxproj
+*.vcxproj*
 *.user
 .vscode/settings.json

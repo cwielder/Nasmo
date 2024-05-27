@@ -58,6 +58,6 @@ void nsm::Application::run() {
         vao.bind();
         ibo.bind();
         shader.bind();
-        glDrawArrays(GL_TRIANGLES, 0, ibo.getCount());
+        glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_INT, nullptr);
     }
 }
