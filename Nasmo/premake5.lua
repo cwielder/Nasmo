@@ -20,7 +20,8 @@ project "Nasmo"
         "include",
 
         "vendor/glfw/include",
-        "vendor/glad/include"
+        "vendor/glad/include",
+        "vendor/glm",
     }
 
     libdirs {

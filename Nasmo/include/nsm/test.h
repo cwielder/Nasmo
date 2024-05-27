@@ -1,3 +1,0 @@
-namespace nsm {
-    void createWindow();
-}

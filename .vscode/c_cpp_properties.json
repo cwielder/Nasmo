@@ -4,11 +4,12 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/Nasmo/vendor/glfw/include/**"
+                "${workspaceFolder}/Nasmo/vendor/glfw/include/**",
+                "${workspaceFolder}/Nasmo/vendor/glm",
+                "${workspaceFolder}/Nasmo/include"
             ],
             "defines": [
                 "_DEBUG",
-
                 "NSM_PLATFORM_LINUX"
             ],
             "compilerPath": "/usr/bin/clang",
@@ -20,13 +21,14 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/Nasmo/vendor/glfw/include/**"
+                "${workspaceFolder}/Nasmo/vendor/glfw/include/**",
+                "${workspaceFolder}/Nasmo/vendor/glm",
+                "${workspaceFolder}/Nasmo/include"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",
-
                 "NSM_PLATFORM_WINDOWS"
             ],
             "windowsSdkVersion": "10.0.22621.0",

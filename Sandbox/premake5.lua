@@ -23,7 +23,8 @@ project "Sandbox"
 
         -- TODO: Automate
         "../Nasmo/vendor/glfw/include",
-        "../Nasmo/vendor/glad/include"
+        "../Nasmo/vendor/glad/include",
+        "../Nasmo/vendor/glm",
     }
 
     files {
