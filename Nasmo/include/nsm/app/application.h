@@ -6,8 +6,6 @@
 #include <string>
 #include <vector>
 
-#include <glm/vec2.hpp>
-
 int main(int argc, char** argv);
 
 namespace nsm {
@@ -28,11 +26,7 @@ namespace nsm {
             }
 
             std::vector<std::string> args;
-            struct WindowInfo {
-                std::string title;
-                glm::u32vec2 size;
-                nsm::Window::WindowType type;
-            } window;
+            nsm::Window::WindowInfo window;
         };
 
     public:
@@ -43,6 +37,8 @@ namespace nsm {
         friend int ::main(int argc, char** argv);
 
         void run();
+
+        nsm::Window mWindow;
     };
 
 }
