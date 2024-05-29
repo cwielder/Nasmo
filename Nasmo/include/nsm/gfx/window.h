@@ -25,7 +25,7 @@ namespace nsm {
         } window;
 
     public:
-        Window(const WindowInfo& info);
+        Window();
         ~Window();
 
         bool update();
@@ -34,6 +34,10 @@ namespace nsm {
         void setViewport(const glm::u32vec2& size);
 
     private:
+        friend class Graphics;
+
+        void init(const WindowInfo& info);
+
         GLFWwindow* mHandle;
     };
 

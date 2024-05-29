@@ -14,7 +14,8 @@ project "Sandbox"
 
         -- TODO: Automate
         "GLFW",
-        "glad"
+        "glad",
+        "simdjson",
     }
 
     includedirs {
@@ -25,6 +26,7 @@ project "Sandbox"
         "../Nasmo/vendor/glfw/include",
         "../Nasmo/vendor/glad/include",
         "../Nasmo/vendor/glm",
+        "../Nasmo/vendor/simdjson/include",
     }
 
     files {

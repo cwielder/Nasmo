@@ -3,10 +3,9 @@
 #include <nsm/gfx/opengl.h>
 
 nsm::Application::Application(const ApplicationInfo& info)
-    : mWindow(info.window)
-{
-
-}
+    : mGraphics(info.graphics)
+    , mScene(info.initialScene)
+{ }
 
 nsm::Application::~Application() { }
 
@@ -16,48 +15,16 @@ nsm::Application::~Application() { }
 #include <nsm/gfx/indexbuffer.h>
 
 void nsm::Application::run() {
-    constexpr f32 positions[] = {
-        -1.0f,  1.0f, 0.0f,
-        -1.0f, -1.0f, 0.0f,
-         1.0f,  1.0f, 0.0f,
-         1.0f, -1.0f, 0.0f
-    };
+    //this->intermoduleDataTransfer();
 
-    constexpr f32 colors[] = {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f,
-        1.0f, 1.0f, 0.0f
-    };
+    do { // Main loop
+        const f32 ts = mGraphics.getTimeStep();
 
-    constexpr u32 indices[] = {
-        0, 1, 2, 1, 3, 2
-    };
+        this->onUpdate(ts);
+        //this->handleEvents();
 
-    VertexBuffer positionsVbo;
-    positionsVbo.init(positions, sizeof(positions), 3 * sizeof(f32), BufferUsage::StaticDraw);
-    positionsVbo.markAttribute(0, 3, VertexBuffer::DataType::Float, 0, false);
+        mScene.update(ts);
 
-    VertexBuffer colorsVbo;
-    colorsVbo.init(colors, sizeof(colors), 3 * sizeof(f32), BufferUsage::StaticDraw);
-    colorsVbo.markAttribute(1, 3, VertexBuffer::DataType::Float, 0, false);
-
-    IndexBuffer ibo(indices, sizeof(indices));
-
-    VertexArray vao;
-    vao.linkBuffer(positionsVbo);
-    vao.linkBuffer(colorsVbo);
-    vao.linkIndices(ibo);
-
-    ShaderProgram shader("test.vsh", "test.fsh");
-
-    while (mWindow.update()) {
-        glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        vao.bind();
-        ibo.bind();
-        shader.bind();
-        glDrawElements(GL_TRIANGLES, ibo.getCount(), GL_UNSIGNED_INT, nullptr);
-    }
+        //this->intermoduleDataTransfer();
+    } while (mGraphics.update());
 }

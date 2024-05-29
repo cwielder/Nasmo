@@ -13,7 +13,8 @@ project "Nasmo"
 
     links {
         "GLFW",
-        "glad"
+        "glad",
+        "simdjson",
     }
 
     includedirs {
@@ -22,6 +23,7 @@ project "Nasmo"
         "vendor/glfw/include",
         "vendor/glad/include",
         "vendor/glm",
+        "vendor/simdjson/include",
     }
 
     libdirs {
@@ -89,4 +91,5 @@ project "Nasmo"
 group "Dependencies"
     include "vendor/glfw"
     include "vendor/glad"
+    include "vendor/simdjson"
 group ""
