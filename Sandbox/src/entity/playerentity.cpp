@@ -1,5 +1,6 @@
 #include <nsm/entity/entity.h>
 #include <nsm/debug/log.h>
+#include <nsm/event/events.h>
 
 class PlayerEntity : public nsm::Entity {
 public:
@@ -12,6 +13,12 @@ public:
 
     void onUpdate(const f32 timeStep) override {
         nsm::warn("PlayerEntity onUpdate");
+    }
+
+    void onEvent(const nsm::Event* event) override {
+        if (event->getType() == nsm::EventType::WindowResize) {
+            nsm::error("resize event");
+        }
     }
 };
 

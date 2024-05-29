@@ -1,6 +1,9 @@
 #include <nsm/app/application.h>
 
 #include <nsm/gfx/opengl.h>
+#include <nsm/event/events.h>
+
+std::deque<const nsm::Event*> nsm::Application::sEventQueue;
 
 nsm::Application::Application(const ApplicationInfo& info)
     : mGraphics(info.graphics)
@@ -21,10 +24,33 @@ void nsm::Application::run() {
         const f32 ts = mGraphics.getTimeStep();
 
         this->onUpdate(ts);
-        //this->handleEvents();
+        this->handleEvents();
 
         mScene.update(ts);
 
         //this->intermoduleDataTransfer();
     } while (mGraphics.update());
+}
+
+void nsm::Application::handleEvents() {
+    std::deque<const Event*> eventQueueCopy;
+    eventQueueCopy.swap(sEventQueue);
+
+    for (auto& event : eventQueueCopy) {
+        this->onEventInternal(event);
+        this->onEvent(event);
+
+        mScene.onEvent(event);
+        mGraphics.onEvent(event);
+
+        delete event;
+    }
+}
+
+void nsm::Application::onEventInternal(const Event* event) {
+    
+}
+
+void nsm::Application::raiseEvent(const Event* event) {
+    sEventQueue.push_back(event);
 }

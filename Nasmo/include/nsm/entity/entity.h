@@ -10,13 +10,14 @@
 namespace nsm {
 
     class Scene;
+    class Event;
 
     class EntityComponent {
     public:
         EntityComponent() = default;
         virtual ~EntityComponent() = default;
 
-        //virtual void onEvent(const Event* event);
+        virtual void onEvent(const Event* event) { }
     };
 
     class Entity {
@@ -87,7 +88,7 @@ namespace nsm {
 
         virtual void onCreate() { }
         virtual void onUpdate(const f32 timeStep) { }
-        //virtual void onEvent(Event* event) { }
+        virtual void onEvent(const Event* event) { }
 
         std::map<std::type_index, std::vector<EntityComponent*>> mComponents;
         const Registry* mRegistry = nullptr;

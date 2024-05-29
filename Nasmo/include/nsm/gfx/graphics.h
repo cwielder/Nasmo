@@ -7,6 +7,8 @@
 
 namespace nsm {
 
+    class Event;
+
     class Graphics final {
     public:
         struct GraphicsInfo {
@@ -18,7 +20,7 @@ namespace nsm {
         ~Graphics();
 
         [[nodiscard]] bool update();
-        //void onEvent(Event* event);
+        void onEvent(const Event* event);
 
         //void pushDrawable(DrawableComponent* drawable, const std::size_t layerHash);
 

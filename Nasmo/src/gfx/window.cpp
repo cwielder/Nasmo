@@ -1,6 +1,9 @@
 #include <nsm/gfx/window.h>
 
+#include <nsm/common.h>
 #include <nsm/gfx/opengl.h>
+#include <nsm/event/events.h>
+#include <nsm/app/application.h>
 
 nsm::Window::Window()
     : mHandle(nullptr)
@@ -59,6 +62,42 @@ void nsm::Window::init(const WindowInfo& info) {
             break;
         }
     }
+
+    glfwSetWindowIconifyCallback(mHandle, [](GLFWwindow*, i32 iconified) {
+        if (!iconified) {
+            Application::raiseEvent(new nsm::WindowMaximizeEvent());
+        }
+    });
+
+    glfwSetWindowSizeCallback(mHandle, [](GLFWwindow*, i32 width, i32 height) {
+        if (width == 0 || height == 0) {
+            Application::raiseEvent(new nsm::WindowMinimizeEvent());
+        } else {
+            Application::raiseEvent(new nsm::WindowResizeEvent(width, height));
+        }
+    });
+
+    glfwSetKeyCallback(mHandle, [](GLFWwindow*, i32 key, i32 scancode, i32 action, i32 mods) {
+        if (action == GLFW_PRESS) {
+            Application::raiseEvent(new nsm::KeyPressEvent(key, scancode, mods));
+        } else if (action == GLFW_RELEASE) {
+            Application::raiseEvent(new nsm::KeyReleaseEvent(key, scancode, mods));
+        } else if (action == GLFW_REPEAT) {
+            Application::raiseEvent(new nsm::KeyRepeatEvent(key, scancode, mods));
+        }
+    });
+
+    glfwSetMouseButtonCallback(mHandle, [](GLFWwindow*, i32 button, i32 action, i32 mods) {
+        if (action == GLFW_PRESS) {
+            Application::raiseEvent(new nsm::MousePressEvent(button, mods));
+        } else if (action == GLFW_RELEASE) {
+            Application::raiseEvent(new nsm::MouseReleaseEvent(button, mods));
+        }
+    });
+
+    glfwSetCursorPosCallback(mHandle, [](GLFWwindow*, f64 x, f64 y) {
+        Application::raiseEvent(new nsm::MouseMoveEvent(x, y));
+    });
 
     glfwMakeContextCurrent(mHandle);
 }

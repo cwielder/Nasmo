@@ -2,6 +2,7 @@
 
 #include <nsm/gfx/opengl.h>
 #include <nsm/debug/log.h>
+#include <nsm/event/events.h>
 
 #include <glm/common.hpp>
 
@@ -61,4 +62,11 @@ bool nsm::Graphics::update() {
     //mLayerStack->drawLayers();
 
     return !glfwWindowShouldClose(window);
+}
+
+void nsm::Graphics::onEvent(const Event* event) {
+    if (event->getType() == nsm::EventType::WindowResize) {
+        const WindowResizeEvent* e = static_cast<const WindowResizeEvent*>(event);
+        mWindow.setViewport(e->getSize());
+    }
 }

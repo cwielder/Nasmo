@@ -15,7 +15,7 @@ namespace nsm {
         ~Scene();
 
         void update(const f32 timeStep);
-        //void onEvent(Event* event);
+        void onEvent(const Event* event);
 
         void switchScene(const std::string& path);
         Entity* spawnEntity(const std::string_view type, const std::string& propertiesJson);

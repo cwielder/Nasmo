@@ -6,10 +6,13 @@
 
 #include <string>
 #include <vector>
+#include <deque>
 
 int main(int argc, char** argv);
 
 namespace nsm {
+
+    class Event;
 
     class Application {
     public:
@@ -36,11 +39,18 @@ namespace nsm {
         virtual ~Application();
 
         virtual void onUpdate(const f32 timeStep) { }
+        virtual void onEvent(const Event* event) { }
+
+        static void raiseEvent(const Event* event);
 
     private:
         friend int ::main(int argc, char** argv);
 
+        static std::deque<const Event*> sEventQueue;
+
         void run();
+        void handleEvents();
+        void onEventInternal(const Event* event);
 
         nsm::Graphics mGraphics;
         nsm::Scene mScene;
