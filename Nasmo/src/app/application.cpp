@@ -3,6 +3,8 @@
 #include <nsm/gfx/opengl.h>
 #include <nsm/event/events.h>
 #include <nsm/entity/component/drawablecomponent.h>
+#include <nsm/entity/component/cameracomponent.h>
+#include <nsm/gfx/layer.h>
 
 std::deque<const nsm::Event*> nsm::Application::sEventQueue;
 
@@ -57,17 +59,15 @@ void nsm::Application::raiseEvent(const Event* event) {
 }
 
 void nsm::Application::intermoduleDataTransfer() {
-    std::vector<Entity*> entities = mScene.getEntities();
-    std::vector<DrawableComponent*> drawables;
-
-    for (auto& entity : entities) {
-        std::span<DrawableComponent*> drawableComponents = entity->getComponents<DrawableComponent>();
-        for (auto& drawable : drawableComponents) {
-            drawables.push_back(drawable);
+    const std::vector<Entity*>& entities = mScene.getEntities();
+    
+    for (auto entity : entities) {        
+        for (auto drawableComponent : entity->getComponents<nsm::DrawableComponent>()) {
+            mGraphics.pushDrawable(drawableComponent);
         }
-    }
-
-    for (auto& drawable : drawables) {
-        mGraphics.pushDrawable(drawable);
+    
+        for (auto cameraComponent : entity->getComponents<nsm::CameraComponent>()) {
+            mGraphics.getLayerStack().getLayer(cameraComponent->getTargetLayerHash())->setCamera(cameraComponent);
+        }
     }
 }

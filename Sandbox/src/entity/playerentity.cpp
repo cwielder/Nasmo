@@ -7,6 +7,8 @@
 #include <nsm/gfx/indexbuffer.h>
 #include <nsm/gfx/shader.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <nsm/gfx/renderinfo.h>
+#include <nsm/entity/component/cameracomponent.h>
 
 class RenderTestComponent : public nsm::DrawableComponent {
 public:
@@ -33,19 +35,15 @@ public:
 
         mVertexArray.linkBuffer(mVertexBuffer);
         mVertexArray.linkIndices(mIndexBuffer);
-
-        mViewProjMtx = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f) * glm::lookAt(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     }
 
     void draw(const nsm::RenderInfo& renderInfo) override {
-        nsm::info("Drawing RenderTestComponent");
-
-        mModelMtx = glm::mat4(1.0f);
-        mModelMtx = glm::translate(mModelMtx, glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f)) * glm::rotate(glm::mat4(1.0f), glm::radians(mRotation), glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 modelMtx = glm::mat4(1.0f);
+        modelMtx = glm::translate(modelMtx, glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f)) * glm::rotate(glm::mat4(1.0f), glm::radians(mRotation), glm::vec3(0.0f, 0.0f, 1.0f));
 
         mShader.bind();
-        mShader.setMat4("uModelMtx", mModelMtx);
-        mShader.setMat4("uViewProj", mViewProjMtx);
+        mShader.setMat4("uModelMtx", modelMtx);
+        mShader.setMat4("uViewProj", renderInfo.camera->getViewProjection());
         mVertexArray.bind();
         mIndexBuffer.bind();
         glDrawElements(GL_TRIANGLES, mIndexBuffer.getCount(), GL_UNSIGNED_INT, nullptr);
@@ -56,8 +54,6 @@ public:
     nsm::IndexBuffer mIndexBuffer;
     nsm::VertexArray mVertexArray;
     nsm::ShaderProgram mShader;
-    glm::mat4 mModelMtx;
-    glm::mat4 mViewProjMtx;
 };
 
 class PlayerEntity : public nsm::Entity {
@@ -73,12 +69,6 @@ public:
     void onUpdate(const f32 timeStep) override {
         RenderTestComponent* renderer = static_cast<RenderTestComponent*>(this->getComponents<nsm::DrawableComponent>()[0]);
         renderer->mRotation += 20.0f * timeStep;
-    }
-
-    void onEvent(const nsm::Event* event) override {
-        if (event->getType() == nsm::EventType::WindowResize) {
-            nsm::error("resize event");
-        }
     }
 };
 

@@ -1,6 +1,12 @@
 {
     "entities": [
         {
+            "type": "CameraEntity",
+            "properties": {
+                "position": [0.0, 0.0, -1.0]
+            }
+        },
+        {
             "type": "PlayerEntity",
             "properties": {
                 "position": [0.0, -0.9, 0.0]

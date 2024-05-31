@@ -1,6 +1,7 @@
 #include <nsm/entity/component/cameracomponent.h>
 
 #include <nsm/gfx/graphics.h>
+#include <nsm/event/events.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -35,4 +36,13 @@ void nsm::OrthographicCameraComponent::setProjection(const f32 top, const f32 bo
     mProjection = glm::ortho(left, right, bottom, top, near, far);
 
     mIsDirty = true;
+}
+
+void nsm::OrthographicCameraComponent::onEvent(const Event* event) {
+    if (event->getType() == nsm::EventType::WindowResize) {
+        const nsm::WindowResizeEvent* e = static_cast<const nsm::WindowResizeEvent*>(event);
+
+        const f32 aspectRatio = static_cast<f32>(e->getSize().x) / static_cast<f32>(e->getSize().y);
+        this->setProjection(1.0f, -1.0f, aspectRatio, -aspectRatio, -1.0f, 1.0f);
+    }
 }

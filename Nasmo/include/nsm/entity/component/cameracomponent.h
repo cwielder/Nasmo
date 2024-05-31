@@ -27,6 +27,8 @@ namespace nsm {
 
         [[nodiscard]] glm::vec3 unProject(const glm::vec2& screenPos) const;
 
+        void onEvent(const Event* event) override = 0;
+
     protected:
         glm::mat4 mProjection, mView, mViewProjection;
         glm::vec3 mPosition;
@@ -40,6 +42,8 @@ namespace nsm {
         ~OrthographicCameraComponent() override = default;
 
         void setProjection(const f32 top, const f32 bottom, const f32 left, const f32 right, const f32 near, const f32 far);
+
+        void onEvent(const Event* event) override;
     };
 
     // TODO: Implement PerspectiveCameraComponent
