@@ -5,20 +5,20 @@
 // VertexBuffer::Attribute
 
 nsm::VertexBuffer::Attribute::Attribute(const u32 location, const u32 count, const DataType type, const u32 offset, const bool normalized)
-    : location_(location)
-    , count_(count)
-    , type_(static_cast<u32>(type))
-    , offset_(offset)
-    , normalized_(normalized)
+    : mLocation(location)
+    , mCount(count)
+    , mType(static_cast<u32>(type))
+    , mOffset(offset)
+    , mNormalized(normalized)
 { }
 
 void nsm::VertexBuffer::Attribute::bind(const u32 stride) const {
-    glEnableVertexAttribArray(this->location_);
-    glVertexAttribPointer(this->location_, this->count_, this->type_, this->normalized_, stride, reinterpret_cast<void*>(static_cast<u64>(this->offset_)));
+    glEnableVertexAttribArray(mLocation);
+    glVertexAttribPointer(mLocation, mCount, mType, mNormalized, stride, reinterpret_cast<void*>(static_cast<u64>(mOffset)));
 }
 
 void nsm::VertexBuffer::Attribute::unbind() const {
-    glDisableVertexAttribArray(this->location_);
+    glDisableVertexAttribArray(mLocation);
 }
 
 // VertexBuffer

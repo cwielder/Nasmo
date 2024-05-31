@@ -34,8 +34,11 @@ namespace nsm {
             void bind(const u32 stride) const;
             void unbind() const;
 
-            u32 location_, count_, type_, offset_;
-            bool normalized_;
+            u32 mLocation;
+            u32 mCount;
+            u32 mType;
+            u32 mOffset;
+            bool mNormalized;
         };
 
     public:
