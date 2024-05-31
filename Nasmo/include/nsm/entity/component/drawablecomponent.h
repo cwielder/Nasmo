@@ -4,7 +4,7 @@
 
 namespace nsm {
 
-    class RenderInfo;
+    struct RenderInfo;
 
     class DrawableComponent : public EntityComponent {
     public:
