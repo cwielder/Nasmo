@@ -12,12 +12,12 @@ namespace nsm {
 
         IndexBuffer();
 
-        void init(const u32* data, const u32 size, const BufferUsage usage);
 
     public:
         IndexBuffer(const u32* data, const u32 size, const BufferUsage usage = BufferUsage::StaticDraw);
         ~IndexBuffer();
 
+        void init(const u32* data, const u32 size, const BufferUsage usage = BufferUsage::StaticDraw);
         void bind() const;
 
         [[nodiscard]] u32 getCount() const { return mCount; }

@@ -1,5 +1,7 @@
 #include <nsm/gfx/vertexbuffer.h>
 
+#include <nsm/debug/log.h>
+
 // VertexBuffer::Attribute
 
 nsm::VertexBuffer::Attribute::Attribute(const u32 location, const u32 count, const DataType type, const u32 offset, const bool normalized)
@@ -32,14 +34,11 @@ nsm::VertexBuffer::VertexBuffer(const void* data, const u32 size, const u32 stri
     , mStride(stride)
     , mAttributes()
 {
-    glGenBuffers(1, &mId);
-    glBindBuffer(GL_ARRAY_BUFFER, mId);
-    glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<GLenum>(usage));
-
-    mAttributes.reserve(8);
+    this->init(data, size, stride, usage);
 }
 
 nsm::VertexBuffer::~VertexBuffer() {
+    nsm::trace("Deleting vertex buffer with id: ", mId);
     glDeleteBuffers(1, &mId);
 }
 
@@ -51,6 +50,8 @@ void nsm::VertexBuffer::init(const void* data, const u32 size, const u32 stride,
     glBufferData(GL_ARRAY_BUFFER, size, data, static_cast<GLenum>(usage));
 
     mAttributes.reserve(8);
+
+    nsm::trace("Creating vertex buffer with id: ", mId);
 }
 
 void nsm::VertexBuffer::subData(const void* data, const u32 size, const u32 offset) {
@@ -72,16 +73,6 @@ void nsm::VertexBuffer::unbind() const {
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-}
-
-void nsm::VertexBuffer::markAttribute(const u32 count, const DataType type, const bool normalized) {
-    u32 offset = 0;
-
-    for (const auto& attribute : mAttributes) {
-        offset += (attribute.count_ * attribute.type_);
-    }
-
-    mAttributes.emplace_back(VertexBuffer::Attribute(static_cast<u32>(mAttributes.size()), count, type, offset, normalized));
 }
 
 void nsm::VertexBuffer::markAttribute(const u32 location, const u32 count, const DataType type, const u32 offset, const bool normalized) {

@@ -40,3 +40,16 @@ static_assert(sizeof(f64) == 8, "f64 is not 8 bytes");
 #define NSM_TOKENPASTE_(x, y) x ## y
 #define NSM_CONCAT(x, y) NSM_TOKENPASTE_(x, y)
 #define NSM_FILENAME (std::strrchr(__FILE__, '\\') ? std::strrchr(__FILE__, '\\') + 1 : __FILE__)
+
+#define NSM_NO_COPY(type) \
+    type(const type&) = delete; \
+    type& operator=(const type&) = delete
+
+#define NSM_NO_MOVE(type) \
+    type(type&&) = delete; \
+    type& operator=(type&&) = delete
+
+#define NSM_NO_COPY_OR_MOVE(type) \
+    NSM_NO_COPY(type); \
+    NSM_NO_MOVE(type)
+

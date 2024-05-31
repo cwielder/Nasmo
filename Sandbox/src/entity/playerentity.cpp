@@ -8,11 +8,11 @@ public:
     ~PlayerEntity() override = default;
 
     void onCreate() override {
-        nsm::warn("PlayerEntity onCreate");
+        
     }
 
     void onUpdate(const f32 timeStep) override {
-        nsm::warn("PlayerEntity onUpdate");
+        
     }
 
     void onEvent(const nsm::Event* event) override {

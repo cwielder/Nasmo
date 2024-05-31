@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nsm/common.h>
 #include <nsm/debug/log.h>
 
 #ifdef NSM_DEBUG

@@ -8,6 +8,8 @@
 namespace nsm {
 
     class Event;
+    class LayerStack;
+    class DrawableComponent;
 
     class Graphics final {
     public:
@@ -22,15 +24,15 @@ namespace nsm {
         [[nodiscard]] bool update();
         void onEvent(const Event* event);
 
-        //void pushDrawable(DrawableComponent* drawable, const std::size_t layerHash);
+        void pushDrawable(DrawableComponent* drawable, const std::size_t layerHash);
 
         [[nodiscard]] f32 getTimeStep() const { return mTimeStep; }
-        //[[nodiscard]] LayerStack& getLayerStack() { return *mLayerStack; }
+        [[nodiscard]] LayerStack& getLayerStack() { return *mLayerStack; }
 
         static glm::u32vec2 getFramebufferSize();
 
     private:
-        //LayerStack* mLayerStack;
+        LayerStack* mLayerStack;
         nsm::Window mWindow;
         f32 mTimeStep, mFrameTime, mLastFrameTime;
     };

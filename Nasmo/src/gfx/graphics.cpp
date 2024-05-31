@@ -3,6 +3,9 @@
 #include <nsm/gfx/opengl.h>
 #include <nsm/debug/log.h>
 #include <nsm/event/events.h>
+#include <nsm/gfx/texture.h>
+#include <nsm/gfx/layer.h>
+#include <nsm/gfx/primitiveshape.h>
 
 #include <glm/common.hpp>
 
@@ -42,10 +45,17 @@ nsm::Graphics::Graphics(const GraphicsInfo& info)
         glEnable(GL_DEBUG_OUTPUT);
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     #endif
+
+    PrimitiveShape::init();
+
+    mLayerStack = new nsm::LayerStack(info.window.size);
 }
 
 nsm::Graphics::~Graphics() {
-    //delete mLayerStack;
+    delete mLayerStack;
+
+    Texture::clearCache();
+    PrimitiveShape::destroy();
 }
 
 bool nsm::Graphics::update() {
@@ -59,7 +69,7 @@ bool nsm::Graphics::update() {
 	mTimeStep = glm::min(mFrameTime, 0.0333f);
 	mLastFrameTime = time;
 
-    //mLayerStack->drawLayers();
+    mLayerStack->drawLayers();
 
     return !glfwWindowShouldClose(window);
 }
@@ -68,5 +78,12 @@ void nsm::Graphics::onEvent(const Event* event) {
     if (event->getType() == nsm::EventType::WindowResize) {
         const WindowResizeEvent* e = static_cast<const WindowResizeEvent*>(event);
         mWindow.setViewport(e->getSize());
+        mLayerStack->resize(e->getSize());
     }
+}
+
+glm::u32vec2 nsm::Graphics::getFramebufferSize() {
+    glm::ivec2 size;
+    glfwGetFramebufferSize(glfwGetCurrentContext(), &size.x, &size.y);
+    return size;
 }

@@ -24,6 +24,7 @@ project "Nasmo"
         "vendor/glad/include",
         "vendor/glm",
         "vendor/simdjson/include",
+        "vendor/"
     }
 
     libdirs {

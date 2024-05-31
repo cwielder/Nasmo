@@ -1,6 +1,7 @@
 #include <nsm/gfx/indexbuffer.h>
 
 #include <nsm/gfx/opengl.h>
+#include <nsm/debug/log.h>
 
 nsm::IndexBuffer::IndexBuffer()
     : mId(GL_NONE)
@@ -11,22 +12,22 @@ nsm::IndexBuffer::IndexBuffer(const u32* data, const u32 size, const BufferUsage
     : mId(GL_NONE)
     , mCount(size / sizeof(u32))
 {
-    glCreateBuffers(1, &mId);
-
-    glNamedBufferData(mId, size, data, static_cast<GLenum>(usage));
+    this->init(data, size, usage);
 }
 
 nsm::IndexBuffer::~IndexBuffer() {
+    nsm::trace("Deleting index buffer with id: ", mId);
     glDeleteBuffers(1, &mId);
 }
 
 void nsm::IndexBuffer::init(const u32* data, const u32 size, const BufferUsage usage) {
     glCreateBuffers(1, &mId);
+    nsm::trace("Creating index buffer with id: ", mId);
 
     glNamedBufferData(mId, size, data, static_cast<GLenum>(usage));
 
     mCount = size / sizeof(u32);
- }
+}
 
 void nsm::IndexBuffer::bind() const {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mId);

@@ -10,3 +10,6 @@
 [submodule "Nasmo/vendor/simdjson"]
 	path = Nasmo/vendor/simdjson
 	url = https://github.com/Lumis-Submodules/simdjson
+[submodule "Nasmo/vendor/stb"]
+	path = Nasmo/vendor/stb
+	url = https://github.com/nothings/stb

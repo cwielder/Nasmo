@@ -8,6 +8,8 @@ namespace nsm {
     class IndexBuffer;
 
     class VertexArray final {
+        NSM_NO_COPY(VertexArray);
+
     public:
         VertexArray();
         ~VertexArray();

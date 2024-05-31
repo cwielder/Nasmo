@@ -51,7 +51,6 @@ namespace nsm {
         void bind() const;
         void unbind() const;
 
-        void markAttribute(const u32 count, const DataType type, const bool normalized = false);
         void markAttribute(const u32 location, const u32 count, const DataType type, const u32 offset, const bool normalized = false);
     
     private:
