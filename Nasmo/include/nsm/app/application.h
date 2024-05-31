@@ -49,9 +49,11 @@ namespace nsm {
         static std::deque<const Event*> sEventQueue;
 
         void run();
+        void intermoduleDataTransfer();
         void handleEvents();
         void onEventInternal(const Event* event);
 
+    protected:
         nsm::Graphics mGraphics;
         nsm::Scene mScene;
     };

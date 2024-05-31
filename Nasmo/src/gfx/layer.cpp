@@ -81,8 +81,6 @@ nsm::Layer* nsm::LayerStack::getLayer(const std::size_t hash) {
 }
 
 void nsm::LayerStack::resize(const glm::u32vec2& size) {
-    glViewport(0, 0, size.x, size.y);
-
     mFramebuffer.resize(size);
 
     for (auto& [hash, layer] : mLayers) {
@@ -90,13 +88,13 @@ void nsm::LayerStack::resize(const glm::u32vec2& size) {
     }
 }
 
-void nsm::LayerStack::pushDrawable(DrawableComponent* drawable, const std::size_t layerHash) {
-    auto it = this->getLayerIterator(layerHash);
+void nsm::LayerStack::pushDrawable(DrawableComponent* drawable) {
+    auto it = this->getLayerIterator(drawable->getTargetLayerHash());
 
     if (it != mLayers.end()) {
         it->second->mDrawables.push_back(drawable);
     } else {
-        nsm::warn("Unable to push drawable to nonexistent layer: ", layerHash);
+        nsm::warn("Unable to push drawable to nonexistent layer: ", drawable->getTargetLayerHash());
     }
 }
 
@@ -105,7 +103,7 @@ void nsm::LayerStack::drawLayers() const {
     Framebuffer::getBackbuffer()->clear(glm::f32vec4{ 1.0f }, Framebuffer::Type::Depth);
 
     mFramebuffer.bind();
-    mFramebuffer.clear(glm::f32vec4{ 1.0f }, Framebuffer::Type::Color);
+    mFramebuffer.clear(glm::f32vec4{ 0.0f }, Framebuffer::Type::Color);
     mFramebuffer.clear(glm::f32vec4{ 1.0f }, Framebuffer::Type::Depth);
 
     for (const auto& [hash, layer] : mLayers) {

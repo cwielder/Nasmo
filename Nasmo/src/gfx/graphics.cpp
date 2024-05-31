@@ -6,6 +6,7 @@
 #include <nsm/gfx/texture.h>
 #include <nsm/gfx/layer.h>
 #include <nsm/gfx/primitiveshape.h>
+#include <nsm/entity/component/drawablecomponent.h>
 
 #include <glm/common.hpp>
 
@@ -80,6 +81,10 @@ void nsm::Graphics::onEvent(const Event* event) {
         mWindow.setViewport(e->getSize());
         mLayerStack->resize(e->getSize());
     }
+}
+
+void nsm::Graphics::pushDrawable(nsm::DrawableComponent* drawable) {
+    mLayerStack->pushDrawable(drawable);
 }
 
 glm::u32vec2 nsm::Graphics::getFramebufferSize() {

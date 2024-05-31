@@ -61,7 +61,7 @@ namespace nsm {
 
         void resize(const glm::u32vec2& size);
 
-        void pushDrawable(DrawableComponent* drawable, const std::size_t layerHash);
+        void pushDrawable(DrawableComponent* drawable);
 
         void drawLayers() const;
 

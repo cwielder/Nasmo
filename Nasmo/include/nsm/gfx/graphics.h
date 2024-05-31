@@ -24,7 +24,7 @@ namespace nsm {
         [[nodiscard]] bool update();
         void onEvent(const Event* event);
 
-        void pushDrawable(DrawableComponent* drawable, const std::size_t layerHash);
+        void pushDrawable(DrawableComponent* drawable);
 
         [[nodiscard]] f32 getTimeStep() const { return mTimeStep; }
         [[nodiscard]] LayerStack& getLayerStack() { return *mLayerStack; }

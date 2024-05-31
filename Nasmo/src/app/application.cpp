@@ -2,6 +2,7 @@
 
 #include <nsm/gfx/opengl.h>
 #include <nsm/event/events.h>
+#include <nsm/entity/component/drawablecomponent.h>
 
 std::deque<const nsm::Event*> nsm::Application::sEventQueue;
 
@@ -18,7 +19,7 @@ nsm::Application::~Application() { }
 #include <nsm/gfx/indexbuffer.h>
 
 void nsm::Application::run() {
-    //this->intermoduleDataTransfer();
+    this->intermoduleDataTransfer();
 
     do { // Main loop
         const f32 ts = mGraphics.getTimeStep();
@@ -28,7 +29,7 @@ void nsm::Application::run() {
 
         mScene.update(ts);
 
-        //this->intermoduleDataTransfer();
+        this->intermoduleDataTransfer();
     } while (mGraphics.update());
 }
 
@@ -53,4 +54,20 @@ void nsm::Application::onEventInternal(const Event* event) {
 
 void nsm::Application::raiseEvent(const Event* event) {
     sEventQueue.push_back(event);
+}
+
+void nsm::Application::intermoduleDataTransfer() {
+    std::vector<Entity*> entities = mScene.getEntities();
+    std::vector<DrawableComponent*> drawables;
+
+    for (auto& entity : entities) {
+        std::span<DrawableComponent*> drawableComponents = entity->getComponents<DrawableComponent>();
+        for (auto& drawable : drawableComponents) {
+            drawables.push_back(drawable);
+        }
+    }
+
+    for (auto& drawable : drawables) {
+        mGraphics.pushDrawable(drawable);
+    }
 }

@@ -20,7 +20,7 @@ namespace nsm {
         void switchScene(const std::string& path);
         Entity* spawnEntity(const std::string_view type, const std::string& propertiesJson);
 
-        const std::vector<Entity*>& getEntities() const { return mEntities; }
+        [[nodiscard]] const std::vector<Entity*>& getEntities() const { return mEntities; }
 
         [[nodiscard]] const std::string& getPath() const { return mPath; }
 
