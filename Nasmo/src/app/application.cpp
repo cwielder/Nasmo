@@ -59,15 +59,7 @@ void nsm::Application::raiseEvent(const Event* event) {
 }
 
 void nsm::Application::intermoduleDataTransfer() {
-    const std::vector<Entity*>& entities = mScene.getEntities();
-    
-    for (auto entity : entities) {        
-        for (auto drawableComponent : entity->getComponents<nsm::DrawableComponent>()) {
-            mGraphics.pushDrawable(drawableComponent);
-        }
-    
-        for (auto cameraComponent : entity->getComponents<nsm::CameraComponent>()) {
-            mGraphics.getLayerStack().getLayer(cameraComponent->getTargetLayerHash())->setCamera(cameraComponent);
-        }
-    }
+    mGraphics.transferData(*this, mScene.getEntities());
+
+    this->onSystemTransferData();
 }

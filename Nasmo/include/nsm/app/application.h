@@ -40,8 +40,12 @@ namespace nsm {
 
         virtual void onUpdate(const f32 timeStep) { }
         virtual void onEvent(const Event* event) { }
+        virtual void onSystemTransferData() { }
 
         static void raiseEvent(const Event* event);
+
+        nsm::Scene& getScene() { return mScene; }
+        nsm::Graphics& getGraphics() { return mGraphics; }
 
     private:
         friend int ::main(int argc, char** argv);

@@ -7,6 +7,8 @@
 #include <nsm/gfx/layer.h>
 #include <nsm/gfx/primitiveshape.h>
 #include <nsm/entity/component/drawablecomponent.h>
+#include <nsm/entity/component/cameracomponent.h>
+#include <nsm/app/application.h>
 
 #include <glm/common.hpp>
 
@@ -85,6 +87,18 @@ void nsm::Graphics::onEvent(const Event* event) {
 
 void nsm::Graphics::pushDrawable(nsm::DrawableComponent* drawable) {
     mLayerStack->pushDrawable(drawable);
+}
+
+void nsm::Graphics::transferData(Application& app, const std::vector<Entity*>& entities) {    
+    for (auto entity : entities) {        
+        for (auto drawableComponent : entity->getComponents<nsm::DrawableComponent>()) {
+            this->pushDrawable(drawableComponent);
+        }
+    
+        for (auto cameraComponent : entity->getComponents<nsm::CameraComponent>()) {
+            this->getLayerStack().getLayer(cameraComponent->getTargetLayerHash())->setCamera(cameraComponent);
+        }
+    }
 }
 
 glm::u32vec2 nsm::Graphics::getFramebufferSize() {

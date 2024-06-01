@@ -2,6 +2,7 @@
 
 #include <nsm/common.h>
 #include <nsm/gfx/window.h>
+#include <nsm/app/system.h>
 
 #include <glm/vec2.hpp>
 
@@ -11,7 +12,7 @@ namespace nsm {
     class LayerStack;
     class DrawableComponent;
 
-    class Graphics final {
+    class Graphics final : public System {
     public:
         struct GraphicsInfo {
             nsm::Window::WindowInfo window;
@@ -25,6 +26,8 @@ namespace nsm {
         void onEvent(const Event* event);
 
         void pushDrawable(DrawableComponent* drawable);
+
+        void transferData(Application& app, const std::vector<Entity*>& entities) override;
 
         [[nodiscard]] f32 getTimeStep() const { return mTimeStep; }
         [[nodiscard]] LayerStack& getLayerStack() { return *mLayerStack; }
