@@ -39,7 +39,7 @@ public:
 
     void draw(const nsm::RenderInfo& renderInfo) override {
         glm::mat4 modelMtx = glm::mat4(1.0f);
-        modelMtx = glm::translate(modelMtx, glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f)) * glm::rotate(glm::mat4(1.0f), glm::radians(mRotation), glm::vec3(0.0f, 0.0f, 1.0f));
+        modelMtx = glm::translate(modelMtx, glm::vec3(0.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f, 0.5f, 0.5f)) * glm::rotate(glm::mat4(1.0f), glm::radians(mRotation), glm::vec3(1.0f, 0.0f, 0.0f));
 
         mShader.bind();
         mShader.setMat4("uModelMtx", modelMtx);

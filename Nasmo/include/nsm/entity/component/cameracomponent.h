@@ -44,8 +44,24 @@ namespace nsm {
         void setProjection(const f32 top, const f32 bottom, const f32 left, const f32 right, const f32 near, const f32 far);
 
         void onEvent(const Event* event) override;
+
+    private:
+        f32 mTop, mBottom;
+        f32 mNear, mFar;
     };
 
-    // TODO: Implement PerspectiveCameraComponent
+    class PerspectiveCameraComponent final : public CameraComponent {
+    public:
+        PerspectiveCameraComponent(const glm::vec3& position, const glm::vec3& lookTarget, const glm::vec3& up, const f32 fov, const f32 aspectRatio, const f32 near, const f32 far);
+        ~PerspectiveCameraComponent() override = default;
+
+        void setProjection(const f32 fov, const f32 aspectRatio, const f32 near, const f32 far);
+
+        void onEvent(const Event* event) override;
+
+    private:
+        f32 mFov;
+        f32 mNear, mFar;
+    };
 
 }

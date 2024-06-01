@@ -15,11 +15,14 @@ public:
     void onCreate() override {
         const f32 aspectRatio = static_cast<f32>(nsm::Graphics::getFramebufferSize().x) / nsm::Graphics::getFramebufferSize().y;
 
-        nsm::CameraComponent* cameraComponent = new nsm::OrthographicCameraComponent(
+        nsm::CameraComponent* cameraComponent = new nsm::PerspectiveCameraComponent(
             mPosition,
             glm::vec3(0.0f, 0.0f, 1.0f),
             glm::vec3(0.0f, 1.0f, 0.0f),
-            1.0f, -1.0f, aspectRatio, -aspectRatio, -1.0f, 1.0f
+            45.0f,
+            aspectRatio,
+            0.01f,
+            1000.0f
         );
         cameraComponent->setTargetLayer("main");
 
