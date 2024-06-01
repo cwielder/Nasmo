@@ -26,7 +26,7 @@ namespace nsm {
 
         class Registry {
         public:
-            using entityFactory = Entity* (*)(const Entity::Properties& properties);
+            using entityFactory = Entity* (*)(Entity::Properties& properties);
         
             Registry() = default;
             Registry(entityFactory factory, const std::string& identifier);
@@ -47,7 +47,7 @@ namespace nsm {
         class RegisterEntity : public Registry {
         public:
             RegisterEntity(const std::string& identifier)
-                : Registry([](const Entity::Properties& properties) -> Entity* {
+                : Registry([](Entity::Properties& properties) -> Entity* {
                     return new T(properties);
                 }, identifier)
             { }

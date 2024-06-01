@@ -3,7 +3,7 @@
 #include <nsm/debug/assert.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
+#include <stb_image.h>
 
 std::unordered_map<std::string, std::tuple<u8*, glm::u32vec2, u32>> nsm::Texture::sCache;
 

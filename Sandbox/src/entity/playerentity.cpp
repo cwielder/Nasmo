@@ -58,7 +58,7 @@ public:
 
 class PlayerEntity : public nsm::Entity {
 public:
-    PlayerEntity(const nsm::Entity::Properties&) { }
+    PlayerEntity(nsm::Entity::Properties&) { }
     ~PlayerEntity() override = default;
 
     void onCreate() override {

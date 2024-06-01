@@ -2,11 +2,12 @@
 #include <nsm/entity/component/cameracomponent.h>
 #include <nsm/gfx/graphics.h>
 #include <nsm/debug/log.h>
+#include <nsm/util/jsonhelpers.h>
 
 class CameraEntity : public nsm::Entity {
 public:
-    CameraEntity(const nsm::Entity::Properties&)
-        : mPosition() // TODO: Set position from properties
+    CameraEntity(nsm::Entity::Properties& properties)
+        : mPosition(nsm::JsonHelpers::getVec3(properties, "position"))
     { }
 
     ~CameraEntity() override = default;
