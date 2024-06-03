@@ -88,11 +88,11 @@ nsm::Material::Material(const std::string& path)
     for (auto it : textures) {
         auto texObj = it.get_object();
 
-        const std::string path = std::string{texObj["path"].get_string().value()};
+        const std::string texPath = std::string{texObj["path"].get_string().value()};
         const Texture::FilterMode filter = getFilterMode(std::string{texObj["filter"].get_string().value()});
         const bool srgb = texObj["srgb"].get_bool().value();
 
-        mTextures.emplace_back(path, srgb, filter);
+        mTextures.emplace_back(texPath, srgb, filter);
     }
 
     auto uniforms = doc["uniforms"].get_array();
