@@ -4,7 +4,7 @@
     "fsh": "skull.fsh",
     "textures": [
         {
-            "path": "skull.png",
+            "path": "skull.jpg",
             "filter": "linear",
             "srgb": true
         }

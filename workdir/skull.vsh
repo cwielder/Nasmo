@@ -6,14 +6,20 @@ layout (location = 2) in vec3 aColor;
 layout (location = 3) in vec3 aNormal;
 
 out vec2 vTexCoord;
+out vec3 vNormal;
 
 uniform mat4 uViewProjMtx;
 
+struct InstanceStruct {
+    mat4 modelMtx;
+};
+
 layout (std430, binding = 0) buffer InstanceData {
-    mat4 uModelMtx[];
+    InstanceStruct data[];
 } instanceData;
 
 void main() {
     vTexCoord = aTexCoord;
-    gl_Position = uViewProjMtx * instanceData.uModelMtx[gl_InstanceID] * vec4(aPos, 1.0);
+    vNormal = aNormal;
+    gl_Position = uViewProjMtx * instanceData.data[gl_InstanceID].modelMtx * vec4(aPos, 1.0);
 }

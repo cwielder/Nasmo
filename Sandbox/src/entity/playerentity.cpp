@@ -26,9 +26,9 @@ public:
     }
 
     void onUpdate(const f32 timeStep) override {
-        mRotation.y += timeStep;
+        mRotation.x += timeStep;
 
-        mModelData.transform = glm::rotate(glm::mat4(1.0f), mRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        mModelData.transform = glm::rotate(glm::mat4(1.0f), mRotation.x, glm::vec3(1.0f, 2.0f, 0.0f));
 
         nsm::ModelComponent* modelComponent = static_cast<nsm::ModelComponent*>(this->getComponents<nsm::DrawableComponent>()[0]);
         modelComponent->setInstanceDataDirty("skull");
