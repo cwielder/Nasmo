@@ -45,7 +45,7 @@ nsm::Model::Model(const std::string& path)
         vertexVector.push_back(v);
     }
 
-    mVertexBuffer.init(vertexVector.data(), vertexVector.size(), sizeof(Vertex), nsm::BufferUsage::StaticDraw);
+    mVertexBuffer.init(vertexVector.data(), vertexVector.size() * sizeof(Vertex), sizeof(Vertex), nsm::BufferUsage::StaticDraw);
     mVertexBuffer.markAttribute(0, 3, VertexBuffer::DataType::Float, 0 * sizeof(f32), false);
     mVertexBuffer.markAttribute(1, 2, VertexBuffer::DataType::Float, 3 * sizeof(f32), false);
     mVertexBuffer.markAttribute(2, 3, VertexBuffer::DataType::Float, 5 * sizeof(f32), false);
@@ -137,7 +137,7 @@ void nsm::Model::setInstanceData(const std::string& meshName, void* data, const 
 nsm::Model::Mesh::Mesh(std::string_view material, const std::vector<u32>& indices, const VertexBuffer& vertexBuffer)
     : mMaterial(Material::get(std::string{material}))
     , mVertexArray()
-    , mIndexBuffer(indices.data(), indices.size(), nsm::BufferUsage::StaticDraw)
+    , mIndexBuffer(indices.data(), indices.size() * sizeof(u32), nsm::BufferUsage::StaticDraw)
     , mInstanceDataBuffer(nullptr)
     , mInstanceDataBufferEntrySize(0)
     , mInstanceDataDirty(false)
