@@ -6,13 +6,12 @@
 namespace nsm {
 
     class ShaderStorage {
+        NSM_NO_COPY(ShaderStorage);
+
     public:
         ShaderStorage();
         ShaderStorage(const std::size_t size, const void* data, const BufferUsage usage = BufferUsage::DynamicDraw);
         ~ShaderStorage();
-
-        ShaderStorage(const ShaderStorage&) = delete;
-        ShaderStorage& operator=(const ShaderStorage&) = delete;
 
         ShaderStorage(ShaderStorage&& other) noexcept
             : mId(other.mId)

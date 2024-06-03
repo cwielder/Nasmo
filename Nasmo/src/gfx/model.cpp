@@ -9,6 +9,7 @@ nsm::Model::Model(const std::string& path)
     : mPath(path)
     , mMeshes()
     , mInstanceIDs()
+    , mVertexBuffer()
 {
     simdjson::ondemand::parser parser;
     simdjson::padded_string json = simdjson::padded_string::load(path);
@@ -23,33 +24,19 @@ nsm::Model::Model(const std::string& path)
 
         auto vertexObject = vertex.get_object();
 
-        const glm::vec3 position = JsonHelpers::getVec3(vertexObject, "position");
-        v.posX = position.x;
-        v.posY = position.y;
-        v.posZ = position.z;
-
-        const glm::vec2 texCoord = JsonHelpers::getVec2(vertexObject, "texcoord");
-        v.texU = texCoord.x;
-        v.texV = texCoord.y;
-
-        const glm::vec3 color = JsonHelpers::getVec3(vertexObject, "color");
-        v.colR = color.r;
-        v.colG = color.g;
-        v.colB = color.b;
-
-        const glm::vec3 normal = JsonHelpers::getVec3(vertexObject, "normal");
-        v.nmlX = normal.x;
-        v.nmlY = normal.y;
-        v.nmlZ = normal.z;
+        v.position = JsonHelpers::getVec3(vertexObject, "position");
+        v.uv = JsonHelpers::getVec2(vertexObject, "texcoord");
+        v.color = JsonHelpers::getVec3(vertexObject, "color");
+        v.normal = JsonHelpers::getVec3(vertexObject, "normal");
 
         vertexVector.push_back(v);
     }
 
     mVertexBuffer.init(vertexVector.data(), vertexVector.size() * sizeof(Vertex), sizeof(Vertex), nsm::BufferUsage::StaticDraw);
-    mVertexBuffer.markAttribute(0, 3, VertexBuffer::DataType::Float, 0 * sizeof(f32), false);
-    mVertexBuffer.markAttribute(1, 2, VertexBuffer::DataType::Float, 3 * sizeof(f32), false);
-    mVertexBuffer.markAttribute(2, 3, VertexBuffer::DataType::Float, 5 * sizeof(f32), false);
-    mVertexBuffer.markAttribute(3, 3, VertexBuffer::DataType::Float, 8 * sizeof(f32), false);
+    mVertexBuffer.markAttribute(0, 3, VertexBuffer::DataType::Float, offsetof(Vertex, position), false);
+    mVertexBuffer.markAttribute(1, 2, VertexBuffer::DataType::Float, offsetof(Vertex, uv), false);
+    mVertexBuffer.markAttribute(2, 3, VertexBuffer::DataType::Float, offsetof(Vertex, color), false);
+    mVertexBuffer.markAttribute(3, 3, VertexBuffer::DataType::Float, offsetof(Vertex, normal), false);
 
     auto meshes = doc["meshes"].get_array();
 

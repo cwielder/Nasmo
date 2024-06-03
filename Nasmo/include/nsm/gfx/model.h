@@ -17,10 +17,10 @@ namespace nsm {
     class Model {
     public:
         struct Vertex {
-            f32 posX, posY, posZ;
-            f32 texU, texV;
-            f32 colR, colG, colB, colA;
-            f32 nmlX, nmlY, nmlZ;
+            glm::vec3 position;
+            glm::vec2 uv;
+            glm::vec3 color;
+            glm::vec3 normal;
         };
 
     public:

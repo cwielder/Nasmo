@@ -10,6 +10,8 @@
 namespace nsm {
 
     class VertexBuffer final {
+        NSM_NO_COPY(VertexBuffer);
+
     public:
         enum class DataType {
             Byte = GL_BYTE,
