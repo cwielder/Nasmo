@@ -62,21 +62,18 @@ namespace nsm {
         void addInstance(std::size_t* outID);
         void removeInstance(std::size_t id);
 
-        template <typename T>
-        void setInstanceData(const std::string& meshName, void* data, const std::size_t index) {
-            auto it = mMeshes.find(meshName);
-            if (it == mMeshes.end()) {
-                NSM_ASSERT(false, "Mesh ", meshName, " not found in model ", mPath);
-            }
-
-            Mesh& mesh = *it->second;
-            
-            mesh.setInstanceData(data, index);
-            mesh.setInstanceDataBufferEntrySize(sizeof(T)); // TODO: Move this to ModelComponent::setInstanceData so it only happens on init (and then make these non-templates)
-        }
+        void setInstanceData(const std::string& meshName, void* data, const std::size_t index);
 
         [[nodiscard]] const std::vector<std::size_t*>& getInstanceIDs() { return mInstanceIDs; }
         [[nodiscard]] const std::string& getPath() const { return mPath; }
+        [[nodiscard]] std::size_t getMeshCount() const { return mMeshes.size(); }
+        [[nodiscard]] Mesh* getMesh(const std::string& name) const {
+            auto it = mMeshes.find(name);
+            if (it == mMeshes.end()) {
+                NSM_ASSERT(false, "Mesh ", name, " not found in model ", mPath);
+            }
+            return it->second;
+        }
 
     private:
         std::string mPath;

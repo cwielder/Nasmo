@@ -101,7 +101,7 @@ void nsm::Model::drawTranslucent(const RenderInfo& renderInfo) {
 void nsm::Model::addInstance(std::size_t* outID) {
     *outID = mInstanceIDs.size();
     mInstanceIDs.push_back(outID);
-    
+
     for (auto& [name, mesh] : mMeshes) {
         mesh->growInstanceDataBuffer(mInstanceIDs.size());
     }
@@ -119,6 +119,17 @@ void nsm::Model::removeInstance(std::size_t id) {
     for (auto& [name, mesh] : mMeshes) {
         mesh->shrinkInstanceDataBuffer(mInstanceIDs.size(), id);
     }
+}
+
+void nsm::Model::setInstanceData(const std::string& meshName, void* data, const std::size_t index) {
+    auto it = mMeshes.find(meshName);
+    if (it == mMeshes.end()) {
+        NSM_ASSERT(false, "Mesh ", meshName, " not found in model ", mPath);
+    }
+
+    Mesh& mesh = *it->second;
+    
+    mesh.setInstanceData(data, index);
 }
 
 // Mesh
@@ -157,8 +168,14 @@ void nsm::Model::Mesh::draw(const RenderInfo& renderInfo, const std::vector<std:
 }
 
 void nsm::Model::Mesh::growInstanceDataBuffer(const std::size_t newSize) {
-    mInstanceDataBuffer = std::realloc(mInstanceDataBuffer, mInstanceDataBufferEntrySize * newSize);
     mInstanceDataDirty = true;
+
+    if (mInstanceDataBuffer == nullptr) {
+        mInstanceDataBuffer = std::malloc(mInstanceDataBufferEntrySize * newSize);
+        return;
+    }
+
+    mInstanceDataBuffer = std::realloc(mInstanceDataBuffer, mInstanceDataBufferEntrySize * newSize);
 }
 
 void nsm::Model::Mesh::shrinkInstanceDataBuffer(const std::size_t newSize, const std::size_t missingIndex) {
@@ -178,7 +195,9 @@ void nsm::Model::Mesh::shrinkInstanceDataBuffer(const std::size_t newSize, const
 }
 
 void nsm::Model::Mesh::setInstanceData(const void* data, const std::size_t index) {
-    std::cout << mInstanceDataBuffer << std::endl;
-    std::memcpy(static_cast<u8*>(mInstanceDataBuffer) + mInstanceDataBufferEntrySize * index, data, mInstanceDataBufferEntrySize);
+    NSM_ASSERT(mInstanceDataBuffer != nullptr, "Instance data buffer is null");
+    NSM_ASSERT(mInstanceDataBufferEntrySize > 0, "Instance data buffer entry size is 0");
+
+    std::memcpy(static_cast<u8*>(mInstanceDataBuffer) + (mInstanceDataBufferEntrySize * index), data, mInstanceDataBufferEntrySize);
     mInstanceDataDirty = true;
 }

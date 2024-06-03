@@ -2,7 +2,7 @@
 
 std::map<std::string, nsm::Model*> nsm::ModelComponent::sModels;
 
-nsm::ModelComponent::ModelComponent(const std::string& path, const std::string& layer)
+nsm::ModelComponent::ModelComponent(const std::string& path, const std::string& layer, const std::pair<std::string, std::size_t>* meshInstanceDataSizes)
     : mModel(nullptr)
     , mInstanceData()
 {
@@ -12,6 +12,11 @@ nsm::ModelComponent::ModelComponent(const std::string& path, const std::string& 
     }
     mModel = sModels[path];
 
+    for (int i = 0; i < mModel->getMeshCount(); i++) {
+        const auto& [meshName, instanceDataSize] = meshInstanceDataSizes[i];
+        
+        mModel->getMesh(meshName)->setInstanceDataBufferEntrySize(instanceDataSize);
+    }
     mModel->addInstance(&mInstanceID);
 
     this->setTargetLayer(layer);
@@ -25,4 +30,13 @@ nsm::ModelComponent::~ModelComponent() {
         delete (*it).second;
         sModels.erase(it);
     }
+}
+
+void nsm::ModelComponent::setInstanceDataDirty(const std::string& meshName) {
+    mModel->setInstanceData(meshName, mInstanceData[meshName], mInstanceID);
+}
+
+void nsm::ModelComponent::setInstanceData(const std::string& meshName, void* data) {
+    mInstanceData[meshName] = data;
+    mModel->setInstanceData(meshName, data, mInstanceID);
 }

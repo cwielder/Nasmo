@@ -16,8 +16,12 @@ public:
     void onCreate() override {
         mScale = glm::vec3(0.5f);
 
-        nsm::ModelComponent* modelComponent = new nsm::ModelComponent("skull.json", "main");
-        modelComponent->setInstanceData<ModelData>("skull", &mModelData);
+        const std::pair<std::string, std::size_t> meshInstanceDataSizes[] = {
+            { "skull", sizeof(ModelData) }
+        };
+
+        nsm::ModelComponent* modelComponent = new nsm::ModelComponent("skull.json", "main", meshInstanceDataSizes);
+        modelComponent->setInstanceData("skull", &mModelData);
         this->addComponent<nsm::DrawableComponent>(modelComponent);
     }
 
@@ -27,7 +31,7 @@ public:
         mModelData.transform = glm::rotate(glm::mat4(1.0f), mRotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
 
         nsm::ModelComponent* modelComponent = static_cast<nsm::ModelComponent*>(this->getComponents<nsm::DrawableComponent>()[0]);
-        modelComponent->setInstanceDataDirty<ModelData>("skull");
+        modelComponent->setInstanceDataDirty("skull");
     }
 
     glm::vec3 mPosition;
