@@ -10,7 +10,10 @@ class PlayerEntity : public nsm::Entity {
     };
 
 public:
-    PlayerEntity(nsm::Entity::Properties&) { }
+    PlayerEntity(nsm::Entity::Properties&)
+        : mPosition(0.0f), mRotation(0.0f), mScale(1.0f), mModelData()
+    { }
+
     ~PlayerEntity() override = default;
 
     void onCreate() override {
