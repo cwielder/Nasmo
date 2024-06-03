@@ -1,26 +1,8 @@
-#include <nsm/gfx/layer.h>
+#include <nsm/gfx/layer/layerstack.h>
 
-#include <nsm/entity/component/drawablecomponent.h>
+#include <nsm/gfx/layer/layer.h>
 #include <nsm/gfx/primitiveshape.h>
-
-nsm::Layer::Layer(const std::string& name)
-    : mDrawables()
-    , mName(name)
-    , mCamera(nullptr)
-    , mGraphicsContext()
-{
-    mGraphicsContext
-        .depth(GraphicsContext::DepthFunction::LessEqual, true)
-    ;
-}
-
-void nsm::Layer::draw(const nsm::RenderInfo& renderInfo) {
-    mGraphicsContext.apply();
-
-    for (auto& drawable : mDrawables) {
-        drawable->draw(renderInfo);
-    }
-}
+#include <nsm/entity/component/drawablecomponent.h>
 
 nsm::LayerStack::LayerStack(const glm::u32vec2& size)
     : mLayers()
@@ -126,7 +108,7 @@ void nsm::LayerStack::drawLayers() const {
     mCompositorShader.bind();
     mFramebuffer.getTextureBuffer(0)->bind(0);
 
-    glDrawElements(GL_TRIANGLES, PrimitiveShape::getQuadIBO().getCount(), GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(PrimitiveShape::getQuadIBO().getCount()), GL_UNSIGNED_INT, nullptr);
 }
 
 nsm::LayerStack::LayerContainer::iterator nsm::LayerStack::getLayerIterator(const std::size_t hash) {

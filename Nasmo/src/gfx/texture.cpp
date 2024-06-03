@@ -16,10 +16,10 @@ nsm::Texture::Texture()
     glCreateTextures(GL_TEXTURE_2D, 1, &mId);
 }
 
-nsm::Texture::Texture(const std::string& path, const FilterMode filterMode)
+nsm::Texture::Texture(const std::string& path, bool srgb, const FilterMode filterMode)
     : Texture()
 {
-    this->initFromFile(path, filterMode);
+    this->initFromFile(path, srgb, filterMode);
 }
 
 nsm::Texture::Texture(const glm::u32vec2& size, const Format fmt, const FilterMode filterMode)
@@ -41,7 +41,7 @@ nsm::Texture::~Texture() {
     }
 }
 
-void nsm::Texture::initFromFile(const std::string& path, const FilterMode filterMode) {
+void nsm::Texture::initFromFile(const std::string& path, bool srgb, const FilterMode filterMode) {
     NSM_ASSERT(mId != GL_NONE, "Cannot initialize invalid texture");
 
     const auto load = [&path]() -> std::tuple<u8*, glm::u32vec2, u32> {
@@ -64,12 +64,12 @@ void nsm::Texture::initFromFile(const std::string& path, const FilterMode filter
 
     const auto& [data, size, channels] = load();
 
-    this->initFromData(data, channels, size, filterMode);
+    this->initFromData(data, channels, size, srgb, filterMode);
 
     nsm::trace("Loaded texture from file: ", path);
 }
 
-void nsm::Texture::initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, const FilterMode filterMode) {
+void nsm::Texture::initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, bool srgb, const FilterMode filterMode) {
     NSM_ASSERT(mId != GL_NONE, "Cannot initialize invalid texture");
 
     mSize = size;
@@ -87,17 +87,33 @@ void nsm::Texture::initFromData(const u8* data, const u32 channelCount, const gl
         mFormat = static_cast<Format>(format);
     };
 
-    if (channelCount == 4) {
-        glTextureStorage2D(mId, 1, GL_RGBA8, size.x, size.y);
-        safeSubImage(GL_RGBA);
-    } else if (channelCount == 3) {
-        glTextureStorage2D(mId, 1, GL_RGB8, size.x, size.y);
-        safeSubImage(GL_RGB);
-    } else if (channelCount == 1) {
-        glTextureStorage2D(mId, 1, GL_R8, size.x, size.y);
-        safeSubImage(GL_RED);
-    } else [[unlikely]] {
-        NSM_ASSERT(false, "Unknown texture channel count: ", channelCount);
+    if (srgb) {
+        if (channelCount == 4) {
+            glTextureStorage2D(mId, 1, GL_SRGB8_ALPHA8, size.x, size.y);
+            safeSubImage(GL_RGBA);
+        } else if (channelCount == 3) {
+            glTextureStorage2D(mId, 1, GL_SRGB8, size.x, size.y);
+            safeSubImage(GL_RGB);
+        } else if (channelCount == 1) {
+            nsm::warn("Texture is grayscale, but is being loaded as sRGB. This may cause unexpected results.");
+            glTextureStorage2D(mId, 1, GL_SRGB8, size.x, size.y);
+            safeSubImage(GL_RED);
+        } else {
+            NSM_ASSERT(false, "Unknown texture channel count: ", channelCount);
+        }
+    } else {
+        if (channelCount == 4) {
+            glTextureStorage2D(mId, 1, GL_RGBA8, size.x, size.y);
+            safeSubImage(GL_RGBA);
+        } else if (channelCount == 3) {
+            glTextureStorage2D(mId, 1, GL_RGB8, size.x, size.y);
+            safeSubImage(GL_RGB);
+        } else if (channelCount == 1) {
+            glTextureStorage2D(mId, 1, GL_R8, size.x, size.y);
+            safeSubImage(GL_RED);
+        } else [[unlikely]] {
+            NSM_ASSERT(false, "Unknown texture channel count: ", channelCount);
+        }
     }
 
     glTextureParameteri(mId, GL_TEXTURE_BASE_LEVEL, 0);

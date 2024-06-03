@@ -29,7 +29,7 @@ nsm::VertexBuffer::VertexBuffer()
     , mAttributes()
 { }
 
-nsm::VertexBuffer::VertexBuffer(const void* data, const u32 size, const u32 stride, const BufferUsage usage)
+nsm::VertexBuffer::VertexBuffer(const void* data, const std::size_t size, const u32 stride, const BufferUsage usage)
     : mId(GL_NONE)
     , mStride(stride)
     , mAttributes()
@@ -42,7 +42,7 @@ nsm::VertexBuffer::~VertexBuffer() {
     glDeleteBuffers(1, &mId);
 }
 
-void nsm::VertexBuffer::init(const void* data, const u32 size, const u32 stride, const BufferUsage usage) {
+void nsm::VertexBuffer::init(const void* data, const std::size_t size, const u32 stride, const BufferUsage usage) {
     mStride = stride;
     
     glGenBuffers(1, &mId);
@@ -54,7 +54,7 @@ void nsm::VertexBuffer::init(const void* data, const u32 size, const u32 stride,
     nsm::trace("Creating vertex buffer with id: ", mId);
 }
 
-void nsm::VertexBuffer::subData(const void* data, const u32 size, const u32 offset) {
+void nsm::VertexBuffer::subData(const void* data, const std::size_t size, const u32 offset) {
     glBindBuffer(GL_ARRAY_BUFFER, mId);
     glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
 }

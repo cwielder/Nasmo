@@ -43,13 +43,13 @@ namespace nsm {
 
     public:
         VertexBuffer();
-        VertexBuffer(const void* data, const u32 size, const u32 stride, const BufferUsage usage);
+        VertexBuffer(const void* data, const std::size_t size, const u32 stride, const BufferUsage usage);
         
         ~VertexBuffer();
 
-        void init(const void* data, const u32 size, const u32 stride, const BufferUsage usage);
+        void init(const void* data, const std::size_t size, const u32 stride, const BufferUsage usage);
 
-        void subData(const void* data, const u32 size, const u32 offset);
+        void subData(const void* data, const std::size_t size, const u32 offset);
         
         void bind() const;
         void unbind() const;

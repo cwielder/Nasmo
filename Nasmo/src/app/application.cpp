@@ -4,7 +4,7 @@
 #include <nsm/event/events.h>
 #include <nsm/entity/component/drawablecomponent.h>
 #include <nsm/entity/component/cameracomponent.h>
-#include <nsm/gfx/layer.h>
+#include <nsm/gfx/layer/layer.h>
 
 std::deque<const nsm::Event*> nsm::Application::sEventQueue;
 
