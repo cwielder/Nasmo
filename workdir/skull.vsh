@@ -11,7 +11,7 @@ out vec3 vNormal;
 uniform mat4 uViewProjMtx;
 
 struct InstanceStruct {
-    mat4 modelMtx;
+    mat4 transform;
 };
 
 layout (std430, binding = 0) buffer InstanceData {
@@ -21,5 +21,5 @@ layout (std430, binding = 0) buffer InstanceData {
 void main() {
     vTexCoord = aTexCoord;
     vNormal = aNormal;
-    gl_Position = uViewProjMtx * instanceData.data[gl_InstanceID].modelMtx * vec4(aPos, 1.0);
+    gl_Position = uViewProjMtx * instanceData.data[gl_InstanceID].transform * vec4(aPos, 1.0);
 }
