@@ -20,6 +20,7 @@ namespace nsm {
         void init(const u32* data, const std::size_t size, const BufferUsage usage = BufferUsage::StaticDraw);
         void bind() const;
 
+        [[nodiscard]] u32 getId() const { return mId; }
         [[nodiscard]] std::size_t getCount() const { return mCount; }
 
     private:

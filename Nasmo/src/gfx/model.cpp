@@ -33,10 +33,6 @@ nsm::Model::Model(const std::string& path)
     }
 
     mVertexBuffer.init(vertexVector.data(), vertexVector.size() * sizeof(Vertex), sizeof(Vertex), nsm::BufferUsage::StaticDraw);
-    mVertexBuffer.markAttribute(0, 3, VertexBuffer::DataType::Float, offsetof(Vertex, position), false);
-    mVertexBuffer.markAttribute(1, 2, VertexBuffer::DataType::Float, offsetof(Vertex, uv), false);
-    mVertexBuffer.markAttribute(2, 3, VertexBuffer::DataType::Float, offsetof(Vertex, color), false);
-    mVertexBuffer.markAttribute(3, 3, VertexBuffer::DataType::Float, offsetof(Vertex, normal), false);
 
     auto meshes = doc["meshes"].get_array();
 
@@ -130,6 +126,10 @@ nsm::Model::Mesh::Mesh(std::string_view material, const std::vector<u32>& indice
     , mInstanceDataDirty(false)
     , mSSBO()
 {
+    mVertexArray.markAttribute(0, 3, VertexArray::DataType::Float, offsetof(Vertex, position), false);
+    mVertexArray.markAttribute(1, 2, VertexArray::DataType::Float, offsetof(Vertex, uv), false);
+    mVertexArray.markAttribute(2, 3, VertexArray::DataType::Float, offsetof(Vertex, color), false);
+    mVertexArray.markAttribute(3, 3, VertexArray::DataType::Float, offsetof(Vertex, normal), false);
     mVertexArray.linkBuffer(vertexBuffer);
     mVertexArray.linkIndices(mIndexBuffer);
 }
