@@ -6,22 +6,6 @@
 
 #include <nsm/debug/log.h>
 
-// VertexArray::Attribute
-
-nsm::VertexArray::Attribute::Attribute(const u32 location, const u32 count, const DataType type, const u32 offset, const bool normalized)
-    : mLocation(location)
-    , mCount(count)
-    , mType(static_cast<u32>(type))
-    , mOffset(offset)
-    , mNormalized(normalized)
-{ }
-
-void nsm::VertexArray::Attribute::bind(const u32 stride, const u32 vao) const {
-    glEnableVertexArrayAttrib(vao, mLocation);
-    glVertexArrayAttribFormat(vao, mLocation, mCount, mType, mNormalized, mOffset);
-    glVertexArrayAttribBinding(vao, mLocation, 0);
-}
-
 // VertexArray
 
 nsm::VertexArray::VertexArray()
@@ -41,7 +25,9 @@ void nsm::VertexArray::bind() const {
     glBindVertexArray(mId);
 
     for (const auto& attribute : mAttributes) {
-        attribute.bind(0, mId);
+        glEnableVertexArrayAttrib(mId, attribute.location);
+        glVertexArrayAttribFormat(mId, attribute.location, attribute.count, static_cast<u32>(attribute.type), attribute.normalized, attribute.offset);
+        glVertexArrayAttribBinding(mId, attribute.location, 0);
     }
 }
 

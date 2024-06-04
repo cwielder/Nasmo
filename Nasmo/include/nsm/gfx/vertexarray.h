@@ -29,18 +29,12 @@ namespace nsm {
         };
     
     private:
-        class Attribute {
-        public:
-            Attribute(const u32 location, const u32 count, const DataType type, const u32 offset, const bool normalized);
-            ~Attribute() = default;
-
-            void bind(const u32 stride, const u32 vao) const;
-
-            u32 mLocation;
-            u32 mCount;
-            u32 mType;
-            u32 mOffset;
-            bool mNormalized;
+        struct Attribute {
+            u32 location;
+            u32 count;
+            DataType type;
+            u32 offset;
+            bool normalized;
         };
 
     public:
