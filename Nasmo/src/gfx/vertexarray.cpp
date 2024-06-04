@@ -27,18 +27,26 @@ void nsm::VertexArray::bind() const {
     for (const auto& attribute : mAttributes) {
         glEnableVertexArrayAttrib(mId, attribute.location);
         glVertexArrayAttribFormat(mId, attribute.location, attribute.count, static_cast<u32>(attribute.type), attribute.normalized, attribute.offset);
-        glVertexArrayAttribBinding(mId, attribute.location, 0);
+        glVertexArrayAttribBinding(mId, attribute.location, attribute.vboIndex);
     }
 }
 
-void nsm::VertexArray::linkBuffer(const VertexBuffer& buffer) const {
-    glVertexArrayVertexBuffer(mId, 0, buffer.getId(), 0, buffer.getStride());
+void nsm::VertexArray::linkBuffer(const VertexBuffer& buffer, const u32 vboIndex) {
+    glVertexArrayVertexBuffer(mId, vboIndex, buffer.getId(), 0, buffer.getStride());
 }
 
 void nsm::VertexArray::linkIndices(const IndexBuffer& indices) const {
     glVertexArrayElementBuffer(mId, indices.getId());
 }
 
-void nsm::VertexArray::markAttribute(const u32 location, const u32 count, const DataType type, const u32 offset, const bool normalized) {
-    mAttributes.emplace_back(location, count, type, offset, normalized);
+void nsm::VertexArray::markAttribute(const u32 location, const u32 count, const DataType type, const u32 offset, const u32 vboIndex, const bool normalized) {
+    Attribute attribute = {
+        .location = location,
+        .count = count,
+        .type = type,
+        .offset = offset,
+        .vboIndex = vboIndex,
+        .normalized = normalized
+    };
+    mAttributes.emplace_back(attribute);
 }

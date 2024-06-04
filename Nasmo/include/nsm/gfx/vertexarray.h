@@ -34,6 +34,7 @@ namespace nsm {
             u32 count;
             DataType type;
             u32 offset;
+            u32 vboIndex;
             bool normalized;
         };
 
@@ -43,10 +44,10 @@ namespace nsm {
 
         void bind() const;
 
-        void linkBuffer(const VertexBuffer& buffer) const;
+        void linkBuffer(const VertexBuffer& buffer, const u32 vboIndex);
         void linkIndices(const IndexBuffer& indices) const;
         
-        void markAttribute(const u32 location, const u32 count, const DataType type, const u32 offset, const bool normalized = false);
+        void markAttribute(const u32 location, const u32 count, const DataType type, const u32 offset, const u32 vboIndex, const bool normalized = false);
 
     private:
         u32 mId;
