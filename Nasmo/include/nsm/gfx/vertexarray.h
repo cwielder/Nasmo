@@ -40,6 +40,7 @@ namespace nsm {
             u32 mCount;
             u32 mType;
             u32 mOffset;
+            bool mNormalized;
         };
 
     public:
