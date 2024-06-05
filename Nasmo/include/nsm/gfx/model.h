@@ -67,6 +67,7 @@ namespace nsm {
         [[nodiscard]] const std::vector<std::size_t*>& getInstanceIDs() { return mInstanceIDs; }
         [[nodiscard]] const std::string& getPath() const { return mPath; }
         [[nodiscard]] std::size_t getMeshCount() const { return mMeshes.size(); }
+        [[nodiscard]] const VertexBuffer& getVertexBuffer() const { return mVertexBuffer; }
         [[nodiscard]] Mesh* getMesh(const std::string& name) const {
             auto it = mMeshes.find(name);
             if (it == mMeshes.end()) {

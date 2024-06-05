@@ -34,3 +34,11 @@ void nsm::VertexBuffer::subData(const void* data, const std::size_t size, const 
 void nsm::VertexBuffer::bind() const {
     glBindBuffer(GL_ARRAY_BUFFER, mId);
 }
+
+void* nsm::VertexBuffer::map(const BufferAccess access) const {
+    return glMapNamedBuffer(mId, static_cast<GLenum>(access));
+}
+
+void nsm::VertexBuffer::unmap() const {
+    glUnmapNamedBuffer(mId);
+}
