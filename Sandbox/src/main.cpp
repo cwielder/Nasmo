@@ -10,6 +10,10 @@ public:
     {
         mGraphics.getLayerStack().pushLayer<nsm::ModelLayer>("main");
     }
+
+    void onUpdate(const f32 timeStep) override {
+        mGraphics.getWindow().setTitle("Nasmo Sandbox | " + std::to_string(1.0f / mGraphics.getFrameTime()) + " FPS");
+    }
 };
 
 int main(int argc, char** argv) {

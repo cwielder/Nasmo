@@ -101,3 +101,7 @@ void nsm::Window::init(const WindowInfo& info) {
 
     glfwMakeContextCurrent(mHandle);
 }
+
+void nsm::Window::setVsync(bool enabled) {
+    glfwSwapInterval(enabled);
+}

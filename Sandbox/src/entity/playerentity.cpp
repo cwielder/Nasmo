@@ -10,37 +10,46 @@ class PlayerEntity : public nsm::Entity {
     };
 
 public:
+    static constexpr int cInstanceCount = 100;
+
     PlayerEntity(nsm::Entity::Properties&)
-        : mPosition(0.0f), mRotation(0.0f), mScale(1.0f), mModelData()
+        : mModelData()
     { }
 
     ~PlayerEntity() override = default;
 
     void onCreate() override {
-        mScale = glm::vec3(0.5f);
-
         const std::pair<std::string, std::size_t> meshInstanceDataSizes[] = {
             { "skull", sizeof(ModelData) }
         };
 
-        nsm::ModelComponent* modelComponent = new nsm::ModelComponent("skull.json", "main", meshInstanceDataSizes);
-        modelComponent->setInstanceData("skull", &mModelData);
-        this->addComponent<nsm::DrawableComponent>(modelComponent);
+        for (int i = 0; i < cInstanceCount; i++) {
+            // randomize position between -100 and 100
+            mModelData[i].transform = glm::translate(glm::mat4(1.0f), glm::vec3(
+                (rand() % 100) - 50,
+                (rand() % 100) - 50,
+                (rand() % 100) - 50
+            ));
+            // scale by 0.1
+            mModelData[i].transform = glm::scale(mModelData[i].transform, glm::vec3(0.1f));
+
+            nsm::ModelComponent* mc = new nsm::ModelComponent("skull.json", "main", meshInstanceDataSizes);
+            mc->setInstanceData("skull", &mModelData[i]);
+            this->addComponent<nsm::DrawableComponent>(mc);
+        }
     }
 
     void onUpdate(const f32 timeStep) override {
-        mRotation.x += timeStep;
+        for (int i = 0; i < cInstanceCount; i++) {
+            // rotate by 0.1 degrees around the y-axis
+            mModelData[i].transform = glm::rotate(mModelData[i].transform, timeStep, glm::vec3(0.0f, 1.0f, 0.0f));
 
-        mModelData.transform = glm::rotate(glm::mat4(1.0f), mRotation.x, glm::vec3(1.0f, 2.0f, 0.0f));
-
-        nsm::ModelComponent* modelComponent = static_cast<nsm::ModelComponent*>(this->getComponents<nsm::DrawableComponent>()[0]);
-        modelComponent->setInstanceDataDirty("skull");
+            nsm::ModelComponent* mc = static_cast<nsm::ModelComponent*>(this->getComponents<nsm::DrawableComponent>()[i]);
+            mc->setInstanceData("skull", &mModelData[i]);
+        }
     }
 
-    glm::vec3 mPosition;
-    glm::vec3 mRotation;
-    glm::vec3 mScale;
-    ModelData mModelData;
+    ModelData mModelData[cInstanceCount];
 };
 
 NSM_REGISTER_ENTITY(PlayerEntity);
