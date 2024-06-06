@@ -82,8 +82,12 @@ void nsm::Model::drawTranslucent(const RenderInfo& renderInfo) {
 }
 
 void nsm::Model::addInstance(std::size_t* outID) {
+    NSM_ASSERT(outID != nullptr, "Output ID is null");
+
     *outID = mInstanceIDs.size();
     mInstanceIDs.push_back(outID);
+
+    NSM_ASSERT(mInstanceIDs[*outID] == outID, "Instance ID ", *outID, " not set correctly");
 
     for (auto& [name, mesh] : mMeshes) {
         mesh->growInstanceDataBuffer(mInstanceIDs.size());
@@ -91,11 +95,12 @@ void nsm::Model::addInstance(std::size_t* outID) {
 }
 
 void nsm::Model::removeInstance(std::size_t id) {
+    NSM_ASSERT(id < mInstanceIDs.size(), "Instance ID ", id, " out of bounds");
     mInstanceIDs.erase(mInstanceIDs.begin() + id);
 
     for (std::size_t i = id; i < mInstanceIDs.size(); i++) {
         if (*mInstanceIDs[i] > id) {
-            mInstanceIDs[i]--;
+            *mInstanceIDs[i] -= 1;
         }
     }
 
