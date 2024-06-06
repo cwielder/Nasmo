@@ -2,6 +2,7 @@
 
 #include <nsm/gfx/shader.h>
 #include <nsm/util/jsonhelpers.h>
+#include <nsm/debug/assert.h>
 
 #include <simdjson.h>
 
@@ -20,6 +21,7 @@ static nsm::Texture::FilterMode getFilterMode(const std::string& mode) {
         return nsm::Texture::FilterMode::LinearMipmapLinear;
     }
 
+    NSM_ASSERT(false, "Invalid filter mode: ", mode);
     return nsm::Texture::FilterMode::Count;
 }
 
@@ -72,7 +74,9 @@ nsm::Material* nsm::Material::get(const std::string& path) {
 
 nsm::Material::Material(const std::string& path)
     : mShader(nullptr)
+    , mTextures()
     , mUniforms()
+    , mIsTranslucent(false)
 {
     simdjson::ondemand::parser parser;
     simdjson::padded_string json = simdjson::padded_string::load(path);

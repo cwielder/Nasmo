@@ -13,6 +13,7 @@ nsm::GraphicsContext::GraphicsContext()
     , mDstRGB(BlendFactor::OneMinusSrcAlpha)
     , mDstA(BlendFactor::OneMinusSrcAlpha)
     , mBlendEquation(BlendEquation::Add)
+    , mSrgb(false)
 { }
 
 void nsm::GraphicsContext::apply() const {
@@ -32,5 +33,11 @@ void nsm::GraphicsContext::apply() const {
     if (mBlendEnabled) {
         glBlendFuncSeparate(static_cast<GLenum>(mSrcRGB), static_cast<GLenum>(mDstRGB), static_cast<GLenum>(mSrcA), static_cast<GLenum>(mDstA));
         glBlendEquation(static_cast<GLenum>(mBlendEquation));
+    }
+
+    if (mSrgb) {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+    } else {
+        glDisable(GL_FRAMEBUFFER_SRGB);
     }
 }

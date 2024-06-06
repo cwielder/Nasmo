@@ -6,7 +6,7 @@ namespace nsm {
 
     class ModelLayer : public Layer {
     public:
-        ModelLayer(const std::string& name) : Layer(name) { }
+        ModelLayer(const std::string& name);
 
         void draw(const RenderInfo& renderInfo) override;
     };

@@ -11,12 +11,14 @@ nsm::LayerStack::LayerStack(const glm::u32vec2& size)
     , mGraphicsContext()
 {
     mFramebuffer.addTextureBuffer(Texture::Format::RGBA8); //? Is this the right format? check for HDR
+    mFramebuffer.addTextureBuffer(Texture::Format::Depth24Stencil8);
     mFramebuffer.finalize();
 
     mGraphicsContext
         .blend(false)
         .cull(false)
         .depth(false)
+        .srgb(true)
     ;
 }
 
