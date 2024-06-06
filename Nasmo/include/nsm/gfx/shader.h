@@ -16,6 +16,8 @@
 namespace nsm {
 
     class ShaderProgram final {
+        NSM_NO_COPY(ShaderProgram);
+
     public:
         enum class ShaderType {
             Vertex = GL_VERTEX_SHADER,

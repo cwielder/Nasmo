@@ -1,13 +1,14 @@
 #include <iostream>
 #include <nsm/app/application.h>
-#include <nsm/gfx/layer.h>
+#include <nsm/gfx/layer/modellayer.h>
+#include <nsm/gfx/layer/layerstack.h>
 
 class SandboxApplication : public nsm::Application {
 public:
     SandboxApplication(const ApplicationInfo& info)
         : Application(info)
     {
-        mGraphics.getLayerStack().pushLayer<nsm::Layer>("main");
+        mGraphics.getLayerStack().pushLayer<nsm::ModelLayer>("main");
     }
 };
 

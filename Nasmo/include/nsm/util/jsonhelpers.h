@@ -46,6 +46,30 @@ namespace nsm {
 
             return glm::vec4(x, y, z, w);
         }
+
+        static inline glm::mat4 getMat4(simdjson::simdjson_result<simdjson::ondemand::object>& object, const std::string_view key) {
+            auto array = object[key].get_array();
+
+            auto it = array.begin();
+
+            glm::mat4 mat;
+
+            for (u8 i = 0; i < 4; ++i) {
+                auto row = (*it.value()).get_array();
+                auto rowIt = row.begin();
+
+                for (u8 j = 0; j < 4; ++j) {
+                    mat[i][j] = static_cast<f32>(f64(*rowIt.value()));
+                    ++rowIt;
+                }
+
+                ++it;
+            }
+
+            return mat;
+
+            // TODO: Test if this needs to be transposed
+        }
     };
 
 }

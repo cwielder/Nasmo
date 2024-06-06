@@ -4,8 +4,10 @@
 #include <nsm/debug/log.h>
 #include <nsm/event/events.h>
 #include <nsm/gfx/texture.h>
-#include <nsm/gfx/layer.h>
+#include <nsm/gfx/layer/layerstack.h>
+#include <nsm/gfx/layer/layer.h>
 #include <nsm/gfx/primitiveshape.h>
+#include <nsm/gfx/material.h>
 #include <nsm/entity/component/drawablecomponent.h>
 #include <nsm/entity/component/cameracomponent.h>
 #include <nsm/app/application.h>
@@ -14,7 +16,7 @@
 
 static void glErrorCallback(GLenum, GLenum, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*) {
     switch (severity) {
-        case GL_DEBUG_SEVERITY_HIGH: nsm::error(message); break;
+        case GL_DEBUG_SEVERITY_HIGH: NSM_ASSERT(false, message); break;
         case GL_DEBUG_SEVERITY_MEDIUM: nsm::warn(message); break;
         case GL_DEBUG_SEVERITY_LOW: nsm::info(message); break;
         case GL_DEBUG_SEVERITY_NOTIFICATION: nsm::trace(message); break;
@@ -58,6 +60,7 @@ nsm::Graphics::~Graphics() {
     delete mLayerStack;
 
     Texture::clearCache();
+    Material::clearCache();
     PrimitiveShape::destroy();
 }
 

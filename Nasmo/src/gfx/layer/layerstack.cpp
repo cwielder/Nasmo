@@ -1,0 +1,120 @@
+#include <nsm/gfx/layer/layerstack.h>
+
+#include <nsm/gfx/layer/layer.h>
+#include <nsm/gfx/primitiveshape.h>
+#include <nsm/entity/component/drawablecomponent.h>
+
+nsm::LayerStack::LayerStack(const glm::u32vec2& size)
+    : mLayers()
+    , mFramebuffer(size)
+    , mCompositorShader("nsm/assets/shaders/compositor.vsh", "nsm/assets/shaders/compositor.fsh")
+    , mGraphicsContext()
+{
+    mFramebuffer.addTextureBuffer(Texture::Format::RGBA8); //? Is this the right format? check for HDR
+    mFramebuffer.addTextureBuffer(Texture::Format::Depth24Stencil8);
+    mFramebuffer.finalize();
+
+    mGraphicsContext
+        .blend(false)
+        .cull(false)
+        .depth(false)
+        .srgb(true)
+    ;
+}
+
+nsm::LayerStack::~LayerStack() {
+    this->clearLayers();
+}
+
+void nsm::LayerStack::popLayer() {
+    if (!mLayers.empty()) {
+        delete mLayers.back().second;
+        mLayers.pop_back();
+    }
+}
+
+void nsm::LayerStack::removeLayer(const std::string& name) {
+    const std::size_t targetHash = std::hash<std::string>{}(name);
+
+    auto it = this->getLayerIterator(targetHash);
+
+    if (it != mLayers.end()) {
+        delete it->second;
+        mLayers.erase(it);
+    } else {
+        nsm::warn("Unable to remove nonexistent layer: ", name);
+    }
+}
+
+void nsm::LayerStack::clearLayers() {
+    for (auto& [hash, layer] : mLayers) {
+        delete layer;
+    }
+
+    mLayers.clear();
+}
+
+nsm::Layer* nsm::LayerStack::getLayer(const std::size_t hash) {
+    auto it = this->getLayerIterator(hash);
+
+    if (it != mLayers.end()) {
+        return it->second;
+    }
+
+    return nullptr;
+}
+
+void nsm::LayerStack::resize(const glm::u32vec2& size) {
+    mFramebuffer.resize(size);
+
+    for (auto& [hash, layer] : mLayers) {
+        layer->resize(size);
+    }
+}
+
+void nsm::LayerStack::pushDrawable(DrawableComponent* drawable) {
+    auto it = this->getLayerIterator(drawable->getTargetLayerHash());
+
+    if (it != mLayers.end()) {
+        it->second->mDrawables.push_back(drawable);
+    } else {
+        nsm::warn("Unable to push drawable to nonexistent layer: ", drawable->getTargetLayerHash());
+    }
+}
+
+void nsm::LayerStack::drawLayers() const {
+    Framebuffer::getBackbuffer()->clear(glm::f32vec4{ 0.0f }, Framebuffer::Type::Color);
+    Framebuffer::getBackbuffer()->clear(glm::f32vec4{ 1.0f }, Framebuffer::Type::Depth);
+
+    mFramebuffer.bind();
+    mFramebuffer.clear(glm::f32vec4{ 0.0f }, Framebuffer::Type::Color);
+    mFramebuffer.clear(glm::f32vec4{ 1.0f }, Framebuffer::Type::Depth);
+
+    for (const auto& [hash, layer] : mLayers) {
+        const RenderInfo renderInfo = {
+            .camera = layer->getCamera(),
+            .framebuffer = &mFramebuffer,
+        };
+
+        layer->draw(renderInfo);
+        layer->mDrawables.clear();
+    }
+
+    mGraphicsContext.apply();
+
+    Framebuffer::getBackbuffer()->bind();
+
+    PrimitiveShape::getQuadVAO().bind();
+    PrimitiveShape::getQuadIBO().bind();
+
+    mCompositorShader.bind();
+    mFramebuffer.getTextureBuffer(0)->bind(0);
+
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(PrimitiveShape::getQuadIBO().getCount()), GL_UNSIGNED_INT, nullptr);
+}
+
+nsm::LayerStack::LayerContainer::iterator nsm::LayerStack::getLayerIterator(const std::size_t hash) {
+    return std::find_if(mLayers.begin(), mLayers.end(), [hash](const auto& pair) {
+        return pair.first == hash;
+    });
+}

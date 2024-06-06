@@ -14,17 +14,18 @@ namespace nsm {
 
 
     public:
-        IndexBuffer(const u32* data, const u32 size, const BufferUsage usage = BufferUsage::StaticDraw);
+        IndexBuffer(const u32* data, const std::size_t size, const BufferUsage usage = BufferUsage::StaticDraw);
         ~IndexBuffer();
 
-        void init(const u32* data, const u32 size, const BufferUsage usage = BufferUsage::StaticDraw);
+        void init(const u32* data, const std::size_t size, const BufferUsage usage = BufferUsage::StaticDraw);
         void bind() const;
 
-        [[nodiscard]] u32 getCount() const { return mCount; }
+        [[nodiscard]] u32 getId() const { return mId; }
+        [[nodiscard]] std::size_t getCount() const { return mCount; }
 
     private:
         u32 mId;
-        u32 mCount;
+        std::size_t mCount;
     };
 
 }

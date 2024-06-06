@@ -45,7 +45,7 @@ namespace nsm {
         Texture();
 
     public:
-        Texture(const std::string& path, const FilterMode filterMode = FilterMode::Linear);
+        Texture(const std::string& path, bool srgb = false, const FilterMode filterMode = FilterMode::Linear);
         Texture(const glm::u32vec2& size, const Format fmt, const FilterMode filterMode = FilterMode::Linear);
         ~Texture();
 
@@ -71,8 +71,8 @@ namespace nsm {
             return *this;
         }
 
-        void initFromFile(const std::string& path, const FilterMode filterMode = FilterMode::Linear);
-        void initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, const FilterMode filterMode = FilterMode::Linear);
+        void initFromFile(const std::string& path, bool srgb = false, const FilterMode filterMode = FilterMode::Linear);
+        void initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, bool srgb = false, const FilterMode filterMode = FilterMode::Linear);
 
         void bind(const u32 slot) const;
 
