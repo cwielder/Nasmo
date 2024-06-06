@@ -14,9 +14,9 @@
 
 namespace nsm {
 
-    class Model {
+    class Model final {
     public:
-        struct Vertex {
+        struct Vertex final {
             glm::vec3 position;
             glm::vec2 uv;
             glm::vec3 color;
@@ -24,13 +24,12 @@ namespace nsm {
         };
 
     public:
-        class Mesh {
+        class Mesh final {
+            NSM_NO_COPY(Mesh);
+
         public:
             Mesh(std::string_view material, const std::vector<u32>& indices, const VertexBuffer& vertexBuffer);
             ~Mesh();
-
-            Mesh(const Mesh&) = delete;
-            Mesh& operator=(const Mesh&) = delete;
 
             void draw(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds);
 
@@ -70,9 +69,7 @@ namespace nsm {
         [[nodiscard]] const VertexBuffer& getVertexBuffer() const { return mVertexBuffer; }
         [[nodiscard]] Mesh* getMesh(const std::string& name) const {
             auto it = mMeshes.find(name);
-            if (it == mMeshes.end()) {
-                NSM_ASSERT(false, "Mesh ", name, " not found in model ", mPath);
-            }
+            NSM_ASSERT(it != mMeshes.end(), "Mesh ", name, " not found in model ", mPath);
             return it->second;
         }
 

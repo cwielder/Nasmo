@@ -15,11 +15,9 @@ nsm::ShaderStorage::ShaderStorage(const std::size_t size, const void* data, cons
 }
 
 nsm::ShaderStorage::~ShaderStorage() {
-    if (mId == GL_NONE) {
-        return;
+    if (mId != GL_NONE) {
+        glDeleteBuffers(1, &mId);
     }
-
-    glDeleteBuffers(1, &mId);
 }
 
 void nsm::ShaderStorage::bind(const u32 bindingPoint) const {

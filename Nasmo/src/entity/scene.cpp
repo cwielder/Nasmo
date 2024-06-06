@@ -79,11 +79,8 @@ nsm::Entity* nsm::Scene::spawnEntity(const std::string_view type, const std::str
 nsm::Entity* nsm::Scene::spawnEntity(const std::string_view type, Entity::Properties& properties) {
     const auto& registry = Entity::Registry::getRegistry();
     const auto entityRegistration = registry.find(std::string{type});
-    if (entityRegistration == registry.end()) {
-        nsm::error("Entity '", type, "' not found in registry");
-        return nullptr;
-    }
-
+    NSM_ASSERT(entityRegistration != registry.end(), "Entity '", type, "' not found in registry");
+ 
     const auto& [name, data] = *entityRegistration;
 
     Entity* newEntity = data->getFactory()(properties);

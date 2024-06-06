@@ -8,13 +8,13 @@ nsm::LayerStack::LayerStack(const glm::u32vec2& size)
     : mLayers()
     , mFramebuffer(size)
     , mCompositorShader("nsm/assets/shaders/compositor.vsh", "nsm/assets/shaders/compositor.fsh")
-    , mGraphicsContext()
+    , mRenderState()
 {
     mFramebuffer.addTextureBuffer(Texture::Format::RGBA8); //? Is this the right format? check for HDR
     mFramebuffer.addTextureBuffer(Texture::Format::Depth24Stencil8);
     mFramebuffer.finalize();
 
-    mGraphicsContext
+    mRenderState
         .blend(false)
         .cull(false)
         .depth(false)
@@ -37,13 +37,10 @@ void nsm::LayerStack::removeLayer(const std::string& name) {
     const std::size_t targetHash = std::hash<std::string>{}(name);
 
     auto it = this->getLayerIterator(targetHash);
-
-    if (it != mLayers.end()) {
-        delete it->second;
-        mLayers.erase(it);
-    } else {
-        nsm::warn("Unable to remove nonexistent layer: ", name);
-    }
+    NSM_ASSERT(it != mLayers.end(), "Unable to remove nonexistent layer: ", name);
+    
+    delete it->second;
+    mLayers.erase(it);
 }
 
 void nsm::LayerStack::clearLayers() {
@@ -57,11 +54,9 @@ void nsm::LayerStack::clearLayers() {
 nsm::Layer* nsm::LayerStack::getLayer(const std::size_t hash) {
     auto it = this->getLayerIterator(hash);
 
-    if (it != mLayers.end()) {
-        return it->second;
-    }
+    NSM_ASSERT(it != mLayers.end(), "Unable to find layer with hash: ", hash);
 
-    return nullptr;
+    return it->second;
 }
 
 void nsm::LayerStack::resize(const glm::u32vec2& size) {
@@ -75,11 +70,9 @@ void nsm::LayerStack::resize(const glm::u32vec2& size) {
 void nsm::LayerStack::pushDrawable(DrawableComponent* drawable) {
     auto it = this->getLayerIterator(drawable->getTargetLayerHash());
 
-    if (it != mLayers.end()) {
-        it->second->mDrawables.push_back(drawable);
-    } else {
-        nsm::warn("Unable to push drawable to nonexistent layer: ", drawable->getTargetLayerHash());
-    }
+    NSM_ASSERT(it != mLayers.end(), "Unable to push drawable to nonexistent layer: ", drawable->getTargetLayerHash());
+
+    it->second->mDrawables.push_back(drawable);
 }
 
 void nsm::LayerStack::drawLayers() const {
@@ -100,7 +93,7 @@ void nsm::LayerStack::drawLayers() const {
         layer->mDrawables.clear();
     }
 
-    mGraphicsContext.apply();
+    mRenderState.apply();
 
     Framebuffer::getBackbuffer()->bind();
 

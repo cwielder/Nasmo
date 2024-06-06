@@ -2,7 +2,7 @@
 
 #include <nsm/gfx/shader.h>
 #include <nsm/gfx/framebuffer.h>
-#include <nsm/gfx/graphicscontext.h>
+#include <nsm/gfx/renderstate.h>
 #include <nsm/gfx/renderinfo.h>
 
 #include <glm/vec2.hpp>
@@ -54,7 +54,7 @@ namespace nsm {
         LayerContainer mLayers;
         Framebuffer mFramebuffer;
         ShaderProgram mCompositorShader;
-        GraphicsContext mGraphicsContext;
+        RenderState mRenderState;
     };
 
 }

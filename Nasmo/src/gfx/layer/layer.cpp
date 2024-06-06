@@ -6,15 +6,15 @@ nsm::Layer::Layer(const std::string& name)
     : mDrawables()
     , mName(name)
     , mCamera(nullptr)
-    , mGraphicsContext()
+    , mRenderState()
 {
-    mGraphicsContext
-        .depth(GraphicsContext::DepthFunction::LessEqual, true)
+    mRenderState
+        .depth(RenderState::DepthFunction::LessEqual, true)
     ;
 }
 
 void nsm::Layer::draw(const nsm::RenderInfo& renderInfo) {
-    mGraphicsContext.apply();
+    mRenderState.apply();
 
     for (auto& drawable : mDrawables) {
         drawable->drawOpaque(renderInfo);

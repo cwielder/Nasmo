@@ -36,7 +36,7 @@ nsm::Texture::Texture(const glm::u32vec2& size, const Format fmt, const FilterMo
 }
 
 nsm::Texture::~Texture() {
-    if (mId != GL_NONE) [[likely]] {
+    if (mId != GL_NONE) {
         glDeleteTextures(1, &mId);
     }
 }

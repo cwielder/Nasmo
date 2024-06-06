@@ -129,16 +129,18 @@ void nsm::Framebuffer::finalize() const {
 
     glNamedFramebufferDrawBuffers(mId, static_cast<GLsizei>(mTextureBuffers.size()), attachments);
 
-    u32 status = glCheckNamedFramebufferStatus(mId, GL_FRAMEBUFFER);
-    if (status != GL_FRAMEBUFFER_COMPLETE) {
-        const char* statusStr = "Unknown";
+    #ifdef NSM_DEBUG
+        u32 status = glCheckNamedFramebufferStatus(mId, GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE) {
+            const char* statusStr = "Unknown error";
 
-        switch (status) {
-            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: statusStr = "Not all framebuffer attachments are complete."; break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: statusStr = "Framebuffer has no attachments."; break;
+            switch (status) {
+                case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT: statusStr = "Not all framebuffer attachments are complete."; break;
+                case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: statusStr = "Framebuffer has no attachments."; break;
+            }
+
+            NSM_ASSERT(false, "Framebuffer incomplete: ", statusStr);
         }
-
-        NSM_ASSERT(false, "Framebuffer incomplete: ", statusStr);
-    }
+    #endif
 }
 

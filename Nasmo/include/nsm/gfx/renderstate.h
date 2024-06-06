@@ -5,7 +5,7 @@
 
 namespace nsm {
 
-    class GraphicsContext final {
+    class RenderState final {
     public:
         enum class CullFace {
             Front = GL_FRONT,
@@ -65,9 +65,9 @@ namespace nsm {
         };
 
     public:
-        GraphicsContext();
+        RenderState();
 
-        GraphicsContext& depth(const DepthFunction function, const bool write) {
+        RenderState& depth(const DepthFunction function, const bool write) {
             mDepthTest = true;
             mDepthWrite = write;
             mDepthFunction = function;
@@ -75,7 +75,7 @@ namespace nsm {
             return *this;
         }
 
-        GraphicsContext& depth(const bool b) {
+        RenderState& depth(const bool b) {
             NSM_ASSERT(!b, "True value passed to depth disabler. Use the other overload!");
         
             mDepthTest = false;
@@ -83,7 +83,7 @@ namespace nsm {
             return *this;
         }
 
-        GraphicsContext& cull(const CullFace face, const CullDirection direction) {
+        RenderState& cull(const CullFace face, const CullDirection direction) {
             mCullEnabled = true;
             mCullFace = face;
             mCullDirection = direction;
@@ -91,7 +91,7 @@ namespace nsm {
             return *this;
         }
 
-        GraphicsContext& cull(const bool b) {
+        RenderState& cull(const bool b) {
             NSM_ASSERT(!b, "True value passed to cull disabler. Use the other overload!");
         
             mCullEnabled = false;
@@ -99,7 +99,7 @@ namespace nsm {
             return *this;
         }
 
-        GraphicsContext& blend(const BlendFactor srcRGBA, const BlendFactor dstRGBA, const BlendEquation equation) {
+        RenderState& blend(const BlendFactor srcRGBA, const BlendFactor dstRGBA, const BlendEquation equation) {
             mBlendEnabled = true;
             mSrcRGB = srcRGBA;
             mDstRGB = dstRGBA;
@@ -110,7 +110,7 @@ namespace nsm {
             return *this;
         }
 
-        GraphicsContext& blend(const BlendFactor srcRGB, const BlendFactor dstRGB, const BlendFactor srcA, const BlendFactor dstA, const BlendEquation equation) {
+        RenderState& blend(const BlendFactor srcRGB, const BlendFactor dstRGB, const BlendFactor srcA, const BlendFactor dstA, const BlendEquation equation) {
             mBlendEnabled = true;
             mSrcRGB = srcRGB;
             mDstRGB = dstRGB;
@@ -121,7 +121,7 @@ namespace nsm {
             return *this;
         }
 
-        GraphicsContext& blend(const bool b) {
+        RenderState& blend(const bool b) {
             NSM_ASSERT(!b, "True value passed to blend disabler. Use the other overload!");
         
             mBlendEnabled = false;
@@ -129,7 +129,7 @@ namespace nsm {
             return *this;
         }
 
-        GraphicsContext& srgb(const bool b) {
+        RenderState& srgb(const bool b) {
             mSrgb = b;
 
             return *this;

@@ -33,7 +33,10 @@ namespace nsm {
             Shader(const std::string& path, const ShaderType type);
             ~Shader();
 
-            u32 id;
+            [[nodiscard]] u32 getId() const { return mId; }
+
+        private:
+            u32 mId;
         };
 
     public:
@@ -42,8 +45,6 @@ namespace nsm {
         ~ShaderProgram();
 
         void bind() const;
-
-        [[nodiscard]] bool exists() const { return mId != 0; }
 
         // Uniforms
         //* Note: You must bind the shader before calling these functions.

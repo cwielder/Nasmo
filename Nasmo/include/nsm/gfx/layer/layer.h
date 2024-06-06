@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nsm/gfx/graphicscontext.h>
+#include <nsm/gfx/renderstate.h>
 
 #include <string>
 #include <vector>
@@ -30,7 +30,7 @@ namespace nsm {
         std::vector<DrawableComponent*> mDrawables;
         const std::string mName;
         CameraComponent* mCamera;
-        GraphicsContext mGraphicsContext;
+        RenderState mRenderState;
     };
 
 }

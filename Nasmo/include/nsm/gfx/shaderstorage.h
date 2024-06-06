@@ -5,7 +5,7 @@
 
 namespace nsm {
 
-    class ShaderStorage {
+    class ShaderStorage final {
         NSM_NO_COPY(ShaderStorage);
 
     public:

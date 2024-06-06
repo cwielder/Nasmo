@@ -14,7 +14,7 @@ std::unordered_map<std::string, std::pair<u32, std::unordered_map<std::string, i
 // ShaderProgram::Shader
 
 nsm::ShaderProgram::Shader::Shader(const std::string& path, const ShaderType type)
-    : id(GL_NONE)
+    : mId(GL_NONE)
 {
     auto compile = [=](const std::string& source) -> u32 {
         nsm::trace("Compiling shader: ", path.c_str(), "...");
@@ -42,7 +42,7 @@ nsm::ShaderProgram::Shader::Shader(const std::string& path, const ShaderType typ
 
     for (const auto& [path_, code_] : sSourceCache) {
         if (path_ == path) {
-            this->id = compile(code_);
+            mId = compile(code_);
             return;
         }
     }
@@ -51,13 +51,13 @@ nsm::ShaderProgram::Shader::Shader(const std::string& path, const ShaderType typ
     NSM_ASSERT(file.is_open(), "Failed to open shader file: ", path.c_str());
 
     const std::string shader(std::istreambuf_iterator<char>{file}, {});
-    this->id = compile(shader);
+    mId = compile(shader);
 
     sSourceCache[path] = shader;
 }
 
 nsm::ShaderProgram::Shader::~Shader() {
-    glDeleteShader(this->id);
+    glDeleteShader(mId);
 }
 
 // ShaderProgram
@@ -180,28 +180,32 @@ i32 nsm::ShaderProgram::getOptionalLocation(const std::string& name) const {
 u32 nsm::ShaderProgram::link(const Shader& vsh, const Shader& fsh, const Shader* gsh) {
     const u32 program = glCreateProgram();
 
-    glAttachShader(program, vsh.id);
-    glAttachShader(program, fsh.id);
+    glAttachShader(program, vsh.getId());
+    glAttachShader(program, fsh.getId());
 
-    if (gsh != nullptr)
-        glAttachShader(program, gsh->id);
-    
-    glLinkProgram(program);
-
-    i32 success = false;
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
-    if (!success) {
-        i32 length = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
-
-        std::vector<char> error(length);
-        glGetProgramInfoLog(program, length, &length, error.data());
-
-        NSM_ASSERT(false, "Shader program linking failed: ", error.data());
+    if (gsh != nullptr) {
+        glAttachShader(program, gsh->getId());
     }
 
-    glDetachShader(program, vsh.id);
-    glDetachShader(program, fsh.id);
+    glLinkProgram(program);
+
+
+    #ifdef NSM_DEBUG
+        i32 success = false;
+        glGetProgramiv(program, GL_LINK_STATUS, &success);
+        if (!success) {
+            i32 length = 0;
+            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+
+            std::vector<char> error(length);
+            glGetProgramInfoLog(program, length, &length, error.data());
+
+            NSM_ASSERT(false, "Shader program linking failed: ", error.data());
+        }
+    #endif
+
+    glDetachShader(program, vsh.getId());
+    glDetachShader(program, fsh.getId());
 
     return program;
 }

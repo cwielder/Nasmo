@@ -6,14 +6,8 @@
 namespace nsm {
 
     class IndexBuffer final {
-    private:
-        friend class Model;
-        friend class VertexArray;
-
-        IndexBuffer();
-
-
     public:
+        IndexBuffer();
         IndexBuffer(const u32* data, const std::size_t size, const BufferUsage usage = BufferUsage::StaticDraw);
         ~IndexBuffer();
 

@@ -11,7 +11,7 @@
 
 namespace nsm {
 
-    class Texture {
+    class Texture final {
         NSM_NO_COPY(Texture);
 
     public:

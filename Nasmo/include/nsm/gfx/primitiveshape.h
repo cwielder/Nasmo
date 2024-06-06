@@ -6,7 +6,7 @@
 
 namespace nsm {
 
-    class PrimitiveShape {
+    class PrimitiveShape final {
     public:
         static void init();
         static void destroy();

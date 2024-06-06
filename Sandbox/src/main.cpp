@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
         .size = {1280, 720},
         .type = nsm::Window::WindowType::Windowed
     };
-    info.initialScene = "scene.json";
+    info.initialScene = "scenes/demo.json";
 
     SandboxApplication app(info);
     app.run();    

@@ -5,7 +5,7 @@ namespace nsm {
     class Framebuffer;
     class CameraComponent;
 
-    struct RenderInfo {
+    struct RenderInfo final {
         CameraComponent* camera;
         const Framebuffer* framebuffer;
     };

@@ -41,7 +41,7 @@ void nsm::Application::handleEvents() {
 
     for (auto& event : eventQueueCopy) {
         this->onEventInternal(event);
-        this->onEvent(event);
+        this->onEvent(event); // User-defined event handling
 
         mScene.onEvent(event);
         mGraphics.onEvent(event);

@@ -15,7 +15,7 @@ namespace nsm {
     class Graphics final : public System {
     public:
         struct GraphicsInfo {
-            nsm::Window::WindowInfo window;
+            Window::WindowInfo window;
         };
     
     public:
@@ -30,13 +30,13 @@ namespace nsm {
         void transferData(Application& app, const std::vector<Entity*>& entities) override;
 
         [[nodiscard]] LayerStack& getLayerStack() { return *mLayerStack; }
-        [[nodiscard]] nsm::Window& getWindow() { return mWindow; }
+        [[nodiscard]] Window& getWindow() { return mWindow; }
 
         static glm::u32vec2 getFramebufferSize();
 
     private:
         LayerStack* mLayerStack;
-        nsm::Window mWindow;
+        Window mWindow;
     };
 
 }

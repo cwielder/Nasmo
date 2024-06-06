@@ -1,6 +1,6 @@
-#include <nsm/gfx/graphicscontext.h>
+#include <nsm/gfx/renderstate.h>
 
-nsm::GraphicsContext::GraphicsContext()
+nsm::RenderState::RenderState()
     : mDepthTest(true)
     , mDepthWrite(true)
     , mDepthFunction(DepthFunction::Less)
@@ -16,7 +16,7 @@ nsm::GraphicsContext::GraphicsContext()
     , mSrgb(false)
 { }
 
-void nsm::GraphicsContext::apply() const {
+void nsm::RenderState::apply() const {
     (mDepthTest ? glEnable : glDisable)(GL_DEPTH_TEST);
     if (mDepthTest) {
         glDepthFunc(static_cast<GLenum>(mDepthFunction));
@@ -35,9 +35,5 @@ void nsm::GraphicsContext::apply() const {
         glBlendEquation(static_cast<GLenum>(mBlendEquation));
     }
 
-    if (mSrgb) {
-        glEnable(GL_FRAMEBUFFER_SRGB);
-    } else {
-        glDisable(GL_FRAMEBUFFER_SRGB);
-    }
+    (mSrgb ? glEnable : glDisable)(GL_FRAMEBUFFER_SRGB);
 }

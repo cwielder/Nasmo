@@ -9,16 +9,16 @@
 nsm::ModelLayer::ModelLayer(const std::string& name)
     : Layer(name)
 {
-    mGraphicsContext
-        .depth(GraphicsContext::DepthFunction::Less, true)
-        .cull(GraphicsContext::CullFace::Back, GraphicsContext::CullDirection::CounterClockwise)
+    mRenderState
+        .depth(RenderState::DepthFunction::Less, true)
+        .cull(RenderState::CullFace::Back, RenderState::CullDirection::CounterClockwise)
         .blend(false)
         .srgb(true)
     ;
 }
 
 void nsm::ModelLayer::draw(const RenderInfo& renderInfo) {
-    mGraphicsContext.apply();
+    mRenderState.apply();
 
     std::unordered_set<Model*> models;
     for (const auto& component : mDrawables) {

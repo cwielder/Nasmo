@@ -9,11 +9,5 @@
             "srgb": true
         }
     ],
-    "uniforms": [
-        {
-            "name": "uColour",
-            "type": "vec3",
-            "value": [1, 0, 1]
-        }
-    ]
+    "uniforms": []
 }

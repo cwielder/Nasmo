@@ -16,9 +16,9 @@ namespace nsm {
 
     class ShaderProgram;
 
-    class Material {
+    class Material final {
     public:
-        class UniformVar {
+        class UniformVar final {
         public:
             enum class Type {
                 Int,
