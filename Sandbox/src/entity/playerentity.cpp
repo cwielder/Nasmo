@@ -10,7 +10,7 @@ class PlayerEntity : public nsm::Entity {
     };
 
 public:
-    static constexpr int cInstanceCount = 100;
+    static constexpr int cInstanceCount = 1;
 
     PlayerEntity(nsm::Entity::Properties&)
         : mModelData()
@@ -20,32 +20,31 @@ public:
 
     void onCreate() override {
         const std::pair<std::string, std::size_t> meshInstanceDataSizes[] = {
-            { "skull", sizeof(ModelData) }
+            { "sword", sizeof(ModelData) }
         };
 
         for (int i = 0; i < cInstanceCount; i++) {
-            // randomize position between -100 and 100
             mModelData[i].transform = glm::translate(glm::mat4(1.0f), glm::vec3(
                 (rand() % 100) - 50,
                 (rand() % 100) - 50,
                 (rand() % 100) - 50
-            ));
-            // scale by 0.1
-            mModelData[i].transform = glm::scale(mModelData[i].transform, glm::vec3(0.1f));
+            ) * glm::vec3(cInstanceCount > 1));
 
-            nsm::ModelComponent* mc = new nsm::ModelComponent("skull.json", "main", meshInstanceDataSizes);
-            mc->setInstanceData("skull", &mModelData[i]);
+            nsm::ModelComponent* mc = new nsm::ModelComponent("models/sword.json", "main", meshInstanceDataSizes);
+            mc->setInstanceData("sword", &mModelData[i]);
             this->addComponent<nsm::DrawableComponent>(mc);
         }
     }
 
     void onUpdate(const f32 timeStep) override {
         for (int i = 0; i < cInstanceCount; i++) {
-            // rotate by 0.1 degrees around the y-axis
-            mModelData[i].transform = glm::rotate(mModelData[i].transform, timeStep, glm::vec3(0.0f, 1.0f, 0.0f));
+            const f32 rf1 = static_cast<f32>(rand()) / static_cast<f32>(RAND_MAX);
+            const f32 rf2 = static_cast<f32>(rand()) / static_cast<f32>(RAND_MAX);
+            const f32 rf3 = static_cast<f32>(rand()) / static_cast<f32>(RAND_MAX);
+            mModelData[i].transform = glm::rotate(mModelData[i].transform, timeStep * rf2, glm::vec3(rf1 * 30.0f, rf2 * 30.0f, rf3 * 30.0f));
 
             nsm::ModelComponent* mc = static_cast<nsm::ModelComponent*>(this->getComponents<nsm::DrawableComponent>()[i]);
-            mc->setInstanceData("skull", &mModelData[i]);
+            mc->setInstanceData("sword", &mModelData[i]);
         }
     }
 
