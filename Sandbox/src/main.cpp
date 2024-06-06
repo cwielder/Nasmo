@@ -13,7 +13,7 @@ public:
     }
 
     void onUpdate(const f32 timeStep) override {
-        mGraphics.getWindow().setTitle("Nasmo Sandbox | " + std::to_string(1.0f / mGraphics.getFrameTime()) + " FPS");
+        mGraphics.getWindow().setTitle("Nasmo Sandbox | " + std::to_string(1.0f / timeStep) + " FPS");
     }
 };
 

@@ -29,9 +29,7 @@ namespace nsm {
 
         void transferData(Application& app, const std::vector<Entity*>& entities) override;
 
-        [[nodiscard]] f32 getTimeStep() const { return mTimeStep; }
         [[nodiscard]] LayerStack& getLayerStack() { return *mLayerStack; }
-        [[nodiscard]] f32 getFrameTime() const { return mFrameTime; }
         [[nodiscard]] nsm::Window& getWindow() { return mWindow; }
 
         static glm::u32vec2 getFramebufferSize();
@@ -39,7 +37,6 @@ namespace nsm {
     private:
         LayerStack* mLayerStack;
         nsm::Window mWindow;
-        f32 mTimeStep, mFrameTime, mLastFrameTime;
     };
 
 }

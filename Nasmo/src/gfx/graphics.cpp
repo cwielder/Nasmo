@@ -25,9 +25,6 @@ static void glErrorCallback(GLenum, GLenum, GLuint, GLenum severity, GLsizei, co
 
 nsm::Graphics::Graphics(const GraphicsInfo& info)
     : mWindow()
-    , mTimeStep(0.0f)
-    , mFrameTime(0.0f)
-    , mLastFrameTime(0.0f)
 {
     glfwInit();
 
@@ -69,11 +66,6 @@ bool nsm::Graphics::update() {
 
     glfwPollEvents();
     glfwSwapBuffers(window);
-
-    const f32 time = static_cast<f32>(glfwGetTime());
-	mFrameTime = time - mLastFrameTime;
-	mTimeStep = glm::min(mFrameTime, 0.0333f);
-	mLastFrameTime = time;
 
     mLayerStack->drawLayers();
 

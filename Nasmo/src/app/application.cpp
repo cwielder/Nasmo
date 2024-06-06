@@ -24,7 +24,7 @@ void nsm::Application::run() {
     this->intermoduleDataTransfer();
 
     do { // Main loop
-        const f32 ts = mGraphics.getTimeStep();
+        const f32 ts = mDeltaTime.update();
 
         this->onUpdate(ts);
         this->handleEvents();

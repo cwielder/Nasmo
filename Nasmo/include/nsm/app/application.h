@@ -3,6 +3,7 @@
 #include <nsm/common.h>
 #include <nsm/gfx/graphics.h>
 #include <nsm/entity/scene.h>
+#include <nsm/app/deltatime.h>
 
 #include <string>
 #include <vector>
@@ -58,6 +59,7 @@ namespace nsm {
         void onEventInternal(const Event* event);
 
     protected:
+        nsm::DeltaTime mDeltaTime;
         nsm::Graphics mGraphics;
         nsm::Scene mScene;
     };
