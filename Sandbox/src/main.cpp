@@ -9,6 +9,7 @@ public:
         : Application(info)
     {
         mGraphics.getLayerStack().pushLayer<nsm::ModelLayer>("main");
+        mGraphics.getWindow().setVsync(false);
     }
 
     void onUpdate(const f32 timeStep) override {
