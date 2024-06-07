@@ -14,6 +14,7 @@ public:
 
     DemoEntity(nsm::Entity::Properties&)
         : mModelData()
+        , mModelData2()
     { }
 
     ~DemoEntity() override = default;
