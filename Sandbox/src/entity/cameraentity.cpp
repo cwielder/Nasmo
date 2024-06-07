@@ -8,6 +8,7 @@ class CameraEntity : public nsm::Entity {
 public:
     CameraEntity(nsm::Entity::Properties& properties)
         : mPosition(nsm::JsonHelpers::getVec3(properties, "position"))
+        , mTime(0.0f)
     { }
 
     ~CameraEntity() override = default;
@@ -30,10 +31,14 @@ public:
     }
 
     void onUpdate(const f32 timeStep) override {
+        mPosition.x = static_cast<f32>(std::sin(mTime) * 20.0);
+        mTime += timeStep;
+
         this->getComponents<nsm::CameraComponent>()[0]->setView(mPosition, glm::vec3(mPosition.x, mPosition.y, 1.0f));
     }
 
     glm::vec3 mPosition;
+    f64 mTime;
 };
 
 NSM_REGISTER_ENTITY(CameraEntity);

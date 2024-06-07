@@ -10,11 +10,14 @@ class DemoEntity final : public nsm::Entity {
     };
 
 public:
-    static constexpr int cInstanceCount = 400;
+    static constexpr int cInstanceCount = 100;
 
     DemoEntity(nsm::Entity::Properties&)
         : mModelData()
         , mModelData2()
+        , mRandsX()
+        , mRandsY()
+        , mRandsZ()
     { }
 
     ~DemoEntity() override = default;
@@ -45,24 +48,40 @@ public:
                 (rand() % 100) - 50,
                 (rand() % 100) - 50,
                 (rand() % 100) - 50
-            ) * glm::vec3(cInstanceCount > 1));
+            ) * glm::vec3(cInstanceCount > 1)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
             nsm::ModelComponent* mc = new nsm::ModelComponent("models/skull.json", "main", meshInstanceDataSizes2);
             mc->setInstanceData("skull", &mModelData2[i]);
             this->addComponent<nsm::DrawableComponent>(mc);
         }
+
+        for (int i = 0; i < cInstanceCount; i++) {
+            mRandsX[i] = static_cast<f32>(rand()) / static_cast<f32>(RAND_MAX);
+            mRandsY[i] = static_cast<f32>(rand()) / static_cast<f32>(RAND_MAX);
+            mRandsZ[i] = static_cast<f32>(rand()) / static_cast<f32>(RAND_MAX);
+        }
     }
 
     void onUpdate(const f32 timeStep) override {
         for (int i = 0; i < cInstanceCount; i++) {
-            mModelData[i].transform = glm::rotate(mModelData[i].transform, timeStep , glm::vec3(1.0f));
+            mModelData[i].transform = glm::rotate(
+                mModelData[i].transform, timeStep * mRandsX[i], glm::vec3(
+                (mRandsX[i] * 50.0f) - 25.0f,
+                (mRandsY[i] * 50.0f) - 25.0f,
+                (mRandsZ[i] * 50.0f) - 25.0f
+            ));
 
             nsm::ModelComponent* mc = static_cast<nsm::ModelComponent*>(this->getComponents<nsm::DrawableComponent>()[i]);
             mc->setInstanceData("sword", &mModelData[i]);
         }
 
         for (int i = 0; i < cInstanceCount; i++) {
-            mModelData2[i].transform = glm::rotate(mModelData2[i].transform, timeStep, glm::vec3(1.0f));
+            mModelData2[i].transform = glm::rotate(
+                mModelData2[i].transform, timeStep * mRandsX[i], glm::vec3(
+                    (mRandsX[i] * 50.0f) - 25.0f,
+                    (mRandsY[i] * 50.0f) - 25.0f,
+                    (mRandsZ[i] * 50.0f) - 25.0f
+                ));
 
             nsm::ModelComponent* mc = static_cast<nsm::ModelComponent*>(this->getComponents<nsm::DrawableComponent>()[i + cInstanceCount]);
             mc->setInstanceData("skull", &mModelData2[i]);
@@ -71,6 +90,7 @@ public:
 
     ModelData mModelData[cInstanceCount];
     ModelData mModelData2[cInstanceCount];
+    f32 mRandsX[cInstanceCount], mRandsY[cInstanceCount], mRandsZ[cInstanceCount];
 };
 
 NSM_REGISTER_ENTITY(DemoEntity);
