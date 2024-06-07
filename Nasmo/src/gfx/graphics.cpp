@@ -10,6 +10,7 @@
 #include <nsm/gfx/material.h>
 #include <nsm/entity/component/drawablecomponent.h>
 #include <nsm/entity/component/cameracomponent.h>
+#include <nsm/entity/component/modelcomponent.h>
 #include <nsm/app/application.h>
 
 #include <glm/common.hpp>
@@ -56,6 +57,7 @@ nsm::Graphics::Graphics(const GraphicsInfo& info)
 nsm::Graphics::~Graphics() {
     delete mLayerStack;
 
+    ModelComponent::clearModels();
     Texture::clearCache();
     Material::clearCache();
     PrimitiveShape::destroy();

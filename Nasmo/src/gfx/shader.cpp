@@ -127,6 +127,8 @@ nsm::ShaderProgram::~ShaderProgram() {
     sProgramCacheRefCounter[mId]--;
 
     if (sProgramCacheRefCounter[mId] == 0) {
+        nsm::trace("Deleting shader program: ", mId, "...");
+
         glDeleteProgram(mId);
         sProgramCache.erase(std::find_if(sProgramCache.begin(), sProgramCache.end(), [this](const auto& program) {
             return program.second.first == mId;
@@ -179,6 +181,7 @@ i32 nsm::ShaderProgram::getOptionalLocation(const std::string& name) const {
 
 u32 nsm::ShaderProgram::link(const Shader& vsh, const Shader& fsh, const Shader* gsh) {
     const u32 program = glCreateProgram();
+    nsm::trace("Creating shader program: ", program, "...");
 
     glAttachShader(program, vsh.getId());
     glAttachShader(program, fsh.getId());

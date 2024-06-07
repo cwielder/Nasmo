@@ -40,3 +40,10 @@ void nsm::ModelComponent::setInstanceData(const std::string& meshName, void* dat
     mInstanceData[meshName] = data;
     mModel->setInstanceData(meshName, data, mInstanceID);
 }
+
+void nsm::ModelComponent::clearModels() {
+    for (auto& [path, model] : sModels) {
+        delete model;
+    }
+    sModels.clear();
+}
