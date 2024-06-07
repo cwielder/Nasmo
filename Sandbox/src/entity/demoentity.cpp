@@ -10,7 +10,7 @@ class DemoEntity final : public nsm::Entity {
     };
 
 public:
-    static constexpr int cInstanceCount = 1;
+    static constexpr int cInstanceCount = 400;
 
     DemoEntity(nsm::Entity::Properties&)
         : mModelData()
@@ -21,6 +21,10 @@ public:
     void onCreate() override {
         const std::pair<std::string, std::size_t> meshInstanceDataSizes[] = {
             { "sword", sizeof(ModelData) }
+        };
+
+        const std::pair<std::string, std::size_t> meshInstanceDataSizes2[] = {
+            { "skull", sizeof(ModelData) }
         };
 
         for (int i = 0; i < cInstanceCount; i++) {
@@ -34,6 +38,18 @@ public:
             mc->setInstanceData("sword", &mModelData[i]);
             this->addComponent<nsm::DrawableComponent>(mc);
         }
+
+        for (int i = 0; i < cInstanceCount; i++) {
+            mModelData2[i].transform = glm::translate(glm::mat4(1.0f), glm::vec3(
+                (rand() % 100) - 50,
+                (rand() % 100) - 50,
+                (rand() % 100) - 50
+            ) * glm::vec3(cInstanceCount > 1));
+
+            nsm::ModelComponent* mc = new nsm::ModelComponent("models/skull.json", "main", meshInstanceDataSizes2);
+            mc->setInstanceData("skull", &mModelData2[i]);
+            this->addComponent<nsm::DrawableComponent>(mc);
+        }
     }
 
     void onUpdate(const f32 timeStep) override {
@@ -43,9 +59,17 @@ public:
             nsm::ModelComponent* mc = static_cast<nsm::ModelComponent*>(this->getComponents<nsm::DrawableComponent>()[i]);
             mc->setInstanceData("sword", &mModelData[i]);
         }
+
+        for (int i = 0; i < cInstanceCount; i++) {
+            mModelData2[i].transform = glm::rotate(mModelData2[i].transform, timeStep, glm::vec3(1.0f));
+
+            nsm::ModelComponent* mc = static_cast<nsm::ModelComponent*>(this->getComponents<nsm::DrawableComponent>()[i + cInstanceCount]);
+            mc->setInstanceData("skull", &mModelData2[i]);
+        }
     }
 
     ModelData mModelData[cInstanceCount];
+    ModelData mModelData2[cInstanceCount];
 };
 
 NSM_REGISTER_ENTITY(DemoEntity);
