@@ -138,10 +138,14 @@ nsm::Model::Mesh::Mesh(std::string_view material, const std::vector<u32>& indice
     , mInstanceDataDirty(false)
     , mSSBO()
 {
-    mVertexArray.markAttribute(0, 3, VertexArray::DataType::Float, offsetof(Vertex, position), false);
-    mVertexArray.markAttribute(1, 2, VertexArray::DataType::Float, offsetof(Vertex, uv), false);
-    mVertexArray.markAttribute(2, 3, VertexArray::DataType::Float, offsetof(Vertex, color), false);
-    mVertexArray.markAttribute(3, 3, VertexArray::DataType::Float, offsetof(Vertex, normal), false);
+    const std::array<VertexArray::Attribute, 4> attributes = {
+        VertexArray::Attribute{0, 3, VertexArray::DataType::Float, offsetof(Vertex, position), 0, false},
+        VertexArray::Attribute{1, 2, VertexArray::DataType::Float, offsetof(Vertex, uv), 0, false},
+        VertexArray::Attribute{2, 3, VertexArray::DataType::Float, offsetof(Vertex, color), 0, false},
+        VertexArray::Attribute{3, 3, VertexArray::DataType::Float, offsetof(Vertex, normal), 0, false}
+    };
+
+    mVertexArray.setLayout(attributes);
     mVertexArray.linkBuffer(vertexBuffer, 0);
     mVertexArray.linkIndices(mIndexBuffer);
 }

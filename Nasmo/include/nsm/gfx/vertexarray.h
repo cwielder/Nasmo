@@ -3,7 +3,7 @@
 #include <nsm/common.h>
 #include <nsm/gfx/opengl.h>
 
-#include <vector>
+#include <array>
 
 namespace nsm {
 
@@ -28,7 +28,7 @@ namespace nsm {
             Count
         };
     
-    private:
+    public:
         struct Attribute {
             u32 location;
             u32 count;
@@ -46,12 +46,17 @@ namespace nsm {
 
         void linkBuffer(const VertexBuffer& buffer, const u32 vboIndex);
         void linkIndices(const IndexBuffer& indices) const;
-        
-        void markAttribute(const u32 location, const u32 count, const DataType type, const u32 offset, const u32 vboIndex, const bool normalized = false);
+
+        template <std::size_t N>
+        void setLayout(const std::array<Attribute, N>& attributes) {
+            this->setLayout(attributes.data(), N);
+        }
+    
+    private:
+        void setLayout(const Attribute* attributes, const std::size_t count);
 
     private:
         u32 mId;
-        std::vector<Attribute> mAttributes;
     };
 
 }

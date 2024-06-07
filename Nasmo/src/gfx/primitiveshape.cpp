@@ -21,8 +21,12 @@ void nsm::PrimitiveShape::init() {
     sQuadVBO = new VertexBuffer(quadVertexData, sizeof(quadVertexData), 2 * sizeof(f32), nsm::BufferUsage::StaticDraw);
     sQuadIBO = new IndexBuffer(quadIndexData, sizeof(quadIndexData), nsm::BufferUsage::StaticDraw);
 
+    const std::array<nsm::VertexArray::Attribute, 1> quadAttributes = {
+        nsm::VertexArray::Attribute{0, 2, nsm::VertexArray::DataType::Float, 0, 0, false}
+    };
+
     sQuadVAO = new VertexArray();
-    sQuadVAO->markAttribute(0, 2, nsm::VertexArray::DataType::Float, false, 0, false);
+    sQuadVAO->setLayout(quadAttributes);
     sQuadVAO->linkBuffer(*sQuadVBO, 0);
     sQuadVAO->linkIndices(*sQuadIBO);
 }
