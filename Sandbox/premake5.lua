@@ -27,7 +27,8 @@ project "Sandbox"
         "../Nasmo/vendor/glad/include",
         "../Nasmo/vendor/glm",
         "../Nasmo/vendor/simdjson/include",
-        "../Nasmo/vendor/stb"
+        "../Nasmo/vendor/stb",
+        "../Nasmo/vendor/imgui"
     }
 
     files {

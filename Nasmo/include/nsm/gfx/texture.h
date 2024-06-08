@@ -35,6 +35,8 @@ namespace nsm {
             RGBA8 = GL_RGBA8,
             RGBA16F = GL_RGBA16F,
             RGBA32F = GL_RGBA32F,
+            SRGB8 = GL_SRGB8,
+            SRGBA8 = GL_SRGB8_ALPHA8,
             Depth24Stencil8 = GL_DEPTH24_STENCIL8,
             Depth32FStencil8 = GL_DEPTH32F_STENCIL8,
             

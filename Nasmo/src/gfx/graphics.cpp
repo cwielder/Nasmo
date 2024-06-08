@@ -86,7 +86,7 @@ void nsm::Graphics::pushDrawable(nsm::DrawableComponent* drawable) {
     mLayerStack->pushDrawable(drawable);
 }
 
-void nsm::Graphics::transferData(Application& app, const std::vector<Entity*>& entities) {    
+void nsm::Graphics::transferData(const std::vector<Entity*>& entities) {    
     for (auto entity : entities) {        
         for (auto drawableComponent : entity->getComponents<nsm::DrawableComponent>()) {
             this->pushDrawable(drawableComponent);

@@ -13,3 +13,7 @@
 [submodule "Nasmo/vendor/stb"]
 	path = Nasmo/vendor/stb
 	url = https://github.com/nothings/stb
+[submodule "Nasmo/vendor/imgui"]
+	path = Nasmo/vendor/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking

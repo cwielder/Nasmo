@@ -59,7 +59,7 @@ void nsm::Application::raiseEvent(const Event* event) {
 }
 
 void nsm::Application::intermoduleDataTransfer() {
-    mGraphics.transferData(*this, mScene.getEntities());
+    mGraphics.transferData(mScene.getEntities());
 
     this->onSystemTransferData();
 }

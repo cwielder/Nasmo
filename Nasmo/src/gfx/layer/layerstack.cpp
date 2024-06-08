@@ -10,7 +10,7 @@ nsm::LayerStack::LayerStack(const glm::u32vec2& size)
     , mCompositorShader("nsm/assets/shaders/compositor.vsh", "nsm/assets/shaders/compositor.fsh")
     , mRenderState()
 {
-    mFramebuffer.addTextureBuffer(Texture::Format::RGBA8); //? Is this the right format? check for HDR
+    mFramebuffer.addTextureBuffer(Texture::Format::SRGB8);
     mFramebuffer.addTextureBuffer(Texture::Format::Depth24Stencil8);
     mFramebuffer.finalize();
 

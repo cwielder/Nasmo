@@ -40,6 +40,9 @@ namespace nsm {
 
             [[nodiscard]] const Material* getMaterial() const { return mMaterial; }
             [[nodiscard]] Material* getMaterial() { return mMaterial; }
+            [[nodiscard]] const VertexArray& getVertexArray() const { return mVertexArray; }
+            [[nodiscard]] const IndexBuffer& getIndexBuffer() const { return mIndexBuffer; }
+            [[nodiscard]] const ShaderStorage& getSSBO() const { return mSSBO; }
 
         private:
             Material* mMaterial;
@@ -72,6 +75,7 @@ namespace nsm {
             NSM_ASSERT(it != mMeshes.end(), "Mesh ", name, " not found in model ", mPath);
             return it->second;
         }
+        [[nodiscard]] const std::map<std::string, Mesh*>& getMeshes() const { return mMeshes; }
 
     private:
         std::string mPath;
