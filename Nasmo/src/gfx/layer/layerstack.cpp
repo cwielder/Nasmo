@@ -7,10 +7,10 @@
 nsm::LayerStack::LayerStack(const glm::u32vec2& size)
     : mLayers()
     , mFramebuffer(size)
-    , mCompositorShader("nsm/assets/shaders/compositor.vsh", "nsm/assets/shaders/compositor.fsh")
+    , mCompositorShader("nsm/assets/shaders/screen.vsh", "nsm/assets/shaders/compositor.fsh")
     , mRenderState()
 {
-    mFramebuffer.addTextureBuffer(Texture::Format::SRGB8);
+    mFramebuffer.addTextureBuffer(Texture::Format::RGB16F);
     mFramebuffer.addTextureBuffer(Texture::Format::Depth24Stencil8);
     mFramebuffer.finalize();
 
@@ -18,7 +18,6 @@ nsm::LayerStack::LayerStack(const glm::u32vec2& size)
         .blend(false)
         .cull(false)
         .depth(false)
-        .srgb(true)
     ;
 }
 

@@ -13,7 +13,6 @@ nsm::RenderState::RenderState()
     , mDstRGB(BlendFactor::OneMinusSrcAlpha)
     , mDstA(BlendFactor::OneMinusSrcAlpha)
     , mBlendEquation(BlendEquation::Add)
-    , mSrgb(false)
 { }
 
 void nsm::RenderState::apply() const {
@@ -34,6 +33,4 @@ void nsm::RenderState::apply() const {
         glBlendFuncSeparate(static_cast<GLenum>(mSrcRGB), static_cast<GLenum>(mDstRGB), static_cast<GLenum>(mSrcA), static_cast<GLenum>(mDstA));
         glBlendEquation(static_cast<GLenum>(mBlendEquation));
     }
-
-    (mSrgb ? glEnable : glDisable)(GL_FRAMEBUFFER_SRGB);
 }

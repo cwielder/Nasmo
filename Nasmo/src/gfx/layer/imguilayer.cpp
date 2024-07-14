@@ -97,10 +97,6 @@ static void SetupImGuiStyle() {
 nsm::ImGuiLayer::ImGuiLayer(const std::string& name)
     : Layer(name)
 {
-    mRenderState
-        .srgb(true)
-    ;
-
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::GetIO().ConfigFlags |= (ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable);
@@ -123,7 +119,6 @@ nsm::ImGuiLayer::~ImGuiLayer() {
 
 void nsm::ImGuiLayer::draw(const RenderInfo& renderInfo) {
     ImGui::Render();
-    glEnable(GL_FRAMEBUFFER_SRGB);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     GLFWwindow* backupCurrentContext = glfwGetCurrentContext();

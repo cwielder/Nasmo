@@ -1,6 +1,7 @@
 #include <nsm/app/application.h>
-#include <nsm/gfx/layer/modellayer.h>
 #include <nsm/gfx/layer/layerstack.h>
+#include <nsm/gfx/layer/modellayer.h>
+#include <nsm/gfx/layer/gammalayer.h>
 #include <nsm/gfx/layer/imguilayer.h>
 #include <nsm/entity/component/modelcomponent.h>
 
@@ -44,6 +45,7 @@ public:
         , mDebugSystem()
     {
         mGraphics.getLayerStack().pushLayer<nsm::ModelLayer>("main");
+        mGraphics.getLayerStack().pushLayer<nsm::GammaLayer>("gamma");
         mGraphics.getLayerStack().pushLayer<nsm::ImGuiLayer>("imgui");
 
         mGraphics.getWindow().setVsync(false);

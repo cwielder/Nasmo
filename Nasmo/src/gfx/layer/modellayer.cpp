@@ -13,7 +13,6 @@ nsm::ModelLayer::ModelLayer(const std::string& name)
         .depth(RenderState::DepthFunction::Less, true)
         .cull(RenderState::CullFace::Back, RenderState::CullDirection::CounterClockwise)
         .blend(false)
-        .srgb(true)
     ;
 }
 

@@ -129,16 +129,9 @@ namespace nsm {
             return *this;
         }
 
-        RenderState& srgb(const bool b) {
-            mSrgb = b;
-
-            return *this;
-        }
-
         void apply() const;
 
     private:
-        bool mSrgb;
         bool mDepthTest;
         bool mDepthWrite;
         bool mCullEnabled;
