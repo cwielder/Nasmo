@@ -6,12 +6,13 @@
 
 nsm::LayerStack::LayerStack(const glm::u32vec2& size)
     : mLayers()
-    , mFramebuffer(size)
-    , mCompositorShader("nsm/assets/shaders/screen.vsh", "nsm/assets/shaders/compositor.fsh")
+    , mFramebuffer()
+    , mCompositorShader("nsm/assets/shaders/screen.vsh", "nsm/assets/shaders/blit.fsh")
     , mRenderState()
+    , mViewport(size)
 {
-    mFramebuffer.addTextureBuffer(Texture::Format::RGB16F);
-    mFramebuffer.addTextureBuffer(Texture::Format::Depth24Stencil8);
+    mFramebuffer.addTextureBuffer(Texture::Format::RGB16F, size);
+    mFramebuffer.addTextureBuffer(Texture::Format::Depth24Stencil8, size);
     mFramebuffer.finalize();
 
     mRenderState
@@ -59,6 +60,7 @@ nsm::Layer* nsm::LayerStack::getLayer(const std::size_t hash) {
 }
 
 void nsm::LayerStack::resize(const glm::u32vec2& size) {
+    mViewport.resize(size);
     mFramebuffer.resize(size);
 
     for (auto& [hash, layer] : mLayers) {
@@ -75,6 +77,8 @@ void nsm::LayerStack::pushDrawable(DrawableComponent* drawable) {
 }
 
 void nsm::LayerStack::drawLayers() const {
+    mViewport.apply();
+
     Framebuffer::getBackbuffer()->clear(glm::f32vec4{ 0.0f }, Framebuffer::Type::Color);
     Framebuffer::getBackbuffer()->clear(glm::f32vec4{ 1.0f }, Framebuffer::Type::Depth);
 

@@ -19,7 +19,6 @@ namespace nsm {
     private:
         f32 mExponent;
         ShaderProgram mShader;
-        RenderState mRenderState;
     };
 
 }

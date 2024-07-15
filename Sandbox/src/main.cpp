@@ -1,6 +1,7 @@
 #include <nsm/app/application.h>
 #include <nsm/gfx/layer/layerstack.h>
 #include <nsm/gfx/layer/modellayer.h>
+#include <nsm/gfx/layer/bloomlayer.h>
 #include <nsm/gfx/layer/tonemaplayer.h>
 #include <nsm/gfx/layer/imguilayer.h>
 #include <nsm/entity/component/modelcomponent.h>
@@ -45,6 +46,7 @@ public:
         , mDebugSystem()
     {
         mGraphics.getLayerStack().pushLayer<nsm::ModelLayer>("main");
+        mGraphics.getLayerStack().pushLayer<nsm::BloomLayer>("bloom");
         mGraphics.getLayerStack().pushLayer<nsm::TonemapLayer>("cc");
         mGraphics.getLayerStack().pushLayer<nsm::ImGuiLayer>("imgui");
 

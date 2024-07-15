@@ -10,7 +10,7 @@ class DemoEntity final : public nsm::Entity {
     };
 
 public:
-    static constexpr int cInstanceCount = 200;
+    static constexpr int cInstanceCount = 40;
 
     DemoEntity(nsm::Entity::Properties&)
         : mModelData()

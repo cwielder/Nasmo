@@ -31,7 +31,6 @@ namespace nsm {
         bool update();
 
         void setTitle(const std::string& title);
-        void setViewport(const glm::u32vec2& size);
         void setVsync(bool enabled);
 
     private:

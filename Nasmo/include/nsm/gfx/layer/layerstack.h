@@ -4,6 +4,7 @@
 #include <nsm/gfx/framebuffer.h>
 #include <nsm/gfx/renderstate.h>
 #include <nsm/gfx/renderinfo.h>
+#include <nsm/gfx/viewport.h>
 
 #include <glm/vec2.hpp>
 
@@ -55,6 +56,7 @@ namespace nsm {
         Framebuffer mFramebuffer;
         ShaderProgram mCompositorShader;
         RenderState mRenderState;
+        Viewport mViewport;
     };
 
 }

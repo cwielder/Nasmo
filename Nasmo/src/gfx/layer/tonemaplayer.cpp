@@ -7,7 +7,6 @@ nsm::TonemapLayer::TonemapLayer(const std::string& name, const f32 exponent)
     : Layer(name)
     , mExponent(exponent)
     , mShader("nsm/assets/shaders/screen.vsh", "nsm/assets/shaders/tonemap_aces.fsh")
-    , mRenderState()
 {
     mRenderState
         .blend(false)

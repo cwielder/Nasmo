@@ -29,10 +29,6 @@ void nsm::Window::setTitle(const std::string& title) {
     glfwSetWindowTitle(mHandle, title.c_str());
 }
 
-void nsm::Window::setViewport(const glm::u32vec2& size) {
-    glViewport(0, 0, size.x, size.y);
-}
-
 void nsm::Window::init(const WindowInfo& info) {
     auto createWindow = [&](bool resizable) {
         glfwWindowHint(GLFW_RESIZABLE, resizable);

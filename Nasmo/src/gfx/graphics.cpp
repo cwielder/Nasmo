@@ -77,7 +77,6 @@ bool nsm::Graphics::update() {
 void nsm::Graphics::onEvent(const Event* event) {
     if (event->getType() == nsm::EventType::WindowResize) {
         const WindowResizeEvent* e = static_cast<const WindowResizeEvent*>(event);
-        mWindow.setViewport(e->getSize());
         mLayerStack->resize(e->getSize());
     }
 }

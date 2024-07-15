@@ -6,15 +6,6 @@
 
 nsm::Framebuffer::Framebuffer()
     : mId(GL_NONE)
-    , mSize({ 0, 0 })
-    , mTextureBuffers()
-    , mDepthStencil(nullptr)
-    , mFinalized(true)
-{ }
-
-nsm::Framebuffer::Framebuffer(const glm::u32vec2& size)
-    : mId(GL_NONE)
-    , mSize(size)
     , mTextureBuffers()
     , mDepthStencil(nullptr)
     , mFinalized(false)
@@ -64,8 +55,6 @@ void nsm::Framebuffer::clear(const glm::u32vec4& value, const Type type, const u
 void nsm::Framebuffer::resize(const glm::u32vec2& size) {
     NSM_ASSERT(mId != GL_NONE, "Cannot resize backbuffer!");
 
-    mSize = size;
-
     // as for the texture buffers, we can't resize them so we have to delete them and recreate them
 
     std::vector<Texture*> newTextureBuffers;
@@ -87,9 +76,15 @@ void nsm::Framebuffer::resize(const glm::u32vec2& size) {
     }
 }
 
-const nsm::Framebuffer* nsm::Framebuffer::getBackbuffer() {
-    static const Framebuffer backbuffer = Framebuffer();
-    return &backbuffer;
+static nsm::Framebuffer* backbufferKeeper() {
+    static std::aligned_storage_t<sizeof(nsm::Framebuffer), alignof(nsm::Framebuffer)> backbufferStorage;
+    std::memset(&backbufferStorage, 0, sizeof(nsm::Framebuffer));
+    return reinterpret_cast<nsm::Framebuffer*>(&backbufferStorage);
+}
+
+nsm::Framebuffer* nsm::Framebuffer::getBackbuffer() {
+    static nsm::Framebuffer* backbuffer = backbufferKeeper();
+    return backbuffer;
 }
 
 void nsm::Framebuffer::blit(const Framebuffer& src, const Framebuffer& dst, const glm::u32vec2& srcStart, const glm::u32vec2& srcEnd, const glm::u32vec2& dstStart, const glm::u32vec2& dstEnd, const u32 typeMask, const Texture::FilterMode filterMode) {
@@ -104,16 +99,16 @@ void nsm::Framebuffer::blit(const Framebuffer& src, const Framebuffer& dst, cons
     glBlitNamedFramebuffer(src.getID(), dst.getID(), srcStart.x, srcStart.y, srcEnd.x, srcEnd.y, dstStart.x, dstStart.y, dstEnd.x, dstEnd.y, mask, static_cast<GLenum>(filterMode));
 }
 
-void nsm::Framebuffer::addTextureBuffer(const Texture::Format fmt, const Texture::FilterMode enlargeFilter, const Texture::FilterMode shrinkFilter) {
+void nsm::Framebuffer::addTextureBuffer(const Texture::Format fmt, const glm::u32vec2& size, const Texture::FilterMode enlargeFilter, const Texture::FilterMode shrinkFilter) {
     NSM_ASSERT(mId != GL_NONE, "Cannot add texture buffer to backbuffer!");
     NSM_ASSERT(mFinalized == false, "Cannot add texture buffer to finalized framebuffer!");
 
     if (fmt == Texture::Format::Depth24Stencil8 || fmt == Texture::Format::Depth32FStencil8) {
         NSM_ASSERT(mDepthStencil == nullptr, "Framebuffer already has depth/stencil attachment!");
-        mDepthStencil = new Texture(mSize, fmt, enlargeFilter);
+        mDepthStencil = new Texture(size, fmt, enlargeFilter);
         glNamedFramebufferTexture(mId, GL_DEPTH_STENCIL_ATTACHMENT, mDepthStencil->getID(), 0);
     } else {
-        mTextureBuffers.push_back(new Texture(mSize, fmt, enlargeFilter));
+        mTextureBuffers.push_back(new Texture(size, fmt, enlargeFilter));
         glNamedFramebufferTexture(mId, GL_COLOR_ATTACHMENT0 + static_cast<u32>(mTextureBuffers.size()) - 1, mTextureBuffers.back()->getID(), 0);
     }
 }
@@ -143,4 +138,3 @@ void nsm::Framebuffer::finalize() const {
         }
     #endif
 }
-

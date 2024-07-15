@@ -28,6 +28,7 @@ namespace nsm {
         };
 
         enum class Format : u16 {
+            R11G11B10F = GL_R11F_G11F_B10F,
             RGB16F = GL_RGB16F,
             RGB32F = GL_RGB32F,
             R8 = GL_R8,
