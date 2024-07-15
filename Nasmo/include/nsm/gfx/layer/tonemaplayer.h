@@ -6,10 +6,10 @@
 
 namespace nsm {
 
-    class GammaLayer final : public Layer {
+    class TonemapLayer final : public Layer {
     public:
-        GammaLayer(const std::string& name, const f32 exponent = 2.2f);
-        ~GammaLayer() override = default;
+        TonemapLayer(const std::string& name, const f32 exponent = 2.2f);
+        ~TonemapLayer() override = default;
 
         void draw(const RenderInfo& renderInfo) override;
 

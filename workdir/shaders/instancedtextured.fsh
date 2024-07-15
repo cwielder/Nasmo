@@ -7,8 +7,6 @@ in vec3 vNormal;
 
 out vec4 oFragColor;
 
-uniform vec3 uColour;
-
 void main() {
-    oFragColor = texture(tex0, vTexCoord);
+    oFragColor = texture(tex0, vTexCoord) * vec4(4.0);
 }

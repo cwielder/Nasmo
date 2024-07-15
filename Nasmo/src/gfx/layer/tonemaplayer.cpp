@@ -1,12 +1,12 @@
-#include <nsm/gfx/layer/gammalayer.h>
+#include <nsm/gfx/layer/tonemaplayer.h>
 #include <nsm/gfx/primitiveshape.h>
 #include <nsm/gfx/renderinfo.h>
 #include <nsm/gfx/framebuffer.h>
 
-nsm::GammaLayer::GammaLayer(const std::string& name, const f32 exponent)
+nsm::TonemapLayer::TonemapLayer(const std::string& name, const f32 exponent)
     : Layer(name)
     , mExponent(exponent)
-    , mShader("nsm/assets/shaders/screen.vsh", "nsm/assets/shaders/gamma.fsh")
+    , mShader("nsm/assets/shaders/screen.vsh", "nsm/assets/shaders/tonemap_aces.fsh")
     , mRenderState()
 {
     mRenderState
@@ -16,7 +16,7 @@ nsm::GammaLayer::GammaLayer(const std::string& name, const f32 exponent)
     ;
 }
 
-void nsm::GammaLayer::draw(const RenderInfo& renderInfo) {
+void nsm::TonemapLayer::draw(const RenderInfo& renderInfo) {
     mRenderState.apply();
 
     mShader.bind();
