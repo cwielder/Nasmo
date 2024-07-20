@@ -86,13 +86,6 @@ void nsm::Model::addInstance(std::size_t* outID) {
 }
 
 void nsm::Model::removeInstance(std::size_t id) {
-    /**
-        * TODO: potential strategy for preventing instance buffer reallocation:
-            - when indexes get deleted, keep them in a "free list" to be reused and handed out later
-            - to skip over unused entries, have an int uniform in the instance shader to add a delta to gl_InstanceID 
-            - the instanceIdDelta is the count of how many unused entries exist before the current index
-    */
-
     NSM_ASSERT(id < mInstanceIDs.size(), "Instance ID ", id, " out of bounds");
     mInstanceIDs.erase(mInstanceIDs.begin() + id);
 

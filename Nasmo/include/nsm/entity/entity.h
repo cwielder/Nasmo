@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nsm/common.h>
+#include <nsm/debug/assert.h>
 
 #include <simdjson.h>
 
@@ -72,6 +73,14 @@ namespace nsm {
         template <typename T>
         bool hasComponent() requires std::is_base_of_v<EntityComponent, T> {
             return mComponents.find(std::type_index(typeid(T))) != mComponents.end();
+        }
+
+        template <typename t>
+        void removeComponent(std::size_t index) {
+            NSM_ASSERT(index < mComponents[std::type_index(typeid(t))].size(), "Index out of bounds!");
+
+            delete mComponents[std::type_index(typeid(t))][index];
+            mComponents[std::type_index(typeid(t))].erase(mComponents[std::type_index(typeid(t))].begin() + index);
         }
 
         [[nodiscard]] const std::string& getIdentifier() const { return mRegistry->getIdentifier(); }

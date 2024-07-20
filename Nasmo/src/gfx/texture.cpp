@@ -86,7 +86,7 @@ void nsm::Texture::initFromFile(const std::string& path, bool srgb, const Filter
 void nsm::Texture::initFromMemory(const u8* data, const std::size_t length, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
     i32 width = 0, height = 0, channels = 0;
     u8* loadedData = stbi_load_from_memory(data, static_cast<int>(length), &width, &height, &channels, 0);
-    nsm::warn("Loaded texture from memory: ", width, "x", height, " with ", channels, " channels");
+    nsm::trace("Loaded texture from memory: ", width, "x", height, " with ", channels, " channels");
     NSM_ASSERT(loadedData != nullptr, "Failed to load texture from memory");
 
     // TODO: Cache this data
