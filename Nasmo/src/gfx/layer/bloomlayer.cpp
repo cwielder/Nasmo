@@ -30,8 +30,6 @@ void nsm::BloomLayer::draw(const nsm::RenderInfo& renderInfo) {
     this->downsample(renderInfo, viewport);
     this->upsample(renderInfo, viewport);
     this->blit(renderInfo, viewport);
-    
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT); //? WHY
 }
 
 void nsm::BloomLayer::downsample(const nsm::RenderInfo& renderInfo, nsm::Viewport& viewport) {

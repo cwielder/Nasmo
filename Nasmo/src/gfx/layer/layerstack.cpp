@@ -94,6 +94,8 @@ void nsm::LayerStack::drawLayers() const {
 
         layer->draw(renderInfo);
         layer->mDrawables.clear();
+
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT); //? WHY
     }
 
     mRenderState.apply();
