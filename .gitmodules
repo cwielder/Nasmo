@@ -17,3 +17,6 @@
 	path = Nasmo/vendor/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
+[submodule "Nasmo/vendor/fastgltf"]
+	path = Nasmo/vendor/fastgltf
+	url = https://github.com/Lumis-Submodules/fastgltf.git

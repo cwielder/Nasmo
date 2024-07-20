@@ -27,6 +27,15 @@ namespace nsm {
             Count
         };
 
+        enum class WrapMode : u16 {
+            Repeat = GL_REPEAT,
+            MirroredRepeat = GL_MIRRORED_REPEAT,
+            ClampToEdge = GL_CLAMP_TO_EDGE,
+            ClampToBorder = GL_CLAMP_TO_BORDER,
+
+            Count
+        };
+
         enum class Format : u16 {
             R11G11B10F = GL_R11F_G11F_B10F,
             RGB16F = GL_RGB16F,
@@ -44,19 +53,21 @@ namespace nsm {
             Count
         };
 
-    private:
-        Texture();
-
     public:
-        Texture(const std::string& path, bool srgb = false, const FilterMode filterMode = FilterMode::Linear);
-        Texture(const glm::u32vec2& size, const Format fmt, const FilterMode filterMode = FilterMode::Linear);
+        Texture();
+        Texture(const std::string& path, bool srgb, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
+        Texture(const glm::u32vec2& size, const Format fmt, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
+        Texture(const u8* data, const std::size_t length, bool srgb = false, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
         ~Texture();
 
         Texture(Texture&& other) noexcept
             : mId(other.mId)
             , mSize(other.mSize)
             , mFormat(other.mFormat)
-            , mFilterMode(other.mFilterMode)
+            , mEnlargeFilter(other.mEnlargeFilter)
+            , mShrinkFilter(other.mShrinkFilter)
+            , mWrapS(other.mWrapS)
+            , mWrapT(other.mWrapT)
         {
             other.mId = GL_NONE;
         }
@@ -66,7 +77,10 @@ namespace nsm {
                 mId = other.mId;
                 mSize = other.mSize;
                 mFormat = other.mFormat;
-                mFilterMode = other.mFilterMode;
+                mEnlargeFilter = other.mEnlargeFilter;
+                mShrinkFilter = other.mShrinkFilter;
+                mWrapS = other.mWrapS;
+                mWrapT = other.mWrapT;
 
                 other.mId = GL_NONE;
             }
@@ -74,15 +88,19 @@ namespace nsm {
             return *this;
         }
 
-        void initFromFile(const std::string& path, bool srgb = false, const FilterMode filterMode = FilterMode::Linear);
-        void initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, bool srgb = false, const FilterMode filterMode = FilterMode::Linear);
+        void initFromFile(const std::string& path, bool srgb = false, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
+        void initFromMemory(const u8* data, const std::size_t length, bool srgb = false, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
+        void initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, bool srgb = false, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
 
         void bind(const u32 slot) const;
 
         [[nodiscard]] u32 getID() const { return mId; }
         [[nodiscard]] glm::vec2 getSize() const { return mSize; }
         [[nodiscard]] Format getFormat() const { return mFormat; }
-        [[nodiscard]] FilterMode getFilterMode() const { return mFilterMode; }
+        [[nodiscard]] FilterMode getEnlargeFilter() const { return mEnlargeFilter; }
+        [[nodiscard]] FilterMode getShrinkFilter() const { return mShrinkFilter; }
+        [[nodiscard]] WrapMode getWrapS() const { return mWrapS; }
+        [[nodiscard]] WrapMode getWrapT() const { return mWrapT; }
 
         static void clearCache();
 
@@ -92,7 +110,8 @@ namespace nsm {
         glm::u32vec2 mSize;
         u32 mId;
         Format mFormat;
-        FilterMode mFilterMode;
+        FilterMode mEnlargeFilter, mShrinkFilter;
+        WrapMode mWrapS, mWrapT;
     };
 
 }

@@ -15,6 +15,7 @@ project "Nasmo"
         "GLFW",
         "glad",
         "simdjson",
+        "fastgltf",
     }
 
     includedirs {
@@ -25,7 +26,8 @@ project "Nasmo"
         "vendor/glm",
         "vendor/simdjson/include",
         "vendor/stb",
-        "vendor/imgui"
+        "vendor/imgui",
+        "vendor/fastgltf/include",
     }
 
     libdirs {
@@ -94,4 +96,5 @@ group "Dependencies"
     include "vendor/glfw"
     include "vendor/glad"
     include "vendor/simdjson"
+    include "vendor/fastgltf"
 group ""

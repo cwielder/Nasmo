@@ -12,6 +12,12 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
+namespace fastgltf {
+    class Asset;
+    struct Material;
+    struct Texture;
+}
+
 namespace nsm {
 
     class ShaderProgram;
@@ -56,7 +62,7 @@ namespace nsm {
         };
     
     public:
-        [[nodiscard]] static Material* get(const std::string& path);
+        [[nodiscard]] static Material* get(const std::string& identifier, const fastgltf::Asset& asset, const fastgltf::Material& resource);
 
         void bind() const;
 
@@ -68,7 +74,10 @@ namespace nsm {
         static void clearCache();
 
     private:
-        Material(const std::string& path);
+        Material(const fastgltf::Asset& asset, const fastgltf::Material& resource);
+        ~Material();
+
+        void addTexture(const fastgltf::Asset& asset, const fastgltf::Texture& tex);
 
         static std::map<std::string, Material*> sMaterialCache;
 

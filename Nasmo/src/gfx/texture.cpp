@@ -11,28 +11,42 @@ nsm::Texture::Texture()
     : mId(GL_NONE)
     , mSize(0, 0)
     , mFormat(Format::Count)
-    , mFilterMode(FilterMode::Count)
+    , mEnlargeFilter(FilterMode::Count)
+    , mShrinkFilter(FilterMode::Count)
+    , mWrapS(WrapMode::Count)
+    , mWrapT(WrapMode::Count)
 {
     glCreateTextures(GL_TEXTURE_2D, 1, &mId);
 }
 
-nsm::Texture::Texture(const std::string& path, bool srgb, const FilterMode filterMode)
+nsm::Texture::Texture(const std::string& path, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
     : Texture()
 {
-    this->initFromFile(path, srgb, filterMode);
+    this->initFromFile(path, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
 }
 
-nsm::Texture::Texture(const glm::u32vec2& size, const Format fmt, const FilterMode filterMode)
+nsm::Texture::Texture(const glm::u32vec2& size, const Format fmt, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
     : Texture()
 {
     glTextureStorage2D(mId, 1, static_cast<GLenum>(fmt), size.x, size.y);
 
-    glTextureParameteri(mId, GL_TEXTURE_MIN_FILTER, static_cast<GLenum>(filterMode));
-    glTextureParameteri(mId, GL_TEXTURE_MAG_FILTER, static_cast<GLenum>(filterMode));
+    glTextureParameteri(mId, GL_TEXTURE_MAG_FILTER, static_cast<GLenum>(enlargeFilter));
+    glTextureParameteri(mId, GL_TEXTURE_MIN_FILTER, static_cast<GLenum>(shrinkFilter));
+    glTextureParameteri(mId, GL_TEXTURE_WRAP_S, static_cast<GLenum>(wrapS));
+    glTextureParameteri(mId, GL_TEXTURE_WRAP_T, static_cast<GLenum>(wrapT));
 
     mSize = size;
     mFormat = fmt;
-    mFilterMode = filterMode;
+    mEnlargeFilter = enlargeFilter;
+    mShrinkFilter = shrinkFilter;
+    mWrapS = wrapS;
+    mWrapT = wrapT;
+}
+
+nsm::Texture::Texture(const u8* data, const std::size_t length, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
+    : Texture()
+{
+    this->initFromMemory(data, length, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
 }
 
 nsm::Texture::~Texture() {
@@ -41,7 +55,7 @@ nsm::Texture::~Texture() {
     }
 }
 
-void nsm::Texture::initFromFile(const std::string& path, bool srgb, const FilterMode filterMode) {
+void nsm::Texture::initFromFile(const std::string& path, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
     NSM_ASSERT(mId != GL_NONE, "Cannot initialize invalid texture");
 
     const auto load = [&path]() -> std::tuple<u8*, glm::u32vec2, u32> {
@@ -64,18 +78,31 @@ void nsm::Texture::initFromFile(const std::string& path, bool srgb, const Filter
 
     const auto& [data, size, channels] = load();
 
-    this->initFromData(data, channels, size, srgb, filterMode);
+    this->initFromData(data, channels, size, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
 
     nsm::trace("Loaded texture from file: ", path);
 }
 
-void nsm::Texture::initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, bool srgb, const FilterMode filterMode) {
+void nsm::Texture::initFromMemory(const u8* data, const std::size_t length, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
+    i32 width = 0, height = 0, channels = 0;
+    u8* loadedData = stbi_load_from_memory(data, static_cast<int>(length), &width, &height, &channels, 0);
+    nsm::warn("Loaded texture from memory: ", width, "x", height, " with ", channels, " channels");
+    NSM_ASSERT(loadedData != nullptr, "Failed to load texture from memory");
+
+    // TODO: Cache this data
+
+    this->initFromData(loadedData, channels, { static_cast<u32>(width), static_cast<u32>(height) }, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
+}
+
+void nsm::Texture::initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
     NSM_ASSERT(mId != GL_NONE, "Cannot initialize invalid texture");
 
     mSize = size;
 
-    glTextureParameteri(mId, GL_TEXTURE_MIN_FILTER, static_cast<GLenum>(filterMode));
-    glTextureParameteri(mId, GL_TEXTURE_MAG_FILTER, static_cast<GLenum>(filterMode));
+    glTextureParameteri(mId, GL_TEXTURE_MAG_FILTER, static_cast<GLenum>(enlargeFilter));
+    glTextureParameteri(mId, GL_TEXTURE_MIN_FILTER, static_cast<GLenum>(shrinkFilter));
+    glTextureParameteri(mId, GL_TEXTURE_WRAP_S, static_cast<GLenum>(wrapS));
+    glTextureParameteri(mId, GL_TEXTURE_WRAP_T, static_cast<GLenum>(wrapT));
 
     const auto safeSubImage = [this, data, size](const u32 format) {
         if (data == nullptr) [[unlikely]] {
@@ -120,7 +147,10 @@ void nsm::Texture::initFromData(const u8* data, const u32 channelCount, const gl
     glTextureParameteri(mId, GL_TEXTURE_MAX_LEVEL, 6);
     glGenerateTextureMipmap(mId);
 
-    mFilterMode = filterMode;
+    mEnlargeFilter = enlargeFilter;
+    mShrinkFilter = shrinkFilter;
+    mWrapS = wrapS;
+    mWrapT = wrapT;
 }
 
 void nsm::Texture::bind(const u32 slot) const {

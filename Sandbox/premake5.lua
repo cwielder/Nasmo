@@ -16,6 +16,7 @@ project "Sandbox"
         "GLFW",
         "glad",
         "simdjson",
+        "fastgltf",
     }
 
     includedirs {
@@ -28,7 +29,8 @@ project "Sandbox"
         "../Nasmo/vendor/glm",
         "../Nasmo/vendor/simdjson/include",
         "../Nasmo/vendor/stb",
-        "../Nasmo/vendor/imgui"
+        "../Nasmo/vendor/imgui",
+        "../Nasmo/vendor/fastgltf",
     }
 
     files {

@@ -4,25 +4,30 @@
 #include <nsm/util/jsonhelpers.h>
 #include <nsm/debug/assert.h>
 
-#include <simdjson.h>
+#include <fastgltf/core.hpp>
+#include <fastgltf/glm_element_traits.hpp>
 
-static nsm::Texture::FilterMode getFilterMode(const std::string& mode) {
-    if (mode == "nearest") {
-        return nsm::Texture::FilterMode::Nearest;
-    } else if (mode == "linear") {
-        return nsm::Texture::FilterMode::Linear;
-    } else if (mode == "nearest_mipmap_nearest") {
-        return nsm::Texture::FilterMode::NearestMipmapNearest;
-    } else if (mode == "linear_mipmap_nearest") {
-        return nsm::Texture::FilterMode::LinearMipmapNearest;
-    } else if (mode == "nearest_mipmap_linear") {
-        return nsm::Texture::FilterMode::NearestMipmapLinear;
-    } else if (mode == "linear_mipmap_linear") {
-        return nsm::Texture::FilterMode::LinearMipmapLinear;
+namespace {
+    nsm::Texture::FilterMode getFilterMode(const fastgltf::Filter filter) {
+        switch (filter) {
+            case fastgltf::Filter::Linear: return nsm::Texture::FilterMode::Linear;
+            case fastgltf::Filter::Nearest: return nsm::Texture::FilterMode::Nearest;
+            case fastgltf::Filter::LinearMipMapLinear: return nsm::Texture::FilterMode::LinearMipmapLinear;
+            case fastgltf::Filter::LinearMipMapNearest: return nsm::Texture::FilterMode::LinearMipmapNearest;
+            case fastgltf::Filter::NearestMipMapLinear: return nsm::Texture::FilterMode::NearestMipmapLinear;
+            case fastgltf::Filter::NearestMipMapNearest: return nsm::Texture::FilterMode::NearestMipmapNearest;
+            default: nsm::warn("Unknown filter mode"); return nsm::Texture::FilterMode::Linear;
+        }
     }
 
-    NSM_ASSERT(false, "Invalid filter mode: ", mode);
-    return nsm::Texture::FilterMode::Count;
+    nsm::Texture::WrapMode getWrapMode(const fastgltf::Wrap wrap) {
+        switch (wrap) {
+            case fastgltf::Wrap::ClampToEdge: return nsm::Texture::WrapMode::ClampToEdge;
+            case fastgltf::Wrap::MirroredRepeat: return nsm::Texture::WrapMode::MirroredRepeat;
+            case fastgltf::Wrap::Repeat: return nsm::Texture::WrapMode::Repeat;
+            default: nsm::warn("Unknown wrap mode"); return nsm::Texture::WrapMode::Repeat;
+        }
+    }
 }
 
 // UniformVar
@@ -59,80 +64,123 @@ void nsm::Material::UniformVar::apply(const nsm::ShaderProgram* shader) const {
 
 std::map<std::string, nsm::Material*> nsm::Material::sMaterialCache;
 
-nsm::Material* nsm::Material::get(const std::string& path) {
-    auto it = sMaterialCache.find(path);
+nsm::Material* nsm::Material::get(const std::string& identifier, const fastgltf::Asset& asset, const fastgltf::Material& resource) {
+    auto it = sMaterialCache.find(identifier);
     if (it != sMaterialCache.end()) {
         return it->second;
     }
 
-    Material* material = new Material(path);
+    Material* material = new Material(asset, resource);
 
-    sMaterialCache[path] = material;
+    sMaterialCache[identifier] = material;
 
     return material;
 }
 
-nsm::Material::Material(const std::string& path)
+nsm::Material::Material(const fastgltf::Asset& asset, const fastgltf::Material& resource)
     : mShader(nullptr)
     , mTextures()
     , mUniforms()
     , mIsTranslucent(false)
 {
-    simdjson::ondemand::parser parser;
-    simdjson::padded_string json = simdjson::padded_string::load(path);
-    simdjson::ondemand::document doc = parser.iterate(json);
+    mShader = new ShaderProgram("nsm/assets/shaders/model.vsh", "nsm/assets/shaders/model.fsh");
 
-    mIsTranslucent = doc["translucent"].get_bool().value();    
-    mShader = new ShaderProgram(std::string{doc["vsh"].get_string().value()}, std::string{doc["fsh"].get_string().value()});
+    // Albedo
+    UniformVar uAlbedoTexturePresent;
+    uAlbedoTexturePresent.name = "uAlbedoTexturePresent";
+    uAlbedoTexturePresent.type = UniformVar::Type::Int;
+    if (resource.pbrData.baseColorTexture.has_value()) {
+        this->addTexture(asset, asset.textures[resource.pbrData.baseColorTexture.value().textureIndex]);
+        uAlbedoTexturePresent.value.i = true;
+    } else {
+        uAlbedoTexturePresent.value.i = false;
+        
+        UniformVar uAlbedoFactor;
+        uAlbedoFactor.name = "uAlbedoFactor";
+        uAlbedoFactor.type = UniformVar::Type::Vec4;
+        std::memcpy(&uAlbedoFactor.value.v4, &resource.pbrData.baseColorFactor, sizeof(glm::vec4));
+        mUniforms.push_back(uAlbedoFactor);
+    }
+    mUniforms.push_back(uAlbedoTexturePresent);
 
-    auto textures = doc["textures"].get_array();
-    mTextures.reserve(textures.count_elements());
+    // Metallic-Roughness
+    UniformVar uMetallicRoughnessTexturePresent;
+    uMetallicRoughnessTexturePresent.name = "uMetallicRoughnessTexturePresent";
+    uMetallicRoughnessTexturePresent.type = UniformVar::Type::Int;
+    if (resource.pbrData.metallicRoughnessTexture.has_value()) {
+        this->addTexture(asset, asset.textures[resource.pbrData.metallicRoughnessTexture.value().textureIndex]);
+        uMetallicRoughnessTexturePresent.value.i = true;
+    } else {
+        uMetallicRoughnessTexturePresent.value.i = false;
+        
+        UniformVar uMetallicFactor;
+        uMetallicFactor.name = "uMetallicFactor";
+        uMetallicFactor.type = UniformVar::Type::Float;
+        uMetallicFactor.value.f = resource.pbrData.metallicFactor;
+        mUniforms.push_back(uMetallicFactor);
 
-    std::int_fast8_t i = 0;
-    for (auto it : textures) {
-        auto texObj = it.get_object();
+        UniformVar uRoughnessFactor;
+        uRoughnessFactor.name = "uRoughnessFactor";
+        uRoughnessFactor.type = UniformVar::Type::Float;
+        uRoughnessFactor.value.f = resource.pbrData.roughnessFactor;
+        mUniforms.push_back(uRoughnessFactor);
+    }
+    mUniforms.push_back(uMetallicRoughnessTexturePresent);
+}
 
-        const std::string texPath = std::string{texObj["path"].get_string().value()};
-        const Texture::FilterMode filter = getFilterMode(std::string{texObj["filter"].get_string().value()});
-        const bool srgb = texObj["srgb"].get_bool().value();
+nsm::Material::~Material() {
+    delete mShader;
+}
 
-        mTextures.emplace_back(texPath, srgb, filter);
+void nsm::Material::addTexture(const fastgltf::Asset& asset, const fastgltf::Texture& tex) {
+    NSM_ASSERT(tex.imageIndex.has_value(), "Texture has no image index");
+
+    const fastgltf::DataSource& texData = asset.images[tex.imageIndex.value()].data;
+    
+    Texture::FilterMode enlargeFilter = Texture::FilterMode::Linear;
+    Texture::FilterMode shrinkFilter = Texture::FilterMode::Linear;
+    Texture::WrapMode wrapS = Texture::WrapMode::Repeat;
+    Texture::WrapMode wrapT = Texture::WrapMode::Repeat;
+
+    if (tex.samplerIndex.has_value()) {
+        const fastgltf::Sampler& sampler = asset.samplers[tex.samplerIndex.value()];
+        
+        wrapS = getWrapMode(sampler.wrapS);
+        wrapT = getWrapMode(sampler.wrapT);
+
+        if (sampler.magFilter.has_value()) {
+            enlargeFilter = getFilterMode(sampler.magFilter.value());
+        }
+        if (sampler.minFilter.has_value()) {
+            shrinkFilter = getFilterMode(sampler.minFilter.value());
+        }
     }
 
-    auto uniforms = doc["uniforms"].get_array();
-    mUniforms.resize(uniforms.count_elements());
+    const fastgltf::sources::URI* uri = std::get_if<fastgltf::sources::URI>(&texData);
+    const fastgltf::sources::BufferView* bufferView = std::get_if<fastgltf::sources::BufferView>(&texData);
+    const fastgltf::sources::Array* array = std::get_if<fastgltf::sources::Array>(&texData);
 
-    i = 0;
-    for (auto it : uniforms) {
-        UniformVar& uniform = mUniforms[i++];
-        auto uniformObj = it.get_object();
+    if (uri) {
+        NSM_ASSERT(uri->fileByteOffset == 0, "Non-zero file byte offset not supported");
+        NSM_ASSERT(uri->uri.isLocalPath(), "Non-local path not supported");
 
-        const std::string name = std::string{uniformObj["name"].get_string().value()};
-        uniform.name = name;
+        const std::string path{uri->uri.path().begin(), uri->uri.path().end()};
+        mTextures.emplace_back(path, true, enlargeFilter, shrinkFilter, wrapS, wrapT);
+    } else if (bufferView) {
+        const fastgltf::BufferView& view = asset.bufferViews[bufferView->bufferViewIndex];
+        const fastgltf::Buffer& buffer = asset.buffers[view.bufferIndex];
 
-        const std::string type = std::string{uniformObj["type"].get_string().value()};
-        if (type == "int") {
-            uniform.type = UniformVar::Type::Int;
-            uniform.value.i = static_cast<i32>(uniformObj["value"].get_int64().value());
-        } else if (type == "float") {
-            uniform.type = UniformVar::Type::Float;
-            uniform.value.f = static_cast<f32>(uniformObj["value"].get_double().value());
-        } else if (type == "double") {
-            uniform.type = UniformVar::Type::Double;
-            uniform.value.d = uniformObj["value"].get_double().value();
-        } else if (type == "vec2") {
-            uniform.type = UniformVar::Type::Vec2;
-            uniform.value.v2 = JsonHelpers::getVec2(uniformObj, "value");
-        } else if (type == "vec3") {
-            uniform.type = UniformVar::Type::Vec3;
-            uniform.value.v3 = JsonHelpers::getVec3(uniformObj, "value");
-        } else if (type == "vec4") {
-            uniform.type = UniformVar::Type::Vec4;
-            uniform.value.v4 = JsonHelpers::getVec4(uniformObj, "value");
-        } else if (type == "mat4") {
-            uniform.type = UniformVar::Type::Mat4;
-            uniform.value.m4 = JsonHelpers::getMat4(uniformObj, "value");
-        }
+        const fastgltf::sources::Array* bufferViewArray = std::get_if<fastgltf::sources::Array>(&buffer.data);
+        NSM_ASSERT(bufferViewArray, "Buffer data is not an array");
+
+        const std::byte* data = bufferViewArray->bytes.data() + view.byteOffset;
+        const std::size_t size = view.byteLength;
+
+        mTextures.emplace_back(reinterpret_cast<const u8*>(data), size, true, enlargeFilter, shrinkFilter, wrapS, wrapT);
+    } else if (array) {
+        mTextures.emplace_back(reinterpret_cast<const u8*>(array->bytes.data()), array->bytes.size(), true, enlargeFilter, shrinkFilter, wrapS, wrapT);
+    } else {
+        NSM_ASSERT(false, "Unknown texture data type");
     }
 }
 

@@ -61,7 +61,7 @@ void nsm::Framebuffer::resize(const glm::u32vec2& size) {
     newTextureBuffers.reserve(mTextureBuffers.size());
 
     for (auto& textureBuffer : mTextureBuffers) {
-        newTextureBuffers.push_back(new Texture(size, textureBuffer->getFormat(), textureBuffer->getFilterMode()));
+        newTextureBuffers.push_back(new Texture(size, textureBuffer->getFormat(), textureBuffer->getEnlargeFilter(), textureBuffer->getShrinkFilter(), textureBuffer->getWrapS(), textureBuffer->getWrapT()));
         glNamedFramebufferTexture(mId, GL_COLOR_ATTACHMENT0 + static_cast<u32>(newTextureBuffers.size()) - 1, newTextureBuffers.back()->getID(), 0);
         delete textureBuffer;
     }
@@ -69,7 +69,7 @@ void nsm::Framebuffer::resize(const glm::u32vec2& size) {
     mTextureBuffers = newTextureBuffers;
 
     if (mDepthStencil != nullptr) {
-        Texture* newDepthBuffer = new Texture(size, mDepthStencil->getFormat(), mDepthStencil->getFilterMode());
+        Texture* newDepthBuffer = new Texture(size, mDepthStencil->getFormat(), mDepthStencil->getEnlargeFilter(), mDepthStencil->getShrinkFilter(), mDepthStencil->getWrapS(), mDepthStencil->getWrapT());
         glNamedFramebufferTexture(mId, GL_DEPTH_STENCIL_ATTACHMENT, newDepthBuffer->getID(), 0);
         delete mDepthStencil;
         mDepthStencil = newDepthBuffer;

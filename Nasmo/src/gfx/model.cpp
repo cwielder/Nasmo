@@ -1,57 +1,56 @@
 #include <nsm/gfx/model.h>
 
 #include <nsm/entity/component/cameracomponent.h>
-#include <nsm/util/jsonhelpers.h>
 
-#include <simdjson.h>
+#include <fastgltf/core.hpp>
+#include <fastgltf/glm_element_traits.hpp>
 
 nsm::Model::Model(const std::string& path)
     : mPath(path)
+    , mObjects()
     , mMeshes()
     , mInstanceIDs()
-    , mVertexBuffer()
 {
-    simdjson::ondemand::parser parser;
-    simdjson::padded_string json = simdjson::padded_string::load(path);
-    simdjson::ondemand::document doc = parser.iterate(json);
+    fastgltf::Parser parser;
+    
+    fastgltf::Expected<fastgltf::GltfDataBuffer> data = fastgltf::GltfDataBuffer::FromPath(path);
+    NSM_ASSERT(data.error() == fastgltf::Error::None, fastgltf::getErrorMessage(data.error()));
+    
+    fastgltf::Expected<fastgltf::Asset> asset = parser.loadGltf(data.get(), std::filesystem::path{path}.parent_path(), fastgltf::Options::None);
+    NSM_ASSERT(asset.error() == fastgltf::Error::None, fastgltf::getErrorMessage(asset.error()));
 
-    auto vertices = doc["vertices"].get_array();
+    NSM_ASSERT(fastgltf::validate(asset.get()) == fastgltf::Error::None, "The glTF 2.0 asset is invalid");
 
-    std::vector<Vertex> vertexVector;
+    const fastgltf::Asset& gltf = asset.get();
 
-    for (auto vertex : vertices) {
-        Vertex v;
-
-        auto vertexObject = vertex.get_object();
-
-        v.position = JsonHelpers::getVec3(vertexObject, "position");
-        v.uv = JsonHelpers::getVec2(vertexObject, "texcoord");
-        v.color = JsonHelpers::getVec3(vertexObject, "color");
-        v.normal = JsonHelpers::getVec3(vertexObject, "normal");
-
-        vertexVector.push_back(v);
+    for (const fastgltf::Mesh& mesh : gltf.meshes) {
+        mMeshes.emplace(mesh.name, new Mesh(gltf, mesh, path));
     }
 
-    mVertexBuffer.init(vertexVector.data(), vertexVector.size() * sizeof(Vertex), sizeof(Vertex), nsm::BufferUsage::StaticDraw);
+    for (const fastgltf::Node& node : gltf.nodes) {
+        if (node.meshIndex.has_value()) {
+            const fastgltf::Mesh& mesh = gltf.meshes[node.meshIndex.value()];
+            const std::variant<fastgltf::TRS, fastgltf::math::fmat4x4>& transformOrTRS = node.transform;
 
-    auto meshes = doc["meshes"].get_array();
+            const fastgltf::TRS* trs = std::get_if<fastgltf::TRS>(&transformOrTRS);
+            const fastgltf::math::fmat4x4* transform = std::get_if<fastgltf::math::fmat4x4>(&transformOrTRS);
 
-    for (auto m : meshes) {
-        auto meshObject = m.get_object();
+            glm::mat4 transformMatrix = glm::mat4(1.0f);
 
-        std::vector<u32> indices;
-        auto indicesArray = meshObject["indices"].get_array();
-        indices.reserve(indicesArray.count_elements());
+            if (transform) {
+                std::memcpy(&transformMatrix, transform, sizeof(glm::mat4));
+            } else {
+                fastgltf::math::fmat4x4 trsMatrix(1.0f);
+                
+                trsMatrix = fastgltf::math::scale(trsMatrix, trs->scale);
+                trsMatrix = fastgltf::math::rotate(trsMatrix, trs->rotation);
+                trsMatrix = fastgltf::math::translate(trsMatrix, trs->translation);
 
-        for (auto index : indicesArray) {
-            indices.push_back(static_cast<u32>(index.get_uint64().value()));
+                std::memcpy(&transformMatrix, &trsMatrix, sizeof(glm::mat4));
+            }
+
+            mObjects.emplace(mesh.name, new Object(mMeshes[mesh.name.c_str()], transformMatrix));
         }
-
-        mMeshes.emplace(meshObject["name"].get_string().value(), new Mesh(
-            meshObject["material"].get_string().value(),
-            indices,
-            mVertexBuffer
-        ));
     }
 }
 
@@ -62,22 +61,14 @@ nsm::Model::~Model() {
 }
 
 void nsm::Model::drawOpaque(const RenderInfo& renderInfo) {
-    for (auto& [name, mesh] : mMeshes) {
-        if (mesh->getMaterial()->isTranslucent()) {
-            continue;
-        }
-
-        mesh->draw(renderInfo, mInstanceIDs);
+    for (auto& [name, object] : mObjects) {
+        object->drawOpaque(renderInfo, mInstanceIDs);
     }
 }
 
 void nsm::Model::drawTranslucent(const RenderInfo& renderInfo) {
-    for (auto& [name, mesh] : mMeshes) {
-        if (!mesh->getMaterial()->isTranslucent()) {
-            continue;
-        }
-
-        mesh->draw(renderInfo, mInstanceIDs);
+    for (auto& [name, object] : mObjects) {
+        object->drawTranslucent(renderInfo, mInstanceIDs);
     }
 }
 
@@ -89,8 +80,8 @@ void nsm::Model::addInstance(std::size_t* outID) {
 
     NSM_ASSERT(mInstanceIDs[*outID] == outID, "Instance ID ", *outID, " not set correctly");
 
-    for (auto& [name, mesh] : mMeshes) {
-        mesh->growInstanceDataBuffer(mInstanceIDs.size());
+    for (auto& [name, object] : mObjects) {
+        object->growInstanceDataBuffer(mInstanceIDs.size());
     }
 }
 
@@ -111,34 +102,136 @@ void nsm::Model::removeInstance(std::size_t id) {
         }
     }
 
-    for (auto& [name, mesh] : mMeshes) {
-        mesh->shrinkInstanceDataBuffer(mInstanceIDs.size(), id);
+    for (auto& [name, object] : mObjects) {
+        object->shrinkInstanceDataBuffer(mInstanceIDs.size(), id);
     }
 }
 
-void nsm::Model::setInstanceData(const std::string& meshName, void* data, const std::size_t index) {
-    auto it = mMeshes.find(meshName);
-    if (it == mMeshes.end()) {
-        NSM_ASSERT(false, "Mesh ", meshName, " not found in model ", mPath);
+void nsm::Model::setInstanceData(const std::string& objectName, void* data, const std::size_t index) {
+    auto it = mObjects.find(objectName);
+    if (it == mObjects.end()) {
+        NSM_ASSERT(false, "Object ", objectName, " not found in model ", mPath);
     }
 
-    Mesh& mesh = *it->second;
+    Object& object = *it->second;
     
-    mesh.setInstanceData(data, index);
+    object.setInstanceData(data, index);
 }
 
 // Mesh
 
-nsm::Model::Mesh::Mesh(std::string_view material, const std::vector<u32>& indices, const VertexBuffer& vertexBuffer)
-    : mMaterial(Material::get(std::string{material}))
+nsm::Model::Mesh::Mesh(const fastgltf::Asset& asset, const fastgltf::Mesh& mesh, const std::string& path) {
+    for (const fastgltf::Primitive& primitive : mesh.primitives) {
+        const fastgltf::Accessor& position = asset.accessors[primitive.findAttribute("POSITION")->accessorIndex];
+
+        NSM_ASSERT(position.componentType == fastgltf::ComponentType::Float, "Position component type is not float");
+
+        const fastgltf::Attribute* aTexCoord = primitive.findAttribute("TEXCOORD_0");
+        const fastgltf::Attribute* aColor = primitive.findAttribute("COLOR_0");
+        const fastgltf::Attribute* aNormal = primitive.findAttribute("NORMAL");
+
+        std::vector<Vertex> vertexVector;
+        std::vector<u32> indexVector;
+
+        for (std::size_t i = 0; i < position.count; i++) {
+            Vertex v;
+
+            v.position = fastgltf::getAccessorElement<glm::vec3>(asset, position, i);
+
+            if (aTexCoord != primitive.attributes.end()) {
+                const fastgltf::Accessor& uv = asset.accessors[aTexCoord->accessorIndex];
+                v.uv = fastgltf::getAccessorElement<glm::vec2>(asset, uv, i);
+            } else {
+                v.uv = glm::vec2(0.0f);
+            }
+
+            if (aColor != primitive.attributes.end()) {
+                const fastgltf::Accessor& color = asset.accessors[aColor->accessorIndex];
+                v.color = fastgltf::getAccessorElement<glm::vec3>(asset, color, i);
+            } else {
+                v.color = glm::vec3(1.0f);
+            }
+
+            if (aNormal != primitive.attributes.end()) {
+                const fastgltf::Accessor& normal = asset.accessors[aNormal->accessorIndex];
+                v.normal = fastgltf::getAccessorElement<glm::vec3>(asset, normal, i);
+            } else {
+                v.normal = glm::vec3(0.0f);
+            }
+
+            vertexVector.push_back(v);
+        }
+
+        NSM_ASSERT(primitive.indicesAccessor.has_value(), "Primitive has no indices accessor");
+
+        const fastgltf::Accessor& indices = asset.accessors[primitive.indicesAccessor.value()];
+
+        switch (indices.componentType) {
+            case fastgltf::ComponentType::UnsignedByte: {
+                for (std::size_t i = 0; i < indices.count; i++) {
+                    indexVector.push_back(fastgltf::getAccessorElement<u8>(asset, indices, i));
+                }
+                break;
+            }
+            case fastgltf::ComponentType::UnsignedShort: {
+                for (std::size_t i = 0; i < indices.count; i++) {
+                    indexVector.push_back(fastgltf::getAccessorElement<u16>(asset, indices, i));
+                }
+                break;
+            }
+            case fastgltf::ComponentType::UnsignedInt: {
+                for (std::size_t i = 0; i < indices.count; i++) {
+                    indexVector.push_back(fastgltf::getAccessorElement<u32>(asset, indices, i));
+                }
+                break;
+            }
+            default: {
+                NSM_ASSERT(false, "Unsupported index component type");
+            }
+        }
+
+        NSM_ASSERT(primitive.materialIndex.has_value(), "Primitive has no material");
+
+        const fastgltf::Material& material = asset.materials[primitive.materialIndex.value()];
+        mShapes.push_back(new Shape(asset, material, path + std::string{material.name.c_str()}, vertexVector, indexVector));
+    }
+}
+
+nsm::Model::Mesh::~Mesh() {
+    for (Shape* shape : mShapes) {
+        delete shape;
+    }
+}
+
+void nsm::Model::Mesh::drawOpaque(const RenderInfo& renderInfo, u32 count, const glm::mat4& localTransform) {    
+    for (Shape* shape : mShapes) {
+        if (shape->getMaterial()->isTranslucent()) {
+            continue;
+        }
+
+        shape->draw(renderInfo, count, localTransform);
+    }
+}
+
+void nsm::Model::Mesh::drawTranslucent(const RenderInfo& renderInfo, u32 count, const glm::mat4& localTransform) {
+    for (Shape* shape : mShapes) {
+        if (!shape->getMaterial()->isTranslucent()) {
+            continue;
+        }
+
+        shape->draw(renderInfo, count, localTransform);
+    }
+}
+
+// Shape
+
+nsm::Model::Mesh::Shape::Shape(const fastgltf::Asset& asset, const fastgltf::Material& material, const std::string& materialIdentifier, const std::vector<Vertex>& vertices, const std::vector<u32>& indices)
+    : mMaterial(Material::get(materialIdentifier, asset, material))
     , mVertexArray()
     , mIndexBuffer(indices.data(), indices.size() * sizeof(u32), nsm::BufferUsage::StaticDraw)
-    , mInstanceDataBuffer(nullptr)
-    , mInstanceDataBufferEntrySize(0)
-    , mInstanceDataDirty(false)
-    , mSSBO()
+    , mVertexBuffer(vertices.data(), vertices.size() * sizeof(Vertex), sizeof(Vertex), nsm::BufferUsage::StaticDraw)
 {
-    const std::array<VertexArray::Attribute, 4> attributes = {
+    static const std::array<VertexArray::Attribute, 4> attributes = {
         VertexArray::Attribute{0, 3, VertexArray::DataType::Float, offsetof(Vertex, position), 0, false},
         VertexArray::Attribute{1, 2, VertexArray::DataType::Float, offsetof(Vertex, uv), 0, false},
         VertexArray::Attribute{2, 3, VertexArray::DataType::Float, offsetof(Vertex, color), 0, false},
@@ -146,31 +239,58 @@ nsm::Model::Mesh::Mesh(std::string_view material, const std::vector<u32>& indice
     };
 
     mVertexArray.setLayout(attributes);
-    mVertexArray.linkBuffer(vertexBuffer, 0);
+    mVertexArray.linkBuffer(mVertexBuffer, 0);
     mVertexArray.linkIndices(mIndexBuffer);
 }
 
-nsm::Model::Mesh::~Mesh() {
+void nsm::Model::Mesh::Shape::draw(const RenderInfo& renderInfo, u32 count, const glm::mat4& localTransform) {
+    mMaterial->bind();
+    mVertexArray.bind();
+    mIndexBuffer.bind();
+
+    mMaterial->getShader()->setMat4("uViewProjMtx", renderInfo.camera->getViewProjection());
+    mMaterial->getShader()->setMat4("uNodeTransform", localTransform);
+
+    glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(mIndexBuffer.getCount()), GL_UNSIGNED_INT, nullptr, count);
+}
+
+// Object
+
+nsm::Model::Object::Object(Mesh* mesh, const glm::mat4& transform)
+    : mMesh(mesh)
+    , mTransform(transform)
+    , mInstanceDataBuffer(nullptr)
+    , mInstanceDataBufferEntrySize(0)
+    , mInstanceDataDirty(false)
+{ }
+
+nsm::Model::Object::~Object() {
     std::free(mInstanceDataBuffer);
 }
 
-void nsm::Model::Mesh::draw(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds) {
+void nsm::Model::Object::drawOpaque(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds) {
     if (mInstanceDataDirty) {
         mSSBO.setData(mInstanceDataBufferEntrySize * instanceIds.size(), mInstanceDataBuffer);
         mInstanceDataDirty = false;
     }
     
-    mMaterial->bind();
-    mVertexArray.bind();
-    mIndexBuffer.bind();
     mSSBO.bind(0);
 
-    mMaterial->getShader()->setMat4("uViewProjMtx", renderInfo.camera->getViewProjection());
-
-    glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(mIndexBuffer.getCount()), GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(instanceIds.size()));
+    mMesh->drawOpaque(renderInfo, static_cast<u32>(instanceIds.size()), mTransform);
 }
 
-void nsm::Model::Mesh::growInstanceDataBuffer(const std::size_t newSize) {
+void nsm::Model::Object::drawTranslucent(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds) {
+    if (mInstanceDataDirty) {
+        mSSBO.setData(mInstanceDataBufferEntrySize * instanceIds.size(), mInstanceDataBuffer);
+        mInstanceDataDirty = false;
+    }
+    
+    mSSBO.bind(0);
+
+    mMesh->drawTranslucent(renderInfo, static_cast<u32>(instanceIds.size()), mTransform);
+}
+
+void nsm::Model::Object::growInstanceDataBuffer(const std::size_t newSize) {
     mInstanceDataDirty = true;
 
     if (mInstanceDataBuffer == nullptr) {
@@ -181,7 +301,7 @@ void nsm::Model::Mesh::growInstanceDataBuffer(const std::size_t newSize) {
     mInstanceDataBuffer = std::realloc(mInstanceDataBuffer, mInstanceDataBufferEntrySize * newSize);
 }
 
-void nsm::Model::Mesh::shrinkInstanceDataBuffer(const std::size_t newSize, const std::size_t missingIndex) {
+void nsm::Model::Object::shrinkInstanceDataBuffer(const std::size_t newSize, const std::size_t missingIndex) {
     u8* newBuffer = static_cast<u8*>(std::malloc(mInstanceDataBufferEntrySize * newSize));
 
     // Copy the data before the removed instance
@@ -197,7 +317,7 @@ void nsm::Model::Mesh::shrinkInstanceDataBuffer(const std::size_t newSize, const
     mInstanceDataDirty = true;
 }
 
-void nsm::Model::Mesh::setInstanceData(const void* data, const std::size_t index) {
+void nsm::Model::Object::setInstanceData(const void* data, const std::size_t index) {
     NSM_ASSERT(mInstanceDataBuffer != nullptr, "Instance data buffer is null");
     NSM_ASSERT(mInstanceDataBufferEntrySize > 0, "Instance data buffer entry size is 0");
 
