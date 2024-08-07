@@ -44,6 +44,7 @@ namespace nsm {
         void resize(const glm::u32vec2& size);
 
         void pushDrawable(DrawableComponent* drawable);
+        void applyCamera(CameraComponent* camera);
 
         void drawLayers() const;
 

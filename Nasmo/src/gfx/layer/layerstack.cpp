@@ -53,7 +53,6 @@ void nsm::LayerStack::clearLayers() {
 
 nsm::Layer* nsm::LayerStack::getLayer(const std::size_t hash) {
     auto it = this->getLayerIterator(hash);
-
     NSM_ASSERT(it != mLayers.end(), "Unable to find layer with hash: ", hash);
 
     return it->second;
@@ -70,10 +69,9 @@ void nsm::LayerStack::resize(const glm::u32vec2& size) {
 
 void nsm::LayerStack::pushDrawable(DrawableComponent* drawable) {
     auto it = this->getLayerIterator(drawable->getTargetLayerHash());
-
     NSM_ASSERT(it != mLayers.end(), "Unable to push drawable to nonexistent layer: ", drawable->getTargetLayerHash());
 
-    it->second->mDrawables.push_back(drawable);
+    it->second->pushDrawable(drawable);
 }
 
 void nsm::LayerStack::drawLayers() const {
@@ -93,7 +91,7 @@ void nsm::LayerStack::drawLayers() const {
         };
 
         layer->draw(renderInfo);
-        layer->mDrawables.clear();
+        layer->clearDrawables();
 
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT); //? WHY
     }
@@ -108,6 +106,7 @@ void nsm::LayerStack::drawLayers() const {
     mCompositorShader.bind();
     mFramebuffer.getTextureBuffer(0)->bind(0);
 
+    // final render to screen
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(PrimitiveShape::getQuadIBO().getCount()), GL_UNSIGNED_INT, nullptr);
 }
 

@@ -27,6 +27,9 @@ namespace nsm {
     protected:
         friend class LayerStack;
 
+        void pushDrawable(DrawableComponent* drawable) { mDrawables.push_back(drawable); }
+        void clearDrawables() { mDrawables.clear(); }
+
         std::vector<DrawableComponent*> mDrawables;
         const std::string mName;
         CameraComponent* mCamera;

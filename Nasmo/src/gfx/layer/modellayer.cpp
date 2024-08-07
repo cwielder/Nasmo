@@ -2,7 +2,6 @@
 
 #include <nsm/gfx/model.h>
 #include <nsm/entity/component/modelcomponent.h>
-#include <nsm/gfx/opengl.h>
 
 #include <unordered_set>
 

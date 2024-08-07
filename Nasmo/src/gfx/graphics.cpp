@@ -81,18 +81,14 @@ void nsm::Graphics::onEvent(const Event* event) {
     }
 }
 
-void nsm::Graphics::pushDrawable(nsm::DrawableComponent* drawable) {
-    mLayerStack->pushDrawable(drawable);
-}
-
 void nsm::Graphics::transferData(const std::vector<Entity*>& entities) {    
     for (auto entity : entities) {        
         for (auto drawableComponent : entity->getComponents<nsm::DrawableComponent>()) {
-            this->pushDrawable(drawableComponent);
+            mLayerStack->pushDrawable(drawableComponent);
         }
     
         for (auto cameraComponent : entity->getComponents<nsm::CameraComponent>()) {
-            this->getLayerStack().getLayer(cameraComponent->getTargetLayerHash())->setCamera(cameraComponent);
+            mLayerStack->applyCamera(cameraComponent);
         }
     }
 }

@@ -28,8 +28,6 @@ namespace nsm {
         [[nodiscard]] bool update();
         void onEvent(const Event* event);
 
-        void pushDrawable(DrawableComponent* drawable);
-
         void transferData(const std::vector<Entity*>& entities);
 
         [[nodiscard]] LayerStack& getLayerStack() { return *mLayerStack; }
