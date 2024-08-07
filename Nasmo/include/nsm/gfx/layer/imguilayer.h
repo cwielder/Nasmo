@@ -9,7 +9,7 @@ namespace nsm {
         ImGuiLayer(const std::string& name);
         ~ImGuiLayer() override;
 
-        void draw(const RenderInfo& renderInfo) override;
+        void draw(const RenderInfo& renderInfo);
     };
 
 }

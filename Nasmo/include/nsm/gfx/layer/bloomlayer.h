@@ -16,7 +16,8 @@ namespace nsm {
         BloomLayer(const std::string& name);
         ~BloomLayer() override = default;
 
-        void draw(const RenderInfo& renderInfo) override;
+        void draw(const RenderInfo& renderInfo);
+        
         void resize(const glm::u32vec2& size) override;
 
     private:

@@ -8,7 +8,7 @@ namespace nsm {
     public:
         ModelLayer(const std::string& name);
 
-        void draw(const RenderInfo& renderInfo) override;
+        void draw(const RenderInfo& renderInfo);
     };
 
 }

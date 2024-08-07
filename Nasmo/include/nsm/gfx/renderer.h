@@ -15,30 +15,18 @@ namespace nsm {
 
     class Layer;
     class DrawableComponent;
+    class RenderPipeline;
 
-    class LayerStack {
+    class Renderer final {
     public:
-        LayerStack(const glm::u32vec2 &size);
-        ~LayerStack();
-
-        template<typename T>
-        T* pushLayer(const std::string& name) requires std::is_base_of_v<Layer, T> {
-            T* layer = new T(name);
-            mLayers.emplace_back(std::make_pair(std::hash<std::string>{}(name), layer));
-            
-            return layer;
-        }
-
-        void popLayer();
-        void removeLayer(const std::string& name);
-        void clearLayers();
-
-        [[nodiscard]] Layer* getLayer(const std::size_t hash);
-        [[nodiscard]] Layer* getLayer(const std::string& name) { return this->getLayer(std::hash<std::string>{}(name)); }
+        Renderer(const glm::u32vec2 &size);
+        ~Renderer();
 
         template <typename T>
-        T* getLayer(const std::string& name) requires std::is_base_of_v<Layer, T> {
-            return static_cast<T*>(this->getLayer(name));
+        void usePipeline() requires std::is_base_of_v<RenderPipeline, T> {
+            delete mPipeline;
+
+            mPipeline = new T();
         }
 
         void resize(const glm::u32vec2& size);
@@ -46,14 +34,14 @@ namespace nsm {
         void pushDrawable(DrawableComponent* drawable);
         void applyCamera(CameraComponent* camera);
 
-        void drawLayers() const;
+        void render();
 
     private:
         using LayerContainer = std::vector<std::pair<std::size_t, Layer*>>; // TODO: Use a map instead of a vector for faster lookup?
 
         LayerContainer::iterator getLayerIterator(const std::size_t hash);
 
-        LayerContainer mLayers;
+        RenderPipeline* mPipeline;
         Framebuffer mFramebuffer;
         ShaderProgram mCompositorShader;
         RenderState mRenderState;

@@ -12,15 +12,3 @@ nsm::Layer::Layer(const std::string& name)
         .depth(RenderState::DepthFunction::LessEqual, true)
     ;
 }
-
-void nsm::Layer::draw(const nsm::RenderInfo& renderInfo) {
-    mRenderState.apply();
-
-    for (auto& drawable : mDrawables) {
-        drawable->drawOpaque(renderInfo);
-    }
-
-    for (auto& drawable : mDrawables) {
-        drawable->drawTranslucent(renderInfo);
-    }
-}

@@ -10,7 +10,7 @@
 namespace nsm {
 
     class Event;
-    class LayerStack;
+    class Renderer;
     class DrawableComponent;
     class Application;
     class Entity;
@@ -30,13 +30,13 @@ namespace nsm {
 
         void transferData(const std::vector<Entity*>& entities);
 
-        [[nodiscard]] LayerStack& getLayerStack() { return *mLayerStack; }
+        [[nodiscard]] Renderer& getRenderer() { return *mRenderer; }
         [[nodiscard]] Window& getWindow() { return mWindow; }
 
         static glm::u32vec2 getFramebufferSize();
 
     private:
-        LayerStack* mLayerStack;
+        Renderer* mRenderer;
         Window mWindow;
     };
 

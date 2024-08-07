@@ -4,7 +4,7 @@
 #include <nsm/debug/log.h>
 #include <nsm/event/events.h>
 #include <nsm/gfx/texture.h>
-#include <nsm/gfx/layer/layerstack.h>
+#include <nsm/gfx/renderer.h>
 #include <nsm/gfx/layer/layer.h>
 #include <nsm/gfx/primitiveshape.h>
 #include <nsm/gfx/material.h>
@@ -51,11 +51,11 @@ nsm::Graphics::Graphics(const GraphicsInfo& info)
 
     PrimitiveShape::init();
 
-    mLayerStack = new nsm::LayerStack(info.window.size);
+    mRenderer = new Renderer(info.window.size);
 }
 
 nsm::Graphics::~Graphics() {
-    delete mLayerStack;
+    delete mRenderer;
 
     ModelComponent::clearModels();
     Texture::clearCache();
@@ -69,7 +69,7 @@ bool nsm::Graphics::update() {
     glfwPollEvents();
     glfwSwapBuffers(window);
 
-    mLayerStack->drawLayers();
+    mRenderer->render();
 
     return !glfwWindowShouldClose(window);
 }
@@ -77,18 +77,18 @@ bool nsm::Graphics::update() {
 void nsm::Graphics::onEvent(const Event* event) {
     if (event->getType() == nsm::EventType::WindowResize) {
         const WindowResizeEvent* e = static_cast<const WindowResizeEvent*>(event);
-        mLayerStack->resize(e->getSize());
+        mRenderer->resize(e->getSize());
     }
 }
 
 void nsm::Graphics::transferData(const std::vector<Entity*>& entities) {    
     for (auto entity : entities) {        
         for (auto drawableComponent : entity->getComponents<nsm::DrawableComponent>()) {
-            mLayerStack->pushDrawable(drawableComponent);
+            mRenderer->pushDrawable(drawableComponent);
         }
     
         for (auto cameraComponent : entity->getComponents<nsm::CameraComponent>()) {
-            mLayerStack->applyCamera(cameraComponent);
+            mRenderer->applyCamera(cameraComponent);
         }
     }
 }

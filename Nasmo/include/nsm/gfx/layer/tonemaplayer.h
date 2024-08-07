@@ -11,7 +11,7 @@ namespace nsm {
         TonemapLayer(const std::string& name, const f32 exponent = 2.2f);
         ~TonemapLayer() override = default;
 
-        void draw(const RenderInfo& renderInfo) override;
+        void draw(const RenderInfo& renderInfo);
 
         void setExponent(const f32 exponent) { mExponent = exponent; }
         [[nodiscard]] f32 getExponent() const { return mExponent; }
