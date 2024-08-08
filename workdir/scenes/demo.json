@@ -9,7 +9,13 @@
         {
             "type": "DemoEntity",
             "properties": {
-                "position": [0.0, -0.9, 0.0]
+                
+            }
+        },
+        {
+            "type": "LightEntity",
+            "properties": {
+                
             }
         }
     ]
