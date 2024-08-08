@@ -67,7 +67,6 @@ void nsm::Renderer::render() {
     Framebuffer::getBackbuffer()->bind();
 
     PrimitiveShape::getQuadVAO().bind();
-    PrimitiveShape::getQuadIBO().bind();
 
     mCompositorShader.bind();
     mFramebuffer.getTextureBuffer(0)->bind(0);

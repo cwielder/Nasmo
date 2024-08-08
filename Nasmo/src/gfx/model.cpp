@@ -239,7 +239,6 @@ nsm::Model::Mesh::Shape::Shape(const fastgltf::Asset& asset, const fastgltf::Mat
 void nsm::Model::Mesh::Shape::draw(const RenderInfo& renderInfo, u32 count, const glm::mat4& localTransform) {
     mMaterial->bind();
     mVertexArray.bind();
-    mIndexBuffer.bind();
 
     mMaterial->getShader()->setMat4("uViewProjMtx", renderInfo.camera->getViewProjection());
     mMaterial->getShader()->setMat4("uNodeTransform", localTransform);
