@@ -6,7 +6,6 @@ layout (location = 2) in vec3 aColor;
 layout (location = 3) in vec3 aNormal;
 
 out vec2 vTexCoord;
-out mat3 vTBN;
 out vec3 vPosition;
 out vec3 vNormal;
 
@@ -22,14 +21,9 @@ layout (std430, binding = 0) buffer InstanceData {
 } instanceData;
 
 void main() {
-    mat4 modelMatrix = uNodeTransform * instanceData.data[gl_InstanceID].transform;
+    mat4 modelMatrix = instanceData.data[gl_InstanceID].transform * uNodeTransform;
 
     vTexCoord = aTexCoord;
-    vTBN = mat3(
-        normalize(modelMatrix * vec4(aNormal, 0.0)).xyz,
-        normalize(modelMatrix * vec4(cross(aNormal, vec3(0.0, 0.0, 1.0)), 0.0)).xyz,
-        normalize(modelMatrix * vec4(cross(aNormal, vec3(0.0, 1.0, 0.0)), 0.0)).xyz
-    );
     vPosition = (modelMatrix * vec4(aPos, 1.0)).xyz;
     vNormal = (modelMatrix * vec4(aNormal, 0.0)).xyz;
 

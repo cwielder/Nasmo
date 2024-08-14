@@ -40,34 +40,14 @@ namespace nsm {
 
     class PointLightComponent : public LightComponent {
     public:
-        PointLightComponent(
-            const glm::vec3& position,
-            const glm::vec3& color,
-            f32 intensity,
-            f32 radius
-        );
-
+        PointLightComponent(const glm::vec3& position, const glm::vec3& color, f32 intensity = 1.0f);
         ~PointLightComponent() override = default;
 
         void drawOpaque(const RenderInfo& renderInfo) override;
 
         ShaderProgram* getShaderProgram() override;
 
-        [[nodiscard]] f32 getRadius() const { return mRadius; }
-        void setRadius(f32 radius) { mRadius = radius; mDirty = true; }
-
     private:
-        struct LightVolume {
-            LightVolume() = default;
-
-            VertexArray vao;
-            VertexBuffer vbo;
-            IndexBuffer ibo;
-        };
-
-        static LightVolume* sLightVolume;
-
-        f32 mRadius;
         ShaderProgram mShaderProgram;
     };
 

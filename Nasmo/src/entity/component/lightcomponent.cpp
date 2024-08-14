@@ -20,15 +20,22 @@ nsm::LightComponent::LightComponent(const glm::vec3& position, const glm::vec3& 
 
 // PointLightComponent
 
-nsm::PointLightComponent::LightVolume* nsm::PointLightComponent::sLightVolume = nullptr;
+namespace {
+    struct LightVolume {
+        LightVolume() = default;
 
-nsm::PointLightComponent::PointLightComponent(const glm::vec3& position, const glm::vec3& color, const f32 intensity, const f32 radius)
-    : LightComponent(position, color, intensity)
-    , mRadius(radius)
-    , mShaderProgram("nsm/assets/shaders/light_volume.vsh", "nsm/assets/shaders/point_light.fsh")
-{
-    static bool volumeInited = false;
-    if (!volumeInited) {
+        nsm::VertexArray vao;
+        nsm::VertexBuffer vbo;
+        nsm::IndexBuffer ibo;
+    };
+
+    static const LightVolume* getLightVolume() {
+        static bool volumeInited = false;
+        static LightVolume* sLightVolume = nullptr;
+        if (volumeInited) {
+            return sLightVolume;
+        }
+
         sLightVolume = new LightVolume();
 
         fastgltf::Parser parser;
@@ -73,7 +80,7 @@ nsm::PointLightComponent::PointLightComponent(const glm::vec3& position, const g
         sLightVolume->ibo.init(indices.data(), indices.size() * sizeof(u32), nsm::BufferUsage::StaticDraw);
 
         static const std::array<nsm::VertexArray::Attribute, 1> attributes = {
-            nsm::VertexArray::Attribute{ 0, 3, nsm::VertexArray::DataType::Float, 0, sizeof(glm::vec3), false }
+            nsm::VertexArray::Attribute{ 0, 3, nsm::VertexArray::DataType::Float, 0, 0, false }
         };
 
         sLightVolume->vao.setLayout(attributes);
@@ -81,8 +88,15 @@ nsm::PointLightComponent::PointLightComponent(const glm::vec3& position, const g
         sLightVolume->vao.linkIndices(sLightVolume->ibo);
 
         volumeInited = true;
+
+        return sLightVolume;
     }
 }
+
+nsm::PointLightComponent::PointLightComponent(const glm::vec3& position, const glm::vec3& color, const f32 intensity)
+    : LightComponent(position, color, intensity)
+    , mShaderProgram("nsm/assets/shaders/light_volume.vsh", "nsm/assets/shaders/point_light.fsh")
+{ }
 
 nsm::ShaderProgram* nsm::PointLightComponent::getShaderProgram() {
     return &mShaderProgram;
@@ -90,11 +104,12 @@ nsm::ShaderProgram* nsm::PointLightComponent::getShaderProgram() {
 
 void nsm::PointLightComponent::drawOpaque(const RenderInfo& renderInfo) {    
     if (mDirty) {
+        constexpr f32 cAttenuationLinear = 1.175f;
+        constexpr f32 cAttenuationExp = 0.186f;
+
         const f32 maxChannel = glm::max(glm::max(mColor.r, mColor.g), mColor.b);
-        const f32 attenuationLinear = 0.7f;
-        const f32 attenuationExp = 1.8f;
-        f32 radius = (-attenuationLinear + sqrtf(attenuationLinear * attenuationLinear -
-        4 * attenuationExp * (attenuationExp - 256 * maxChannel * mIntensity)));
+
+        const f32 radius = (-cAttenuationLinear + std::sqrtf(cAttenuationLinear * cAttenuationLinear - 4 * cAttenuationExp * (cAttenuationExp - 256 * mIntensity)));
 
         mModelMatrix = glm::translate(glm::mat4(1.0f), mPosition);
         mModelMatrix = glm::scale(mModelMatrix, glm::vec3(radius));
@@ -102,16 +117,17 @@ void nsm::PointLightComponent::drawOpaque(const RenderInfo& renderInfo) {
     }
 
     mShaderProgram.bind();
-    mShaderProgram.setMat4("uViewProjMtx", renderInfo.camera->getViewProjection());
-    mShaderProgram.setMat4("uModelMtx", mModelMatrix);
-    mShaderProgram.setVec2("uScreenSize", renderInfo.framebuffer->getTextureBuffer(0)->getSize());
+    mShaderProgram.setOptionalMat4("uViewProjMtx", renderInfo.camera->getViewProjection());
+    mShaderProgram.setOptionalMat4("uModelMtx", mModelMatrix);
+    mShaderProgram.setOptionalVec2("uScreenSize", renderInfo.framebuffer->getTextureBuffer(0)->getSize());
+    mShaderProgram.setOptionalVec3("uCamPos", renderInfo.camera->getPosition());
+    mShaderProgram.setOptionalVec3("uLightPos", mPosition);
+    mShaderProgram.setOptionalVec3("uLightColor", mColor * mIntensity);
 
     renderInfo.framebuffer->getTextureBuffer(0)->bind(0); // normal+metallic
     renderInfo.framebuffer->getTextureBuffer(1)->bind(1); // albedo+roughness
     renderInfo.framebuffer->getDepthStencil()->bind(2); // depth
 
-    sLightVolume->vao.bind();
-    GLsizei count = static_cast<GLsizei>(sLightVolume->ibo.getCount());
-    nsm::warn("id: ", sLightVolume->vao.getId());
-    //glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+    getLightVolume()->vao.bind();
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(getLightVolume()->ibo.getCount()), GL_UNSIGNED_INT, nullptr);
 }

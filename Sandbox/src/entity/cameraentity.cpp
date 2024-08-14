@@ -3,6 +3,7 @@
 #include <nsm/gfx/graphics.h>
 #include <nsm/debug/log.h>
 #include <nsm/util/jsonhelpers.h>
+#include <imgui.h>
 
 class CameraEntity : public nsm::Entity {
 public:
@@ -23,7 +24,7 @@ public:
             45.0f,
             aspectRatio,
             0.01f,
-            1000.0f
+            10000.0f
         );
         cameraComponent->setTargetLayer("main");
 
@@ -31,10 +32,13 @@ public:
     }
 
     void onUpdate(const f32 timeStep) override {
-        mPosition.x = static_cast<f32>(std::sin(mTime) * 20.0);
+        if (ImGui::Begin("Camera Controls")) {
+            ImGui::DragFloat3("Position", &mPosition.x, 0.1f);
+        } ImGui::End();
+
         mTime += timeStep;
 
-        this->getComponents<nsm::CameraComponent>()[0]->setView(mPosition, glm::vec3(mPosition.x, mPosition.y, 1.0f));
+        this->getComponents<nsm::CameraComponent>()[0]->setView(mPosition, glm::vec3(0.0f, 1.0f, 0.0f));
     }
 
     glm::vec3 mPosition;

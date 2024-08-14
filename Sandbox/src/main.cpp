@@ -24,7 +24,7 @@ public:
         glm::u32vec2 size = nsm::Graphics::getFramebufferSize();
         mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::RGBA16F, size); // normal+metallic
         mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::RGBA16F, size); // albedo+roughness
-        mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::Depth24Stencil8, size);
+        mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::Depth32FStencil8, size);
         mGeometryBuffer.finalize();
     }
 
@@ -38,7 +38,9 @@ public:
 
         // Lighting pass
         framebuffer->bind();
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         mLayerLighting->draw({ mLayerMain->getCamera(), &mGeometryBuffer });
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
         // Post-process pass
         mLayerBloom->draw({ nullptr, framebuffer });
@@ -47,6 +49,10 @@ public:
 
         // ImGui pass
         mLayerImGui->draw({ nullptr, framebuffer });
+    }
+
+    void onResize(const glm::u32vec2& size) override {
+        mGeometryBuffer.resize(size);
     }
 
     nsm::ModelLayer* mLayerMain;

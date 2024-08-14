@@ -12,7 +12,6 @@ uniform float uRoughnessFactor;
 uniform int uNormalTexturePresent;
 
 in vec2 vTexCoord;
-in mat3 vTBN;
 in vec3 vPosition;
 in vec3 vNormal;
 
@@ -65,7 +64,7 @@ void main() {
         discard;
     }
 
-    oNormalMetallic.rgb = normalize(vTBN * normal);
+    oNormalMetallic.rgb = normalize(normal);
     oNormalMetallic.a = metallic;
     oAlbedoRoughness.rgb = albedo.rgb;
     oAlbedoRoughness.a = roughness;

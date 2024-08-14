@@ -3,7 +3,7 @@
         {
             "type": "CameraEntity",
             "properties": {
-                "position": [0.0, 0.0, -135.0]
+                "position": [8.3, 4.8, 3.1]
             }
         },
         {
@@ -15,7 +15,8 @@
         {
             "type": "LightEntity",
             "properties": {
-                
+                "position": [-0.745, 1.268, 0.188],
+                "intensity": 0.4
             }
         }
     ]

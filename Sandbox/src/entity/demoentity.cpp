@@ -27,16 +27,44 @@ public:
             { "Cube.001", sizeof(ModelData) },
             { "Cube.002", sizeof(ModelData) },
             { "Cube.003", sizeof(ModelData) },
-            { "Cube.004", sizeof(ModelData) }
+            { "Cube.004", sizeof(ModelData) },
+            { "Cube.005", sizeof(ModelData) },
+            { "Cube.006", sizeof(ModelData) },
+            { "Cube.007", sizeof(ModelData) },
+            { "Cube.008", sizeof(ModelData) },
+            { "Cube.009", sizeof(ModelData) },
+            { "Cube.010", sizeof(ModelData) },
+            { "Cube.011", sizeof(ModelData) },
+            { "Cube.012", sizeof(ModelData) },
+            { "Cube.013", sizeof(ModelData) },
+            { "Cube.014", sizeof(ModelData) },
+            { "Cube.015", sizeof(ModelData) },
+            { "Cube.016", sizeof(ModelData) },
+            { "Cube.017", sizeof(ModelData) },
+            { "Cube.018", sizeof(ModelData) }
         };
 
-        mModelData[0].transform = glm::scale(glm::mat4(1.0f), glm::vec3(5.0f));
+        mModelData[0].transform = glm::mat4(1.0f);
         nsm::ModelComponent* mc = new nsm::ModelComponent("models/deccer.gltf", "main", meshInstanceDataSizes);
         mc->setInstanceData("Cube", &mModelData[0]);
         mc->setInstanceData("Cube.001", &mModelData[0]);
         mc->setInstanceData("Cube.002", &mModelData[0]);
         mc->setInstanceData("Cube.003", &mModelData[0]);
         mc->setInstanceData("Cube.004", &mModelData[0]);
+        mc->setInstanceData("Cube.005", &mModelData[0]);
+        mc->setInstanceData("Cube.006", &mModelData[0]);
+        mc->setInstanceData("Cube.007", &mModelData[0]);
+        mc->setInstanceData("Cube.008", &mModelData[0]);
+        mc->setInstanceData("Cube.009", &mModelData[0]);
+        mc->setInstanceData("Cube.010", &mModelData[0]);
+        mc->setInstanceData("Cube.011", &mModelData[0]);
+        mc->setInstanceData("Cube.012", &mModelData[0]);
+        mc->setInstanceData("Cube.013", &mModelData[0]);
+        mc->setInstanceData("Cube.014", &mModelData[0]);
+        mc->setInstanceData("Cube.015", &mModelData[0]);
+        mc->setInstanceData("Cube.016", &mModelData[0]);
+        mc->setInstanceData("Cube.017", &mModelData[0]);
+        mc->setInstanceData("Cube.018", &mModelData[0]);
         this->addComponent<nsm::DrawableComponent>(mc);
 
         //for (int i = 0; i < cInstanceCount; i++) {

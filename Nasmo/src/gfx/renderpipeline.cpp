@@ -19,8 +19,10 @@ nsm::Layer* nsm::RenderPipeline::getLayer(const std::size_t hash) {
     return it->second;
 }
 
-void nsm::RenderPipeline::resize(const glm::u32vec2& size) {
+void nsm::RenderPipeline::resize(const glm::u32vec2& size) {    
     for (auto& [hash, layer] : mLayers) {
         layer->resize(size);
     }
+
+    this->onResize(size);
 }

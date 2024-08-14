@@ -14,6 +14,6 @@ nsm::LightingLayer::LightingLayer(const std::string& name)
 void nsm::LightingLayer::draw(const RenderInfo& renderInfo) {
     for (auto& drawable : mDrawables) {
         drawable->drawOpaque(renderInfo);
-        // lights don't use the tranlucent pass
+        // lights don't use the translucent pass
     }
 }
