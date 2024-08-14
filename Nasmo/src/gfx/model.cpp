@@ -19,9 +19,9 @@ namespace {
         } else {
             fastgltf::math::fmat4x4 trsMatrix(1.0f);
             
-            trsMatrix = fastgltf::math::scale(trsMatrix, trs->scale);
-            trsMatrix = fastgltf::math::rotate(trsMatrix, trs->rotation);
             trsMatrix = fastgltf::math::translate(trsMatrix, trs->translation);
+            trsMatrix = fastgltf::math::rotate(trsMatrix, trs->rotation);
+            trsMatrix = fastgltf::math::scale(trsMatrix, trs->scale);
 
             std::memcpy(&transformMatrix, &trsMatrix, sizeof(glm::mat4));
         }
@@ -75,13 +75,13 @@ nsm::Model::~Model() {
 
 void nsm::Model::drawOpaque(const RenderInfo& renderInfo) {
     for (auto& [name, object] : mObjects) {
-        object->drawOpaque(renderInfo, mInstanceIDs);
+        object->drawOpaque(renderInfo, mInstanceIDs.size());
     }
 }
 
 void nsm::Model::drawTranslucent(const RenderInfo& renderInfo) {
     for (auto& [name, object] : mObjects) {
-        object->drawTranslucent(renderInfo, mInstanceIDs);
+        object->drawTranslucent(renderInfo, mInstanceIDs.size());
     }
 }
 
@@ -140,6 +140,8 @@ nsm::Model::Object* nsm::Model::getObject(const std::string& name) const {
                 break;
             }
         }
+
+        NSM_ASSERT(object, "Object not found: ", name);
 
         return object;
     }
@@ -296,9 +298,9 @@ nsm::Model::Object::Object(Object* parent, const fastgltf::Asset& gltf, const st
 
         if (node.meshIndex.has_value()) {
             const fastgltf::Mesh& mesh = gltf.meshes[node.meshIndex.value()];
-            mChildren.emplace(node.name, new MeshObject(parent, gltf, meshes, mesh.name.c_str(), transformMatrix, node.children));
+            mChildren.emplace(node.name, new MeshObject(this, gltf, meshes, mesh.name.c_str(), transformMatrix, node.children));
         } else {
-            mChildren.emplace(node.name, new Object(parent, gltf, meshes, transformMatrix, node.children));
+            mChildren.emplace(node.name, new Object(this, gltf, meshes, transformMatrix, node.children));
         }
     }
 }
@@ -327,15 +329,15 @@ void nsm::Model::Object::setInstanceData(const void* data, const std::size_t ind
     }
 }
 
-void nsm::Model::Object::drawOpaque(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds) {
+void nsm::Model::Object::drawOpaque(const RenderInfo& renderInfo, const std::size_t instanceCount) {
     for (const auto& [name, child] : mChildren) {
-        child->drawOpaque(renderInfo, instanceIds);
+        child->drawOpaque(renderInfo, instanceCount);
     }
 }
 
-void nsm::Model::Object::drawTranslucent(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds) {
+void nsm::Model::Object::drawTranslucent(const RenderInfo& renderInfo, const std::size_t instanceCount) {
     for (const auto& [name, child] : mChildren) {
-        child->drawTranslucent(renderInfo, instanceIds);
+        child->drawTranslucent(renderInfo, instanceCount);
     }
 }
 
@@ -379,47 +381,53 @@ nsm::Model::MeshObject::~MeshObject() {
     std::free(mInstanceDataBuffer);
 }
 
-void nsm::Model::MeshObject::drawOpaque(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds) {
+glm::mat4 nsm::Model::MeshObject::preDraw(const std::size_t instanceCount) {
     if (mInstanceDataDirty) {
-        mSSBO.setData(mInstanceDataBufferEntrySize * instanceIds.size(), mInstanceDataBuffer);
+        mSSBO.setData(mInstanceDataBufferEntrySize * instanceCount, mInstanceDataBuffer);
         mInstanceDataDirty = false;
     }
     
     mSSBO.bind(0);
 
     Object* parent = mParent;
-    glm::mat4 transform = mTransform;
+    std::size_t parentCount = 0;
     while (parent != nullptr) {
-        transform *= parent->getTransform();
+        parentCount += 1;
         parent = parent->getParent();
     }
+    std::vector<glm::mat4> transforms(parentCount);
+    parent = mParent;
+    for (std::size_t i = 0; i < parentCount; i++) {
+        transforms[i] = parent->getTransform();
+        parent = parent->getParent();
+    }
+    glm::mat4 transform = glm::mat4(1.0f);
+    if (mParent != nullptr) {
+        for (const glm::mat4& t : transforms) {
+            transform = t * transform;
+        }
+    }
 
-    mMesh->drawOpaque(renderInfo, static_cast<u32>(instanceIds.size()), transform);
+    return transform * mTransform;
+}
+
+void nsm::Model::MeshObject::drawOpaque(const RenderInfo& renderInfo, const std::size_t instanceCount) {
+    glm::mat4 transform = this->preDraw(instanceCount);
+
+    mMesh->drawOpaque(renderInfo, static_cast<u32>(instanceCount), transform);
 
     for (const auto& [name, child] : mChildren) {
-        child->drawOpaque(renderInfo, instanceIds);
+        child->drawOpaque(renderInfo, instanceCount);
     }
 }
 
-void nsm::Model::MeshObject::drawTranslucent(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds) {
-    if (mInstanceDataDirty) {
-        mSSBO.setData(mInstanceDataBufferEntrySize * instanceIds.size(), mInstanceDataBuffer);
-        mInstanceDataDirty = false;
-    }
-    
-    mSSBO.bind(0);
+void nsm::Model::MeshObject::drawTranslucent(const RenderInfo& renderInfo, const std::size_t instanceCount) {
+    glm::mat4 transform = this->preDraw(instanceCount);
 
-    Object* parent = mParent;
-    glm::mat4 transform = mTransform;
-    while (parent != nullptr) {
-        transform *= parent->getTransform();
-        parent = parent->getParent();
-    }
-
-    mMesh->drawTranslucent(renderInfo, static_cast<u32>(instanceIds.size()), transform);
+    mMesh->drawTranslucent(renderInfo, static_cast<u32>(instanceCount), transform);
 
     for (const auto& [name, child] : mChildren) {
-        child->drawTranslucent(renderInfo, instanceIds);
+        child->drawTranslucent(renderInfo, instanceCount);
     }
 }
 

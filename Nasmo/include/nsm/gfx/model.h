@@ -67,8 +67,8 @@ namespace nsm {
             virtual void setInstanceData(const void* data, const std::size_t index);
             virtual void setInstanceDataBufferEntrySize(const std::size_t) { }
 
-            virtual void drawOpaque(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds);
-            virtual void drawTranslucent(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds);
+            virtual void drawOpaque(const RenderInfo& renderInfo, const std::size_t instanceCount);
+            virtual void drawTranslucent(const RenderInfo& renderInfo, const std::size_t instanceCount);
 
             [[nodiscard]] const glm::mat4& getTransform() const { return mTransform; }
             [[nodiscard]] const std::map<std::string, Object*>& getChildren() const { return mChildren; }
@@ -94,10 +94,12 @@ namespace nsm {
             void setInstanceData(const void* data, const std::size_t index) override;
             void setInstanceDataBufferEntrySize(const std::size_t entrySize) override { mInstanceDataBufferEntrySize = entrySize; }
 
-            void drawOpaque(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds);
-            void drawTranslucent(const RenderInfo& renderInfo, const std::vector<std::size_t*>& instanceIds);
+            void drawOpaque(const RenderInfo& renderInfo, const std::size_t instanceCount) override;
+            void drawTranslucent(const RenderInfo& renderInfo, const std::size_t instanceCount) override;
 
         private:
+            glm::mat4 preDraw(const std::size_t instanceCount);
+
             Mesh* mMesh;
             void* mInstanceDataBuffer;
             std::size_t mInstanceDataBufferEntrySize;
