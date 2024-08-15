@@ -30,7 +30,7 @@ project "Sandbox"
         "../Nasmo/vendor/simdjson/include",
         "../Nasmo/vendor/stb",
         "../Nasmo/vendor/imgui",
-        "../Nasmo/vendor/fastgltf",
+        "../Nasmo/vendor/fastgltf/include",
     }
 
     files {

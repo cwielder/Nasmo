@@ -11,6 +11,10 @@ namespace nsm {
 
     class JsonHelpers {
     public:
+        static inline f32 getFloat(simdjson::simdjson_result<simdjson::ondemand::object>& object, const std::string_view key) {
+            return static_cast<f32>(f64(object[key].get_double()));
+        }
+
         static inline glm::vec2 getVec2(simdjson::simdjson_result<simdjson::ondemand::object>& object, const std::string_view key) {
             auto array = object[key].get_array();
 

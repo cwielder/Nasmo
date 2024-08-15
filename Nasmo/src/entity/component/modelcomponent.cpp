@@ -13,9 +13,13 @@ nsm::ModelComponent::ModelComponent(const std::string& path, const std::string& 
     mModel = sModels[path];
 
     for (int i = 0; i < mModel->getObjectCount(); i++) {
-        const auto& [meshName, instanceDataSize] = meshInstanceDataSizes[i];
+        const auto& [objectName, instanceDataSize] = meshInstanceDataSizes[i];
         
-        mModel->getObject(meshName)->setInstanceDataBufferEntrySize(instanceDataSize);
+        Model::Object* object = mModel->getObject(objectName);
+        NSM_ASSERT(object, "Object not found: ", objectName);
+        NSM_ASSERT(!object->isTransformOnly(), "Object is transform only: ", objectName);
+        
+        static_cast<Model::MeshObject*>(object)->setInstanceDataBufferEntrySize(instanceDataSize);
     }
     mModel->addInstance(&mInstanceID);
 

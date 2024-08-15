@@ -59,7 +59,6 @@ void nsm::BloomLayer::downsample(const nsm::RenderInfo& renderInfo, nsm::Viewpor
         mFramebuffers[i].bind();
         
         PrimitiveShape::getQuadVAO().bind();
-        PrimitiveShape::getQuadIBO().bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     }
 }
@@ -79,7 +78,6 @@ void nsm::BloomLayer::upsample(const nsm::RenderInfo& renderInfo, nsm::Viewport&
         mFramebuffers[i - 1].bind();
 
         PrimitiveShape::getQuadVAO().bind();
-        PrimitiveShape::getQuadIBO().bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     }
 }
@@ -95,8 +93,6 @@ void nsm::BloomLayer::blit(const nsm::RenderInfo& renderInfo, nsm::Viewport& vie
     viewport.apply();
 
     PrimitiveShape::getQuadVAO().bind();
-    PrimitiveShape::getQuadIBO().bind();
-
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
 

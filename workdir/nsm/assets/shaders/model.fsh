@@ -2,17 +2,21 @@
 
 layout (binding = 0) uniform sampler2D tex0;
 layout (binding = 1) uniform sampler2D tex1;
+layout (binding = 2) uniform sampler2D tex2;
 
 uniform int uAlbedoTexturePresent;
 uniform int uMetallicRoughnessTexturePresent;
 uniform vec4 uAlbedoFactor;
 uniform float uMetallicFactor;
 uniform float uRoughnessFactor;
+uniform int uNormalTexturePresent;
 
 in vec2 vTexCoord;
+in vec3 vPosition;
 in vec3 vNormal;
 
-out vec4 oFragColor;
+layout (location = 0) out vec4 oNormalMetallic;
+layout (location = 1) out vec4 oAlbedoRoughness;
 
 void main() {
     vec4 albedo;
@@ -41,5 +45,27 @@ void main() {
         roughness = uRoughnessFactor;
     }
 
-    oFragColor = vec4(albedo.rgb, 1.0);
+    vec3 normal;
+    if (uNormalTexturePresent == 1) {
+        if (uAlbedoTexturePresent == 1 && uMetallicRoughnessTexturePresent == 1) {
+            normal = texture(tex2, vTexCoord).xyz * 2.0 - 1.0;
+        } else if (uAlbedoTexturePresent == 1 || uMetallicRoughnessTexturePresent == 1) {
+            normal = texture(tex1, vTexCoord).xyz * 2.0 - 1.0;
+        } else {
+            normal = texture(tex0, vTexCoord).xyz * 2.0 - 1.0;
+        }
+    } else {
+        normal = vNormal;
+    }
+
+    vec2 uv = vTexCoord; // apply parallax mapping here
+
+    if (uv.x > 1.0 || uv.y > 1.0 || uv.x < 0.0 || uv.y < 0.0) {
+        discard;
+    }
+
+    oNormalMetallic.rgb = normalize(normal);
+    oNormalMetallic.a = metallic;
+    oAlbedoRoughness.rgb = albedo.rgb;
+    oAlbedoRoughness.a = roughness;
 }

@@ -126,6 +126,18 @@ nsm::Material::Material(const fastgltf::Asset& asset, const fastgltf::Material& 
         mUniforms.push_back(uRoughnessFactor);
     }
     mUniforms.push_back(uMetallicRoughnessTexturePresent);
+
+    // Normal
+    UniformVar uNormalTexturePresent;
+    uNormalTexturePresent.name = "uNormalTexturePresent";
+    uNormalTexturePresent.type = UniformVar::Type::Int;
+    if (resource.normalTexture.has_value()) {
+        this->addTexture(asset, asset.textures[resource.normalTexture.value().textureIndex]);
+        uNormalTexturePresent.value.i = true;
+    } else {
+        uNormalTexturePresent.value.i = false;
+    }
+    mUniforms.push_back(uNormalTexturePresent);
 }
 
 nsm::Material::~Material() {

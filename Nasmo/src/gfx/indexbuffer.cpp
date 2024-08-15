@@ -28,7 +28,3 @@ void nsm::IndexBuffer::init(const u32* data, const std::size_t size, const Buffe
 
     mCount = size / sizeof(u32);
 }
-
-void nsm::IndexBuffer::bind() const {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mId);
-}

@@ -24,7 +24,5 @@ void nsm::TonemapLayer::draw(const RenderInfo& renderInfo) {
     renderInfo.framebuffer->getTextureBuffer(0)->bind(0);
 
     PrimitiveShape::getQuadVAO().bind();
-    PrimitiveShape::getQuadIBO().bind();
-
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }

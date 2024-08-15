@@ -51,6 +51,8 @@ namespace nsm {
         void setLayout(const std::array<Attribute, N>& attributes) {
             this->setLayout(attributes.data(), N);
         }
+
+        [[nodiscard]] u32 getId() const { return mId; }
     
     private:
         void setLayout(const Attribute* attributes, const std::size_t count);

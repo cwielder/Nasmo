@@ -4,6 +4,7 @@
 #include <nsm/gfx/layer/bloomlayer.h>
 #include <nsm/gfx/layer/tonemaplayer.h>
 #include <nsm/gfx/layer/imguilayer.h>
+#include <nsm/gfx/layer/lightinglayer.h>
 #include <nsm/entity/component/modelcomponent.h>
 #include <nsm/gfx/renderpipeline.h>
 
@@ -15,14 +16,31 @@ class DemoPipeline : public nsm::RenderPipeline {
 public:
     DemoPipeline() {
         mLayerMain = this->pushLayer<nsm::ModelLayer>("main");
+        mLayerLighting = this->pushLayer<nsm::LightingLayer>("lighting");
         mLayerBloom = this->pushLayer<nsm::BloomLayer>("bloom");
         mLayerTonemap = this->pushLayer<nsm::TonemapLayer>("cc");
         mLayerImGui = this->pushLayer<nsm::ImGuiLayer>("imgui");
+
+        glm::u32vec2 size = nsm::Graphics::getFramebufferSize();
+        mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::RGBA16F, size); // normal+metallic
+        mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::RGBA16F, size); // albedo+roughness
+        mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::Depth32FStencil8, size);
+        mGeometryBuffer.finalize();
     }
 
     void render(const nsm::Framebuffer* framebuffer) override {
-        // Opaque pass
-        mLayerMain->draw({ mLayerMain->getCamera(), framebuffer });
+        // Build geometry buffer
+        mGeometryBuffer.bind();
+        mGeometryBuffer.clear(glm::f32vec4{ 0.0f }, nsm::Framebuffer::Type::Color, 0);
+        mGeometryBuffer.clear(glm::f32vec4{ 0.0f }, nsm::Framebuffer::Type::Color, 1);
+        mGeometryBuffer.clear(glm::f32vec4{ 1.0f }, nsm::Framebuffer::Type::Depth, 2);
+        mLayerMain->draw({ mLayerMain->getCamera(), &mGeometryBuffer });
+
+        // Lighting pass
+        framebuffer->bind();
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+        mLayerLighting->draw({ mLayerMain->getCamera(), &mGeometryBuffer });
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
         // Post-process pass
         mLayerBloom->draw({ nullptr, framebuffer });
@@ -33,10 +51,17 @@ public:
         mLayerImGui->draw({ nullptr, framebuffer });
     }
 
+    void onResize(const glm::u32vec2& size) override {
+        mGeometryBuffer.resize(size);
+    }
+
     nsm::ModelLayer* mLayerMain;
+    nsm::LightingLayer* mLayerLighting;
     nsm::BloomLayer* mLayerBloom;
     nsm::TonemapLayer* mLayerTonemap;
     nsm::ImGuiLayer* mLayerImGui;
+
+    nsm::Framebuffer mGeometryBuffer;
 };
 
 class SandboxApplication : public nsm::Application {
