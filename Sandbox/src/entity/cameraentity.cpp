@@ -38,6 +38,9 @@ public:
 
         mTime += timeStep;
 
+        mPosition.x = static_cast<f32>(10.0f * std::cos(mTime));
+        mPosition.y = static_cast<f32>(5.0f * std::sin(mTime));
+
         this->getComponents<nsm::CameraComponent>()[0]->setView(mPosition, glm::vec3(0.0f, 1.0f, 0.0f));
     }
 
