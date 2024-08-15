@@ -130,6 +130,16 @@ std::size_t nsm::Model::getObjectCount() const {
     return count;
 }
 
+std::size_t nsm::Model::getMeshObjectCount() const {
+    std::size_t count = 0;
+    for (const auto& [_, object] : mObjects) {
+        count += !object->isTransformOnly();
+        count += object->getChildMeshObjectCount();
+    }
+
+    return count;
+}
+
 nsm::Model::Object* nsm::Model::getObject(const std::string& name) const {
     auto it = mObjects.find(name);
     if (it == mObjects.end()) {
@@ -178,7 +188,19 @@ nsm::Model::Mesh::Mesh(const fastgltf::Asset& asset, const fastgltf::Mesh& mesh,
 
             if (aColor != primitive.attributes.end()) {
                 const fastgltf::Accessor& color = asset.accessors[aColor->accessorIndex];
-                v.color = fastgltf::getAccessorElement<glm::vec3>(asset, color, i);
+                const fastgltf::AccessorType colorType = fastgltf::getAccessorType("COLOR_0");
+                
+                switch (colorType) {
+                    case fastgltf::AccessorType::Vec3: {
+                        v.color = fastgltf::getAccessorElement<glm::vec3>(asset, color, i);
+                        break;
+                    }
+                    case fastgltf::AccessorType::Vec4: {
+                        // TODO: Handle alpha transparency
+                        v.color = fastgltf::getAccessorElement<glm::vec4>(asset, color, i);
+                        break;
+                    }
+                }
             } else {
                 v.color = glm::vec3(1.0f);
             }
@@ -362,6 +384,16 @@ std::size_t nsm::Model::Object::getChildCount() const {
     std::size_t count = mChildren.size();
     for (const auto& [_, object] : mChildren) {
         count += object->getChildCount();
+    }
+
+    return count;
+}
+
+std::size_t nsm::Model::Object::getChildMeshObjectCount() const {
+    std::size_t count = 0;
+    for (const auto& [_, object] : mChildren) {
+        count += !object->isTransformOnly();
+        count += object->getChildMeshObjectCount();
     }
 
     return count;

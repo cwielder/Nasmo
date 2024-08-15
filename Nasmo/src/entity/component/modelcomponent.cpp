@@ -12,7 +12,7 @@ nsm::ModelComponent::ModelComponent(const std::string& path, const std::string& 
     }
     mModel = sModels[path];
 
-    for (int i = 0; i < mModel->getObjectCount(); i++) {
+    for (int i = 0; i < mModel->getMeshObjectCount(); i++) {
         const auto& [objectName, instanceDataSize] = meshInstanceDataSizes[i];
         
         Model::Object* object = mModel->getObject(objectName);

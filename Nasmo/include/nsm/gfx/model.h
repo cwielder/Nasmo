@@ -75,7 +75,8 @@ namespace nsm {
             [[nodiscard]] bool isTransformOnly() const { return mTransformOnly; }
             [[nodiscard]] Object* getParent() const { return mParent; }
             [[nodiscard]] Object* getChild(const std::string& name) const;
-            [[nodiscard]] std::size_t getChildCount() const;
+            [[nodiscard]] std::size_t getChildCount() const; // Includes children of children
+            [[nodiscard]] std::size_t getChildMeshObjectCount() const; // Includes children of children
 
         protected:
             glm::mat4 mTransform;
@@ -122,6 +123,8 @@ namespace nsm {
         [[nodiscard]] const std::vector<std::size_t*>& getInstanceIDs() { return mInstanceIDs; }
         [[nodiscard]] const std::string& getPath() const { return mPath; }
         [[nodiscard]] std::size_t getObjectCount() const;
+        [[nodiscard]] std::size_t getMeshObjectCount() const;
+        [[nodiscard]] std::size_t getMeshCount() const { return mMeshes.size(); }
         [[nodiscard]] Object* getObject(const std::string& name) const;
         [[nodiscard]] const std::map<std::string, Object*>& getObjects() const { return mObjects; }
 
