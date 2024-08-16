@@ -13,9 +13,7 @@ namespace nsm {
         StaticCopy = GL_STATIC_COPY,
         DynamicDraw = GL_DYNAMIC_DRAW,
         DynamicRead = GL_DYNAMIC_READ,
-        DynamicCopy = GL_DYNAMIC_COPY,
-
-        Count
+        DynamicCopy = GL_DYNAMIC_COPY
     };
 
 }

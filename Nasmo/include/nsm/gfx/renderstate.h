@@ -10,16 +10,12 @@ namespace nsm {
         enum class CullFace {
             Front = GL_FRONT,
             Back = GL_BACK,
-            FrontAndBack = GL_FRONT_AND_BACK,
-
-            Count
+            FrontAndBack = GL_FRONT_AND_BACK
         };
 
         enum class CullDirection {
             Clockwise = GL_CW,
-            CounterClockwise = GL_CCW,
-
-            Count
+            CounterClockwise = GL_CCW
         };
 
         enum class DepthFunction {
@@ -30,9 +26,7 @@ namespace nsm {
             Greater = GL_GREATER,
             NotEqual = GL_NOTEQUAL,
             GreaterEqual = GL_GEQUAL,
-            Always = GL_ALWAYS,
-
-            Count
+            Always = GL_ALWAYS
         };
 
         enum class BlendFactor {
@@ -49,9 +43,7 @@ namespace nsm {
             ConstantColor = GL_CONSTANT_COLOR,
             OneMinusConstantColor = GL_ONE_MINUS_CONSTANT_COLOR,
             ConstantAlpha = GL_CONSTANT_ALPHA,
-            OneMinusConstantAlpha = GL_ONE_MINUS_CONSTANT_ALPHA,
-
-            Count
+            OneMinusConstantAlpha = GL_ONE_MINUS_CONSTANT_ALPHA
         };
 
         enum class BlendEquation {
@@ -59,9 +51,7 @@ namespace nsm {
             Subtract = GL_FUNC_SUBTRACT,
             ReverseSubtract = GL_FUNC_REVERSE_SUBTRACT,
             Min = GL_MIN,
-            Max = GL_MAX,
-        
-            Count
+            Max = GL_MAX
         };
 
     public:

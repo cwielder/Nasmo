@@ -22,18 +22,14 @@ namespace nsm {
             NearestMipmapNearest = GL_NEAREST_MIPMAP_NEAREST,
             LinearMipmapNearest = GL_LINEAR_MIPMAP_NEAREST,
             NearestMipmapLinear = GL_NEAREST_MIPMAP_LINEAR,
-            LinearMipmapLinear = GL_LINEAR_MIPMAP_LINEAR,
-
-            Count
+            LinearMipmapLinear = GL_LINEAR_MIPMAP_LINEAR
         };
 
         enum class WrapMode : u16 {
             Repeat = GL_REPEAT,
             MirroredRepeat = GL_MIRRORED_REPEAT,
             ClampToEdge = GL_CLAMP_TO_EDGE,
-            ClampToBorder = GL_CLAMP_TO_BORDER,
-
-            Count
+            ClampToBorder = GL_CLAMP_TO_BORDER
         };
 
         enum class Format : u16 {
@@ -48,9 +44,7 @@ namespace nsm {
             SRGB8 = GL_SRGB8,
             SRGBA8 = GL_SRGB8_ALPHA8,
             Depth24Stencil8 = GL_DEPTH24_STENCIL8,
-            Depth32FStencil8 = GL_DEPTH32F_STENCIL8,
-            
-            Count
+            Depth32FStencil8 = GL_DEPTH32F_STENCIL8
         };
 
     public:

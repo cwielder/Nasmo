@@ -22,9 +22,7 @@ namespace nsm {
         enum class ShaderType {
             Vertex = GL_VERTEX_SHADER,
             Geometry = GL_GEOMETRY_SHADER,
-            Fragment = GL_FRAGMENT_SHADER,
-
-            Count
+            Fragment = GL_FRAGMENT_SHADER
         };
 
     private:

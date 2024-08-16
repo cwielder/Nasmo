@@ -23,9 +23,7 @@ namespace nsm {
             UnsignedInt = GL_UNSIGNED_INT,
             UnsignedInt24_8 = GL_UNSIGNED_INT_24_8,
             Float = GL_FLOAT,
-            Double = GL_DOUBLE,
-
-            Count
+            Double = GL_DOUBLE
         };
     
     public:
