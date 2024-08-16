@@ -2,6 +2,7 @@
 
 #include <nsm/common.h>
 #include <nsm/gfx/bufferusage.h>
+#include <nsm/gfx/primitivetype.h>
 
 namespace nsm {
 
@@ -14,13 +15,20 @@ namespace nsm {
         ~IndexBuffer();
 
         void init(const u32* data, const std::size_t size, const BufferUsage usage = BufferUsage::StaticDraw);
+        
+        void draw() const;
+        void drawInstanced(const std::size_t instanceCount) const;
 
+        void setPrimitiveType(const PrimitiveType primitiveType) { mPrimitiveType = primitiveType; }
+
+        [[nodiscard]] PrimitiveType getPrimitiveType() const { return mPrimitiveType; }
         [[nodiscard]] u32 getId() const { return mId; }
-        [[nodiscard]] std::size_t getCount() const { return mCount; }
+        [[nodiscard]] u32 getCount() const { return mCount; }
 
     private:
         u32 mId;
-        std::size_t mCount;
+        u32 mCount;
+        PrimitiveType mPrimitiveType;
     };
 
 }

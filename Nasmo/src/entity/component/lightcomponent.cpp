@@ -129,5 +129,5 @@ void nsm::PointLightComponent::drawOpaque(const RenderInfo& renderInfo) {
     renderInfo.framebuffer->getDepthStencil()->bind(2); // depth
 
     getLightVolume()->vao.bind();
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(getLightVolume()->ibo.getCount()), GL_UNSIGNED_INT, nullptr);
+    getLightVolume()->ibo.draw();
 }

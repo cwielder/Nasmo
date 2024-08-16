@@ -10,11 +10,11 @@ std::unordered_map<std::string, std::tuple<u8*, glm::u32vec2, u32>> nsm::Texture
 nsm::Texture::Texture()
     : mId(GL_NONE)
     , mSize(0, 0)
-    , mFormat(Format::Count)
-    , mEnlargeFilter(FilterMode::Count)
-    , mShrinkFilter(FilterMode::Count)
-    , mWrapS(WrapMode::Count)
-    , mWrapT(WrapMode::Count)
+    , mFormat()
+    , mEnlargeFilter()
+    , mShrinkFilter()
+    , mWrapS()
+    , mWrapT()
 {
     glCreateTextures(GL_TEXTURE_2D, 1, &mId);
 }

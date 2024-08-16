@@ -66,11 +66,10 @@ void nsm::Renderer::render() {
 
     Framebuffer::getBackbuffer()->bind();
 
-    PrimitiveShape::getQuadVAO().bind();
-
     mCompositorShader.bind();
     mFramebuffer.getTextureBuffer(0)->bind(0);
 
     // final render to screen
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(PrimitiveShape::getQuadIBO().getCount()), GL_UNSIGNED_INT, nullptr);
+    PrimitiveShape::getQuadVAO().bind();
+    PrimitiveShape::getQuadIBO().draw();
 }

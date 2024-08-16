@@ -303,7 +303,7 @@ void nsm::Model::Mesh::Shape::draw(const RenderInfo& renderInfo, u32 count, cons
     mMaterial->getShader()->setMat4("uViewProjMtx", renderInfo.camera->getViewProjection());
     mMaterial->getShader()->setMat4("uNodeTransform", localTransform);
 
-    glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(mIndexBuffer.getCount()), GL_UNSIGNED_INT, nullptr, count);
+    mIndexBuffer.drawInstanced(count);
 }
 
 // Object
