@@ -19,13 +19,13 @@ nsm::Texture2D::Texture2D()
     glCreateTextures(GL_TEXTURE_2D, 1, &mId);
 }
 
-nsm::Texture2D::Texture2D(const std::string& path, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
+nsm::Texture2D::Texture2D(const std::string& path, bool srgb, const Texture::FilterMode enlargeFilter, const Texture::FilterMode shrinkFilter, const Texture::WrapMode wrapS, const Texture::WrapMode wrapT)
     : Texture2D()
 {
     this->initFromFile(path, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
 }
 
-nsm::Texture2D::Texture2D(const glm::u32vec2& size, const Format fmt, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
+nsm::Texture2D::Texture2D(const glm::u32vec2& size, const Texture::Format fmt, const Texture::FilterMode enlargeFilter, const Texture::FilterMode shrinkFilter, const Texture::WrapMode wrapS, const Texture::WrapMode wrapT)
     : Texture2D()
 {
     glTextureStorage2D(mId, 1, static_cast<GLenum>(fmt), size.x, size.y);
@@ -43,7 +43,7 @@ nsm::Texture2D::Texture2D(const glm::u32vec2& size, const Format fmt, const Filt
     mWrapT = wrapT;
 }
 
-nsm::Texture2D::Texture2D(const u8* data, const std::size_t length, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
+nsm::Texture2D::Texture2D(const u8* data, const std::size_t length, bool srgb, const Texture::FilterMode enlargeFilter, const Texture::FilterMode shrinkFilter, const Texture::WrapMode wrapS, const Texture::WrapMode wrapT)
     : Texture2D()
 {
     this->initFromMemory(data, length, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
@@ -55,7 +55,7 @@ nsm::Texture2D::~Texture2D() {
     }
 }
 
-void nsm::Texture2D::initFromFile(const std::string& path, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
+void nsm::Texture2D::initFromFile(const std::string& path, bool srgb, const Texture::FilterMode enlargeFilter, const Texture::FilterMode shrinkFilter, const Texture::WrapMode wrapS, const Texture::WrapMode wrapT) {
     NSM_ASSERT(mId != GL_NONE, "Cannot initialize invalid texture");
 
     const auto load = [&path]() -> std::tuple<u8*, glm::u32vec2, u32> {
@@ -83,7 +83,7 @@ void nsm::Texture2D::initFromFile(const std::string& path, bool srgb, const Filt
     nsm::trace("Loaded texture from file: ", path);
 }
 
-void nsm::Texture2D::initFromMemory(const u8* data, const std::size_t length, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
+void nsm::Texture2D::initFromMemory(const u8* data, const std::size_t length, bool srgb, const Texture::FilterMode enlargeFilter, const Texture::FilterMode shrinkFilter, const Texture::WrapMode wrapS, const Texture::WrapMode wrapT) {
     i32 width = 0, height = 0, channels = 0;
     u8* loadedData = stbi_load_from_memory(data, static_cast<int>(length), &width, &height, &channels, 0);
     nsm::trace("Loaded texture from memory: ", width, "x", height, " with ", channels, " channels");
@@ -94,7 +94,7 @@ void nsm::Texture2D::initFromMemory(const u8* data, const std::size_t length, bo
     this->initFromData(loadedData, channels, { static_cast<u32>(width), static_cast<u32>(height) }, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
 }
 
-void nsm::Texture2D::initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
+void nsm::Texture2D::initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, bool srgb, const Texture::FilterMode enlargeFilter, const Texture::FilterMode shrinkFilter, const Texture::WrapMode wrapS, const Texture::WrapMode wrapT) {
     NSM_ASSERT(mId != GL_NONE, "Cannot initialize invalid texture");
 
     mSize = size;
@@ -111,14 +111,14 @@ void nsm::Texture2D::initFromData(const u8* data, const u32 channelCount, const 
 
         glTextureSubImage2D(mId, 0, 0, 0, size.x, size.y, format, GL_UNSIGNED_BYTE, data);
 
-        mFormat = static_cast<Format>(format);
+        mFormat = static_cast<Texture::Format>(format);
     };
 
     if (srgb) {
         if (channelCount == 4) {
             glTextureStorage2D(mId, 1, GL_SRGB8_ALPHA8, size.x, size.y);
             safeSubImage(GL_RGBA);
-        } else if (channelCount == 3) {
+        } else if (channelCount == 3) { 
             glTextureStorage2D(mId, 1, GL_SRGB8, size.x, size.y);
             safeSubImage(GL_RGB);
         } else if (channelCount == 1) {

@@ -87,7 +87,7 @@ nsm::Framebuffer* nsm::Framebuffer::getBackbuffer() {
     return backbuffer;
 }
 
-void nsm::Framebuffer::blit(const Framebuffer& src, const Framebuffer& dst, const glm::u32vec2& srcStart, const glm::u32vec2& srcEnd, const glm::u32vec2& dstStart, const glm::u32vec2& dstEnd, const u32 typeMask, const Texture2D::FilterMode filterMode) {
+void nsm::Framebuffer::blit(const Framebuffer& src, const Framebuffer& dst, const glm::u32vec2& srcStart, const glm::u32vec2& srcEnd, const glm::u32vec2& dstStart, const glm::u32vec2& dstEnd, const u32 typeMask, const Texture::FilterMode filterMode) {
     u32 mask = 0;
     if (typeMask & static_cast<u32>(Type::Color)) {
         mask |= GL_COLOR_BUFFER_BIT;
@@ -99,11 +99,11 @@ void nsm::Framebuffer::blit(const Framebuffer& src, const Framebuffer& dst, cons
     glBlitNamedFramebuffer(src.getID(), dst.getID(), srcStart.x, srcStart.y, srcEnd.x, srcEnd.y, dstStart.x, dstStart.y, dstEnd.x, dstEnd.y, mask, static_cast<GLenum>(filterMode));
 }
 
-void nsm::Framebuffer::addTextureBuffer(const Texture2D::Format fmt, const glm::u32vec2& size, const Texture2D::FilterMode enlargeFilter, const Texture2D::FilterMode shrinkFilter) {
+void nsm::Framebuffer::addTextureBuffer(const Texture::Format fmt, const glm::u32vec2& size, const Texture::FilterMode enlargeFilter, const Texture::FilterMode shrinkFilter) {
     NSM_ASSERT(mId != GL_NONE, "Cannot add texture buffer to backbuffer!");
     NSM_ASSERT(mFinalized == false, "Cannot add texture buffer to finalized framebuffer!");
 
-    if (fmt == Texture2D::Format::Depth24Stencil8 || fmt == Texture2D::Format::Depth32FStencil8) {
+    if (fmt == Texture::Format::Depth24Stencil8 || fmt == Texture::Format::Depth32FStencil8) {
         NSM_ASSERT(mDepthStencil == nullptr, "Framebuffer already has depth/stencil attachment!");
         mDepthStencil = new Texture2D(size, fmt, enlargeFilter);
         glNamedFramebufferTexture(mId, GL_DEPTH_STENCIL_ATTACHMENT, mDepthStencil->getID(), 0);

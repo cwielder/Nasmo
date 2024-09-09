@@ -41,9 +41,9 @@ namespace nsm {
         void resize(const glm::u32vec2& size);
 
         [[nodiscard]] static Framebuffer* getBackbuffer();
-        static void blit(const Framebuffer& src, const Framebuffer& dst, const glm::u32vec2& srcStart, const glm::u32vec2& srcEnd, const glm::u32vec2& dstStart, const glm::u32vec2& dstEnd, const u32 typeMask, const Texture2D::FilterMode filterMode = Texture2D::FilterMode::Linear);
+        static void blit(const Framebuffer& src, const Framebuffer& dst, const glm::u32vec2& srcStart, const glm::u32vec2& srcEnd, const glm::u32vec2& dstStart, const glm::u32vec2& dstEnd, const u32 typeMask, const Texture::FilterMode filterMode = Texture::FilterMode::Linear);
 
-        void addTextureBuffer(const Texture2D::Format fmt, const glm::u32vec2& size, const Texture2D::FilterMode enlargeFilter = Texture2D::FilterMode::Linear, const Texture2D::FilterMode shrinkFilter = Texture2D::FilterMode::Linear);
+        void addTextureBuffer(const Texture::Format fmt, const glm::u32vec2& size, const Texture::FilterMode enlargeFilter = Texture::FilterMode::Linear, const Texture::FilterMode shrinkFilter = Texture::FilterMode::Linear);
         //void addRenderBuffer(); // TODO: Implement
         void finalize() const;
 

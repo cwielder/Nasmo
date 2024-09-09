@@ -18,7 +18,7 @@ nsm::BloomLayer::BloomLayer(const std::string& name)
 {
     glm::u32vec2 size = Graphics::getFramebufferSize();
     for (u32 i = 0; i < cPasses; ++i) {
-        mFramebuffers[i].addTextureBuffer(Texture2D::Format::R11G11B10F, size);
+        mFramebuffers[i].addTextureBuffer(Texture::Format::R11G11B10F, size);
         size /= 2;
         mFramebuffers[i].finalize();
     }
