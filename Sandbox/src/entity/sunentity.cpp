@@ -31,6 +31,7 @@ public:
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, mOrigin);
+        model = glm::scale(model, glm::vec3(0.1f));
 
         mShaderProgram.setMat4("uModelMtx", model);
         mShaderProgram.setMat4("uViewProjMtx", renderInfo.camera->getViewProjection());
@@ -104,7 +105,7 @@ public:
 
         mIndicatorComponent->update(
             mLightComponent->getDirection(),
-            1.5f
+            indicatorLength
         );
     }
 

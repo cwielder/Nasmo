@@ -36,29 +36,35 @@ void nsm::PrimitiveShape::init() {
 
     // Cube data
     constexpr f32 cubeVertexData[] = {
-        -0.1f, -0.1f,  0.1f,
-        -0.1f, -0.1f, -0.1f,
-         0.1f, -0.1f, -0.1f,
-         0.1f, -0.1f,  0.1f,
-        -0.1f,  0.1f,  0.1f,
-        -0.1f,  0.1f, -0.1f,
-         0.1f,  0.1f, -0.1f,
-         0.1f,  0.1f,  0.1f
+	    -1.0f, -1.0f,  1.0f,//        7--------6
+	     1.0f, -1.0f,  1.0f,//       /|       /|
+	     1.0f, -1.0f, -1.0f,//      4--------5 |
+	    -1.0f, -1.0f, -1.0f,//      | |      | |
+	    -1.0f,  1.0f,  1.0f,//      | 3------|-2
+	     1.0f,  1.0f,  1.0f,//      |/       |/
+	     1.0f,  1.0f, -1.0f,//      0--------1
+	    -1.0f,  1.0f, -1.0f
     };
 
     constexpr u32 cubeIndexData[] = {
-        0, 1, 2,
-        0, 2, 3,
+        // Right
+        1, 2, 6,
+        6, 5, 1,
+        // Left
         0, 4, 7,
-        0, 7, 3,
-        3, 7, 6,
-        3, 6, 2,
-        2, 6, 5,
-        2, 5, 1,
-        1, 5, 4,
-        1, 4, 0,
+        7, 3, 0,
+        // Top
         4, 5, 6,
-        4, 6, 7
+        6, 7, 4,
+        // Bottom
+        0, 3, 2,
+        2, 1, 0,
+        // Back
+        0, 1, 5,
+        5, 4, 0,
+        // Front
+        3, 7, 6,
+        6, 2, 3
     };
 
     sCubeVBO = new VertexBuffer(cubeVertexData, sizeof(cubeVertexData), 3 * sizeof(f32), nsm::BufferUsage::StaticDraw);

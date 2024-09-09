@@ -16,9 +16,16 @@ class DebugLayer : public nsm::Layer {
 public:
     DebugLayer(const std::string& name)
         : Layer(name)
-    { }
+    {
+        mRenderState
+            .depth(nsm::RenderState::DepthFunction::Less, true)
+        ;
+
+    }
 
     void draw(const nsm::RenderInfo& renderInfo) {
+        mRenderState.apply();
+
         for (auto& drawable : mDrawables) {
             drawable->drawOpaque(renderInfo);
         }
