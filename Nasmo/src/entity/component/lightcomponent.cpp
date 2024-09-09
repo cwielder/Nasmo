@@ -4,6 +4,7 @@
 #include <nsm/gfx/renderinfo.h>
 #include <nsm/gfx/framebuffer.h>
 #include <nsm/entity/component/cameracomponent.h>
+#include <nsm/gfx/primitiveshape.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <fastgltf/core.hpp>
@@ -98,10 +99,6 @@ nsm::PointLightComponent::PointLightComponent(const glm::vec3& position, const g
     , mShaderProgram("nsm/assets/shaders/light_volume.vsh", "nsm/assets/shaders/point_light.fsh")
 { }
 
-nsm::ShaderProgram* nsm::PointLightComponent::getShaderProgram() {
-    return &mShaderProgram;
-}
-
 void nsm::PointLightComponent::drawOpaque(const RenderInfo& renderInfo) {    
     if (mDirty) {
         constexpr f32 cAttenuationLinear = 1.175f;
@@ -109,6 +106,7 @@ void nsm::PointLightComponent::drawOpaque(const RenderInfo& renderInfo) {
 
         const f32 maxChannel = glm::max(glm::max(mColor.r, mColor.g), mColor.b);
 
+        // TODO: This calculation needs to be improved
         const f32 radius = (-cAttenuationLinear + std::sqrtf(cAttenuationLinear * cAttenuationLinear - 4 * cAttenuationExp * (cAttenuationExp - 256 * mIntensity)));
 
         mModelMatrix = glm::translate(glm::mat4(1.0f), mPosition);
@@ -130,4 +128,40 @@ void nsm::PointLightComponent::drawOpaque(const RenderInfo& renderInfo) {
 
     getLightVolume()->vao.bind();
     getLightVolume()->ibo.draw();
+}
+
+// DirectionalLightComponent
+
+nsm::DirectionalLightComponent::DirectionalLightComponent(const f32 yaw, const f32 pitch, const glm::vec3& color, const f32 intensity)
+    : LightComponent(glm::vec3(0.0f), color, intensity)
+    , mShaderProgram("nsm/assets/shaders/screen.vsh", "nsm/assets/shaders/directional_light.fsh")
+    , mDirection(yawPitchToDirection(yaw, pitch))
+{ }
+
+void nsm::DirectionalLightComponent::drawOpaque(const RenderInfo& renderInfo) {
+    mShaderProgram.bind();
+    mShaderProgram.setOptionalMat4("uViewProjMtx", renderInfo.camera->getViewProjection());
+    mShaderProgram.setOptionalVec3("uCamPos", renderInfo.camera->getPosition());
+    mShaderProgram.setOptionalVec3("uLightDir", mDirection);
+    mShaderProgram.setOptionalVec3("uLightColor", mColor * mIntensity);
+
+    renderInfo.framebuffer->getTextureBuffer(0)->bind(0); // normal+metallic
+    renderInfo.framebuffer->getTextureBuffer(1)->bind(1); // albedo+roughness
+    renderInfo.framebuffer->getDepthStencil()->bind(2); // depth
+
+    PrimitiveShape::getQuadVAO().bind();
+    PrimitiveShape::getQuadIBO().draw();
+}
+
+glm::vec3 nsm::DirectionalLightComponent::yawPitchToDirection(const f32 yaw, const f32 pitch) {
+    const f32 yawCos = std::cos(glm::radians(yaw));
+    const f32 yawSin = std::sin(glm::radians(yaw));
+    const f32 pitchCos = std::cos(glm::radians(pitch));
+    const f32 pitchSin = std::sin(glm::radians(pitch));
+
+    return glm::vec3(
+        yawCos * pitchCos,
+        yawSin * pitchCos,
+        pitchSin
+    );
 }

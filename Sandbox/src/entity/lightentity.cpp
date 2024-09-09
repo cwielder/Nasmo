@@ -19,7 +19,7 @@ public:
             glm::vec3(1.0f, 1.0f, 1.0f),
             mIntensity
         );
-        mLightComponent->setTargetLayer("lighting");
+        mLightComponent->setTargetLayer("lighting_point");
         this->addComponent<nsm::DrawableComponent>(mLightComponent);
     }
 

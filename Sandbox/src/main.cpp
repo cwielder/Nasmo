@@ -12,13 +12,28 @@
 
 #include <imgui.h>
 
+class DebugLayer : public nsm::Layer {
+public:
+    DebugLayer(const std::string& name)
+        : Layer(name)
+    { }
+
+    void draw(const nsm::RenderInfo& renderInfo) {
+        for (auto& drawable : mDrawables) {
+            drawable->drawOpaque(renderInfo);
+        }
+    }
+};
+
 class DemoPipeline : public nsm::RenderPipeline {
 public:
     DemoPipeline() {
         mLayerMain = this->pushLayer<nsm::ModelLayer>("main");
-        mLayerLighting = this->pushLayer<nsm::LightingLayer>("lighting");
+        mLayerLightingDirectional = this->pushLayer<nsm::LightingLayer>("lighting_directional", nsm::LightingLayer::Type::Directional);
+        mLayerLightingPoint = this->pushLayer<nsm::LightingLayer>("lighting_point", nsm::LightingLayer::Type::Point);
         mLayerBloom = this->pushLayer<nsm::BloomLayer>("bloom");
         mLayerTonemap = this->pushLayer<nsm::TonemapLayer>("cc");
+        mLayerDebug = this->pushLayer<DebugLayer>("debug");
         mLayerImGui = this->pushLayer<nsm::ImGuiLayer>("imgui");
 
         glm::u32vec2 size = nsm::Graphics::getFramebufferSize();
@@ -39,13 +54,18 @@ public:
         // Lighting pass
         framebuffer->bind();
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-        mLayerLighting->draw({ mLayerMain->getCamera(), &mGeometryBuffer });
+        mLayerLightingDirectional->draw({ mLayerMain->getCamera(), &mGeometryBuffer });
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+        mLayerLightingPoint->draw({ mLayerMain->getCamera(), &mGeometryBuffer });
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
         // Post-process pass
         mLayerBloom->draw({ nullptr, framebuffer });
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         mLayerTonemap->draw({ nullptr, framebuffer });
+
+        // Debug pass
+        mLayerDebug->draw({ mLayerDebug->getCamera(), framebuffer });
 
         // ImGui pass
         mLayerImGui->draw({ nullptr, framebuffer });
@@ -56,9 +76,11 @@ public:
     }
 
     nsm::ModelLayer* mLayerMain;
-    nsm::LightingLayer* mLayerLighting;
+    nsm::LightingLayer* mLayerLightingDirectional;
+    nsm::LightingLayer* mLayerLightingPoint;
     nsm::BloomLayer* mLayerBloom;
     nsm::TonemapLayer* mLayerTonemap;
+    DebugLayer* mLayerDebug;
     nsm::ImGuiLayer* mLayerImGui;
 
     nsm::Framebuffer mGeometryBuffer;

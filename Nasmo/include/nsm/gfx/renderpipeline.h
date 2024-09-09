@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include <type_traits>
 
 namespace nsm {
 
@@ -19,9 +20,9 @@ namespace nsm {
         virtual void onResize(const glm::u32vec2& size) { }
 
     protected:
-        template<typename T>
-        T* pushLayer(const std::string& name) requires std::is_base_of_v<Layer, T> {
-            T* layer = new T(name);
+        template<typename T, typename... Args>
+        T* pushLayer(const std::string& name, Args&&... args) requires std::is_base_of_v<Layer, T> {
+            T* layer = new T(name, std::forward<Args>(args)...);
             mLayers.emplace_back(std::make_pair(std::hash<std::string>{}(name), layer));
             
             return layer;

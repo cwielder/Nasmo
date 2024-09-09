@@ -42,7 +42,11 @@ void nsm::Renderer::pushDrawable(DrawableComponent* drawable) {
 }
 
 void nsm::Renderer::applyCamera(CameraComponent* camera) {
-    mPipeline->getLayer(camera->getTargetLayerHash())->setCamera(camera);
+    for (const auto& [hash, layer] : mPipeline->getLayers()) {
+        if (camera->isTargetLayer(hash)) {
+            layer->setCamera(camera);
+        }
+    }
 }
 
 void nsm::Renderer::render() {

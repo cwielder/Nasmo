@@ -22,8 +22,10 @@ namespace nsm {
         [[nodiscard]] const glm::mat4& getViewProjection() { return mIsDirty ? mViewProjection = mProjection * mView, mIsDirty = false, mViewProjection : mViewProjection; }
         [[nodiscard]] const glm::vec3& getPosition() const { return mPosition; }
 
-        void setTargetLayer(const std::string& layerName) { mTargetLayerHash = std::hash<std::string>{}(layerName); }
-        [[nodiscard]] std::size_t getTargetLayerHash() const { return mTargetLayerHash; }
+        void addTargetLayer(const std::string& layerName) { mTargetLayerHashes.push_back(std::hash<std::string>{}(layerName)); }
+        void removeFromTargetLayer(const std::string& layerName) { mTargetLayerHashes.erase(std::remove(mTargetLayerHashes.begin(), mTargetLayerHashes.end(), std::hash<std::string>{}(layerName)), mTargetLayerHashes.end()); }
+
+        [[nodiscard]] bool isTargetLayer(const std::size_t layerHash) const { return std::find(mTargetLayerHashes.begin(), mTargetLayerHashes.end(), layerHash) != mTargetLayerHashes.end(); }
 
         [[nodiscard]] glm::vec3 unProject(const glm::vec2& screenPos) const;
 
@@ -32,7 +34,7 @@ namespace nsm {
     protected:
         glm::mat4 mProjection, mView, mViewProjection;
         glm::vec3 mPosition;
-        std::size_t mTargetLayerHash;
+        std::vector<size_t> mTargetLayerHashes;
         bool mIsDirty;
     };
 

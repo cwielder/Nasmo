@@ -20,8 +20,6 @@ namespace nsm {
     public:
         void drawTranslucent(const RenderInfo& renderInfo) override { }
 
-        virtual ShaderProgram* getShaderProgram() = 0;
-
         [[nodiscard]] const glm::vec3& getPosition() const { return mPosition; }
         [[nodiscard]] const glm::vec3& getColor() const { return mColor; }
         [[nodiscard]] f32 getIntensity() const { return mIntensity; }
@@ -45,10 +43,26 @@ namespace nsm {
 
         void drawOpaque(const RenderInfo& renderInfo) override;
 
-        ShaderProgram* getShaderProgram() override;
-
     private:
         ShaderProgram mShaderProgram;
+    };
+
+    class DirectionalLightComponent : public LightComponent {
+    public:
+        DirectionalLightComponent(const f32 yaw, const f32 pitch, const glm::vec3& color, f32 intensity = 1.0f);
+        ~DirectionalLightComponent() override = default;
+
+        void drawOpaque(const RenderInfo& renderInfo) override;
+
+        [[nodiscard]] const glm::vec3& getDirection() const { return mDirection; }
+        void setDirection(const f32 yaw, const f32 pitch) { mDirection = yawPitchToDirection(yaw, pitch); }
+
+    private:
+        static glm::vec3 yawPitchToDirection(const f32 yaw, const f32 pitch);
+
+        ShaderProgram mShaderProgram;
+        glm::vec3 mDirection;
+        bool mDirty;
     };
 
 }

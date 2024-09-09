@@ -14,10 +14,17 @@ namespace nsm {
         [[nodiscard]] static VertexArray& getQuadVAO() { return *sQuadVAO; }
         [[nodiscard]] static IndexBuffer& getQuadIBO() { return *sQuadIBO; }
 
+        [[nodiscard]] static VertexArray& getCubeVAO() { return *sCubeVAO; }
+        [[nodiscard]] static IndexBuffer& getCubeIBO() { return *sCubeIBO; }
+
     private:
         static VertexBuffer* sQuadVBO;
         static VertexArray* sQuadVAO;
         static IndexBuffer* sQuadIBO;
+
+        static VertexBuffer* sCubeVBO;
+        static VertexArray* sCubeVAO;
+        static IndexBuffer* sCubeIBO;
     };
 
 }

@@ -10,7 +10,7 @@
 nsm::CameraComponent::CameraComponent(const glm::vec3& position, const glm::vec3& lookTarget, const glm::vec3& up)
     : EntityComponent()
     , mPosition(position)
-    , mTargetLayerHash(0)
+    , mTargetLayerHashes()
     , mIsDirty(true)
 {
     this->setView(position, lookTarget, up);
