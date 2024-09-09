@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nsm/common.h>
-#include <nsm/gfx/texture.h>
+#include <nsm/gfx/texture2D.h>
 
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
@@ -41,21 +41,21 @@ namespace nsm {
         void resize(const glm::u32vec2& size);
 
         [[nodiscard]] static Framebuffer* getBackbuffer();
-        static void blit(const Framebuffer& src, const Framebuffer& dst, const glm::u32vec2& srcStart, const glm::u32vec2& srcEnd, const glm::u32vec2& dstStart, const glm::u32vec2& dstEnd, const u32 typeMask, const Texture::FilterMode filterMode = Texture::FilterMode::Linear);
+        static void blit(const Framebuffer& src, const Framebuffer& dst, const glm::u32vec2& srcStart, const glm::u32vec2& srcEnd, const glm::u32vec2& dstStart, const glm::u32vec2& dstEnd, const u32 typeMask, const Texture2D::FilterMode filterMode = Texture2D::FilterMode::Linear);
 
-        void addTextureBuffer(const Texture::Format fmt, const glm::u32vec2& size, const Texture::FilterMode enlargeFilter = Texture::FilterMode::Linear, const Texture::FilterMode shrinkFilter = Texture::FilterMode::Linear);
+        void addTextureBuffer(const Texture2D::Format fmt, const glm::u32vec2& size, const Texture2D::FilterMode enlargeFilter = Texture2D::FilterMode::Linear, const Texture2D::FilterMode shrinkFilter = Texture2D::FilterMode::Linear);
         //void addRenderBuffer(); // TODO: Implement
         void finalize() const;
 
         [[nodiscard]] const u32 getID() const { return mId; }
-        [[nodiscard]] const Texture* getTextureBuffer(const std::size_t index) const { return mTextureBuffers[index]; }
-        [[nodiscard]] const Texture* getDepthStencil() const { return mDepthStencil; }
+        [[nodiscard]] const Texture2D* getTextureBuffer(const std::size_t index) const { return mTextureBuffers[index]; }
+        [[nodiscard]] const Texture2D* getDepthStencil() const { return mDepthStencil; }
         [[nodiscard]] const bool isFinalized() const { return mFinalized; }
 
     private:
-        std::vector<Texture*> mTextureBuffers;
+        std::vector<Texture2D*> mTextureBuffers;
         u32 mId;
-        Texture* mDepthStencil;
+        Texture2D* mDepthStencil;
         bool mFinalized;
     };
 

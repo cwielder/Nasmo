@@ -8,24 +8,24 @@
 #include <fastgltf/glm_element_traits.hpp>
 
 namespace {
-    nsm::Texture::FilterMode getFilterMode(const fastgltf::Filter filter) {
+    nsm::Texture2D::FilterMode getFilterMode(const fastgltf::Filter filter) {
         switch (filter) {
-            case fastgltf::Filter::Linear: return nsm::Texture::FilterMode::Linear;
-            case fastgltf::Filter::Nearest: return nsm::Texture::FilterMode::Nearest;
-            case fastgltf::Filter::LinearMipMapLinear: return nsm::Texture::FilterMode::LinearMipmapLinear;
-            case fastgltf::Filter::LinearMipMapNearest: return nsm::Texture::FilterMode::LinearMipmapNearest;
-            case fastgltf::Filter::NearestMipMapLinear: return nsm::Texture::FilterMode::NearestMipmapLinear;
-            case fastgltf::Filter::NearestMipMapNearest: return nsm::Texture::FilterMode::NearestMipmapNearest;
-            default: nsm::warn("Unknown filter mode"); return nsm::Texture::FilterMode::Linear;
+            case fastgltf::Filter::Linear: return nsm::Texture2D::FilterMode::Linear;
+            case fastgltf::Filter::Nearest: return nsm::Texture2D::FilterMode::Nearest;
+            case fastgltf::Filter::LinearMipMapLinear: return nsm::Texture2D::FilterMode::LinearMipmapLinear;
+            case fastgltf::Filter::LinearMipMapNearest: return nsm::Texture2D::FilterMode::LinearMipmapNearest;
+            case fastgltf::Filter::NearestMipMapLinear: return nsm::Texture2D::FilterMode::NearestMipmapLinear;
+            case fastgltf::Filter::NearestMipMapNearest: return nsm::Texture2D::FilterMode::NearestMipmapNearest;
+            default: nsm::warn("Unknown filter mode"); return nsm::Texture2D::FilterMode::Linear;
         }
     }
 
-    nsm::Texture::WrapMode getWrapMode(const fastgltf::Wrap wrap) {
+    nsm::Texture2D::WrapMode getWrapMode(const fastgltf::Wrap wrap) {
         switch (wrap) {
-            case fastgltf::Wrap::ClampToEdge: return nsm::Texture::WrapMode::ClampToEdge;
-            case fastgltf::Wrap::MirroredRepeat: return nsm::Texture::WrapMode::MirroredRepeat;
-            case fastgltf::Wrap::Repeat: return nsm::Texture::WrapMode::Repeat;
-            default: nsm::warn("Unknown wrap mode"); return nsm::Texture::WrapMode::Repeat;
+            case fastgltf::Wrap::ClampToEdge: return nsm::Texture2D::WrapMode::ClampToEdge;
+            case fastgltf::Wrap::MirroredRepeat: return nsm::Texture2D::WrapMode::MirroredRepeat;
+            case fastgltf::Wrap::Repeat: return nsm::Texture2D::WrapMode::Repeat;
+            default: nsm::warn("Unknown wrap mode"); return nsm::Texture2D::WrapMode::Repeat;
         }
     }
 }
@@ -145,14 +145,14 @@ nsm::Material::~Material() {
 }
 
 void nsm::Material::addTexture(const fastgltf::Asset& asset, const fastgltf::Texture& tex) {
-    NSM_ASSERT(tex.imageIndex.has_value(), "Texture has no image index");
+    NSM_ASSERT(tex.imageIndex.has_value(), "Texture2D has no image index");
 
     const fastgltf::DataSource& texData = asset.images[tex.imageIndex.value()].data;
     
-    Texture::FilterMode enlargeFilter = Texture::FilterMode::Linear;
-    Texture::FilterMode shrinkFilter = Texture::FilterMode::Linear;
-    Texture::WrapMode wrapS = Texture::WrapMode::Repeat;
-    Texture::WrapMode wrapT = Texture::WrapMode::Repeat;
+    Texture2D::FilterMode enlargeFilter = Texture2D::FilterMode::Linear;
+    Texture2D::FilterMode shrinkFilter = Texture2D::FilterMode::Linear;
+    Texture2D::WrapMode wrapS = Texture2D::WrapMode::Repeat;
+    Texture2D::WrapMode wrapT = Texture2D::WrapMode::Repeat;
 
     if (tex.samplerIndex.has_value()) {
         const fastgltf::Sampler& sampler = asset.samplers[tex.samplerIndex.value()];

@@ -1,13 +1,13 @@
-#include <nsm/gfx/texture.h>
+#include <nsm/gfx/texture2D.h>
 
 #include <nsm/debug/assert.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-std::unordered_map<std::string, std::tuple<u8*, glm::u32vec2, u32>> nsm::Texture::sCache;
+std::unordered_map<std::string, std::tuple<u8*, glm::u32vec2, u32>> nsm::Texture2D::sCache;
 
-nsm::Texture::Texture()
+nsm::Texture2D::Texture2D()
     : mId(GL_NONE)
     , mSize(0, 0)
     , mFormat()
@@ -19,14 +19,14 @@ nsm::Texture::Texture()
     glCreateTextures(GL_TEXTURE_2D, 1, &mId);
 }
 
-nsm::Texture::Texture(const std::string& path, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
-    : Texture()
+nsm::Texture2D::Texture2D(const std::string& path, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
+    : Texture2D()
 {
     this->initFromFile(path, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
 }
 
-nsm::Texture::Texture(const glm::u32vec2& size, const Format fmt, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
-    : Texture()
+nsm::Texture2D::Texture2D(const glm::u32vec2& size, const Format fmt, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
+    : Texture2D()
 {
     glTextureStorage2D(mId, 1, static_cast<GLenum>(fmt), size.x, size.y);
 
@@ -43,19 +43,19 @@ nsm::Texture::Texture(const glm::u32vec2& size, const Format fmt, const FilterMo
     mWrapT = wrapT;
 }
 
-nsm::Texture::Texture(const u8* data, const std::size_t length, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
-    : Texture()
+nsm::Texture2D::Texture2D(const u8* data, const std::size_t length, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT)
+    : Texture2D()
 {
     this->initFromMemory(data, length, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
 }
 
-nsm::Texture::~Texture() {
+nsm::Texture2D::~Texture2D() {
     if (mId != GL_NONE) {
         glDeleteTextures(1, &mId);
     }
 }
 
-void nsm::Texture::initFromFile(const std::string& path, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
+void nsm::Texture2D::initFromFile(const std::string& path, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
     NSM_ASSERT(mId != GL_NONE, "Cannot initialize invalid texture");
 
     const auto load = [&path]() -> std::tuple<u8*, glm::u32vec2, u32> {
@@ -83,7 +83,7 @@ void nsm::Texture::initFromFile(const std::string& path, bool srgb, const Filter
     nsm::trace("Loaded texture from file: ", path);
 }
 
-void nsm::Texture::initFromMemory(const u8* data, const std::size_t length, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
+void nsm::Texture2D::initFromMemory(const u8* data, const std::size_t length, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
     i32 width = 0, height = 0, channels = 0;
     u8* loadedData = stbi_load_from_memory(data, static_cast<int>(length), &width, &height, &channels, 0);
     nsm::trace("Loaded texture from memory: ", width, "x", height, " with ", channels, " channels");
@@ -94,7 +94,7 @@ void nsm::Texture::initFromMemory(const u8* data, const std::size_t length, bool
     this->initFromData(loadedData, channels, { static_cast<u32>(width), static_cast<u32>(height) }, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
 }
 
-void nsm::Texture::initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
+void nsm::Texture2D::initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, bool srgb, const FilterMode enlargeFilter, const FilterMode shrinkFilter, const WrapMode wrapS, const WrapMode wrapT) {
     NSM_ASSERT(mId != GL_NONE, "Cannot initialize invalid texture");
 
     mSize = size;
@@ -153,13 +153,13 @@ void nsm::Texture::initFromData(const u8* data, const u32 channelCount, const gl
     mWrapT = wrapT;
 }
 
-void nsm::Texture::bind(const u32 slot) const {
+void nsm::Texture2D::bind(const u32 slot) const {
     NSM_ASSERT(mId != GL_NONE, "Cannot bind invalid texture");
 
     glBindTextureUnit(slot, mId);
 }
 
-void nsm::Texture::clearCache() {
+void nsm::Texture2D::clearCache() {
     for (const auto& [path, data] : sCache) {
         const auto& [dataPtr, size, channels] = data;
 

@@ -11,8 +11,8 @@
 
 namespace nsm {
 
-    class Texture final {
-        NSM_NO_COPY(Texture);
+    class Texture2D final {
+        NSM_NO_COPY(Texture2D);
 
     public:
         enum class FilterMode : u16 {
@@ -48,13 +48,13 @@ namespace nsm {
         };
 
     public:
-        Texture();
-        Texture(const std::string& path, bool srgb, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
-        Texture(const glm::u32vec2& size, const Format fmt, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
-        Texture(const u8* data, const std::size_t length, bool srgb = false, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
-        ~Texture();
+        Texture2D();
+        Texture2D(const std::string& path, bool srgb, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
+        Texture2D(const glm::u32vec2& size, const Format fmt, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
+        Texture2D(const u8* data, const std::size_t length, bool srgb = false, const FilterMode enlargeFilter = FilterMode::Linear, const FilterMode shrinkFilter = FilterMode::Linear, const WrapMode wrapS = WrapMode::Repeat, const WrapMode wrapT = WrapMode::Repeat);
+        ~Texture2D();
 
-        Texture(Texture&& other) noexcept
+        Texture2D(Texture2D&& other) noexcept
             : mId(other.mId)
             , mSize(other.mSize)
             , mFormat(other.mFormat)
@@ -66,7 +66,7 @@ namespace nsm {
             other.mId = GL_NONE;
         }
 
-        Texture& operator=(Texture&& other) noexcept {
+        Texture2D& operator=(Texture2D&& other) noexcept {
             if (this != &other) {
                 mId = other.mId;
                 mSize = other.mSize;

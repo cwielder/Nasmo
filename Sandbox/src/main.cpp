@@ -44,9 +44,9 @@ public:
         mLayerImGui = this->pushLayer<nsm::ImGuiLayer>("imgui");
 
         glm::u32vec2 size = nsm::Graphics::getFramebufferSize();
-        mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::RGBA16F, size); // normal+metallic
-        mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::RGBA16F, size); // albedo+roughness
-        mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::Depth32FStencil8, size);
+        mGeometryBuffer.addTextureBuffer(nsm::Texture2D::Format::RGBA16F, size); // normal+metallic
+        mGeometryBuffer.addTextureBuffer(nsm::Texture2D::Format::RGBA16F, size); // albedo+roughness
+        mGeometryBuffer.addTextureBuffer(nsm::Texture2D::Format::Depth32FStencil8, size);
         mGeometryBuffer.finalize();
     }
 

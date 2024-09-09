@@ -13,8 +13,8 @@ nsm::Renderer::Renderer(const glm::u32vec2& size)
     , mRenderState()
     , mViewport(size)
 {
-    mFramebuffer.addTextureBuffer(Texture::Format::RGB16F, size);
-    mFramebuffer.addTextureBuffer(Texture::Format::Depth24Stencil8, size);
+    mFramebuffer.addTextureBuffer(Texture2D::Format::RGB16F, size);
+    mFramebuffer.addTextureBuffer(Texture2D::Format::Depth24Stencil8, size);
     mFramebuffer.finalize();
 
     mRenderState

@@ -4,12 +4,12 @@
 
 namespace nsm {
 
-    class Texture;
+    class Texture2D;
 
     class Viewport final {
     public:
         Viewport(const glm::u32vec2& size);
-        Viewport(const Texture& texture);
+        Viewport(const Texture2D& texture);
         ~Viewport() = default;
 
         void apply() const;

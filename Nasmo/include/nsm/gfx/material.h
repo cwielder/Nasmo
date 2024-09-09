@@ -2,7 +2,7 @@
 
 #include <nsm/common.h>
 
-#include <nsm/gfx/texture.h>
+#include <nsm/gfx/texture2D.h>
 #include <nsm/gfx/shader.h>
 
 #include <string>
@@ -67,7 +67,7 @@ namespace nsm {
         void bind() const;
 
         [[nodiscard]] ShaderProgram* getShader() const { return mShader; }
-        [[nodiscard]] const std::vector<Texture>& getTextures() const { return mTextures; }
+        [[nodiscard]] const std::vector<Texture2D>& getTextures() const { return mTextures; }
         [[nodiscard]] const std::vector<UniformVar>& getUniforms() const { return mUniforms; }
         [[nodiscard]] bool isTranslucent() const { return mIsTranslucent; }
 
@@ -82,7 +82,7 @@ namespace nsm {
         static std::map<std::string, Material*> sMaterialCache;
 
         ShaderProgram* mShader;
-        std::vector<Texture> mTextures;
+        std::vector<Texture2D> mTextures;
         std::vector<UniformVar> mUniforms;
         bool mIsTranslucent;
     };

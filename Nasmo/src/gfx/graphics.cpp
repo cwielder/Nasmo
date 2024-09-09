@@ -3,7 +3,7 @@
 #include <nsm/gfx/opengl.h>
 #include <nsm/debug/log.h>
 #include <nsm/event/events.h>
-#include <nsm/gfx/texture.h>
+#include <nsm/gfx/texture2D.h>
 #include <nsm/gfx/renderer.h>
 #include <nsm/gfx/layer/layer.h>
 #include <nsm/gfx/primitiveshape.h>
@@ -58,7 +58,7 @@ nsm::Graphics::~Graphics() {
     delete mRenderer;
 
     ModelComponent::clearModels();
-    Texture::clearCache();
+    Texture2D::clearCache();
     Material::clearCache();
     PrimitiveShape::destroy();
 }
