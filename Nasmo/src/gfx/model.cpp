@@ -95,6 +95,7 @@ void nsm::Model::addInstance(std::size_t* outID) {
 
     for (auto& [name, object] : mObjects) {
         object->growInstanceDataBuffer(mInstanceIDs.size());
+        object->growTransformBuffer();
     }
 }
 
@@ -110,6 +111,7 @@ void nsm::Model::removeInstance(std::size_t id) {
 
     for (auto& [name, object] : mObjects) {
         object->shrinkInstanceDataBuffer(mInstanceIDs.size(), id);
+        object->shrinkTransformBuffer(id);
     }
 }
 
@@ -119,6 +121,28 @@ void nsm::Model::setInstanceData(const std::string& objectName, void* data, cons
     NSM_ASSERT(!object->isTransformOnly(), "MeshObject ", objectName, " is transform only");
 
     static_cast<MeshObject*>(object)->setInstanceData(data, index);
+}
+
+void nsm::Model::setTransformAll(const std::size_t instanceID, const glm::mat4& transform) {
+    std::vector<Object*> allObjects = this->getAllObjects();
+    for (Object* object : allObjects) {
+        if (object->isTransformOnly()) {
+            continue;
+        }
+
+        if (object->getChildCount() > 0) {
+            continue;
+        }
+
+        object->setTransform(transform, instanceID);
+    }
+}
+
+void nsm::Model::setTransform(const std::size_t instanceID, const std::string& objectName, const glm::mat4& transform) {
+    Object* object = this->getObject(objectName);
+    NSM_ASSERT(object, "Object not found: ", objectName);
+
+    object->setTransform(transform, instanceID);
 }
 
 std::size_t nsm::Model::getObjectCount() const {
@@ -157,6 +181,18 @@ nsm::Model::Object* nsm::Model::getObject(const std::string& name) const {
     }
 
     return it->second;
+}
+
+std::vector<nsm::Model::Object*> nsm::Model::getAllObjects() const {
+    std::vector<nsm::Model::Object*> objects;
+    for (const auto& [name, object] : mObjects) {
+        std::vector<nsm::Model::Object*> allChildren = object->getAllChildren();
+        for (nsm::Model::Object* child : allChildren) {
+            objects.push_back(child);
+        }
+    }
+
+    return objects;
 }
 
 // Mesh
@@ -307,6 +343,7 @@ void nsm::Model::Mesh::Shape::draw(const RenderInfo& renderInfo, u32 count, cons
 }
 
 // Object
+
 nsm::Model::Object::Object(Object* parent, const fastgltf::Asset& gltf, const std::map<std::string, nsm::Model::Mesh*>& meshes, const glm::mat4& transform, const fastgltf::pmr::MaybeSmallVector<size_t>& children, bool transformOnly)
     : mTransform(transform)
     , mChildren()
@@ -333,15 +370,15 @@ nsm::Model::Object::~Object() {
     }
 }
 
-void nsm::Model::Object::growInstanceDataBuffer(const std::size_t newSize) {
+void nsm::Model::Object::growInstanceDataBuffer(const std::size_t newCount) {
     for (const auto& [name, child] : mChildren) {
-        child->growInstanceDataBuffer(newSize);
+        child->growInstanceDataBuffer(newCount);
     }
 }
 
-void nsm::Model::Object::shrinkInstanceDataBuffer(const std::size_t newSize, const std::size_t missingIndex) {
+void nsm::Model::Object::shrinkInstanceDataBuffer(const std::size_t newCount, const std::size_t missingIndex) {
     for (const auto& [name, child] : mChildren) {
-        child->shrinkInstanceDataBuffer(newSize, missingIndex);
+        child->shrinkInstanceDataBuffer(newCount, missingIndex);
     }
 }
 
@@ -349,6 +386,26 @@ void nsm::Model::Object::setInstanceData(const void* data, const std::size_t ind
     for (const auto& [name, child] : mChildren) {
         child->setInstanceData(data, index);
     }
+}
+
+void nsm::Model::Object::growTransformBuffer() {
+    for (const auto& [name, child] : mChildren) {
+        child->growTransformBuffer();
+    }
+
+    mTransformBuffer.push_back(glm::mat4(1.0f));
+}
+
+void nsm::Model::Object::shrinkTransformBuffer(const std::size_t missingIndex) {
+    for (const auto& [name, child] : mChildren) {
+        child->shrinkTransformBuffer(missingIndex);
+    }
+
+    mTransformBuffer.erase(mTransformBuffer.begin() + missingIndex);
+}
+
+void nsm::Model::Object::setTransform(const glm::mat4& transform, const std::size_t index) {
+    mTransformBuffer[index] = transform;
 }
 
 void nsm::Model::Object::drawOpaque(const RenderInfo& renderInfo, const std::size_t instanceCount) {
@@ -361,6 +418,19 @@ void nsm::Model::Object::drawTranslucent(const RenderInfo& renderInfo, const std
     for (const auto& [name, child] : mChildren) {
         child->drawTranslucent(renderInfo, instanceCount);
     }
+}
+
+std::vector<nsm::Model::Object*> nsm::Model::Object::getAllChildren() const {
+    std::vector<nsm::Model::Object*> objects;
+    for (const auto& [name, object] : mChildren) {
+        objects.push_back(object);
+        std::vector<nsm::Model::Object*> allChildren = object->getAllChildren();
+        for (nsm::Model::Object* child : allChildren) {
+            objects.push_back(child);
+        }
+    }
+
+    return objects;
 }
 
 nsm::Model::Object* nsm::Model::Object::getChild(const std::string& name) const {
@@ -404,22 +474,19 @@ std::size_t nsm::Model::Object::getChildMeshObjectCount() const {
 nsm::Model::MeshObject::MeshObject(Object* parent, const fastgltf::Asset& gltf, const std::map<std::string, nsm::Model::Mesh*>& meshes, const std::string& meshName, const glm::mat4& transform, const fastgltf::pmr::MaybeSmallVector<size_t>& children)
     : Object(parent, gltf, meshes, transform, children, false)
     , mMesh(meshes.at(meshName))
-    , mInstanceDataBuffer(nullptr)
-    , mInstanceDataBufferEntrySize(0)
+    , mInstanceDataBuffer()
     , mInstanceDataDirty(false)
 { }
 
-nsm::Model::MeshObject::~MeshObject() {
-    std::free(mInstanceDataBuffer);
-}
+nsm::Model::MeshObject::~MeshObject() { }
 
 glm::mat4 nsm::Model::MeshObject::preDraw(const std::size_t instanceCount) {
     if (mInstanceDataDirty) {
-        mSSBO.setData(mInstanceDataBufferEntrySize * instanceCount, mInstanceDataBuffer);
+        mInstanceDataSSBO.setData(mInstanceDataBuffer.getElementSize() * instanceCount, mInstanceDataBuffer.getBuffer());
         mInstanceDataDirty = false;
     }
-    
-    mSSBO.bind(0);
+
+    glm::mat4* hierarchyTransformInstanced = new glm::mat4[instanceCount];
 
     Object* parent = mParent;
     std::size_t parentCount = 0;
@@ -438,7 +505,30 @@ glm::mat4 nsm::Model::MeshObject::preDraw(const std::size_t instanceCount) {
         for (const glm::mat4& t : transforms) {
             transform = t * transform;
         }
+
+        for (std::size_t i = 0; i < instanceCount; i++) {
+            std::vector<glm::mat4> instanceTransforms(parentCount);
+            parent = mParent;
+            for (std::size_t j = 0; j < parentCount; j++) {
+                instanceTransforms[j] = parent->getTransformBuffer()[i];
+                parent = parent->getParent();
+            }
+
+            glm::mat4 instanceTransform = mTransformBuffer[i];
+            for (const glm::mat4& t : instanceTransforms) {
+                instanceTransform = t * instanceTransform;
+            }
+
+            hierarchyTransformInstanced[i] = instanceTransform;
+        }
     }
+
+    mTransformSSBO.setData(sizeof(glm::mat4) * instanceCount, hierarchyTransformInstanced);
+
+    delete[] hierarchyTransformInstanced;
+
+    mInstanceDataSSBO.bind(0);
+    mTransformSSBO.bind(1);
 
     return transform * mTransform;
 }
@@ -463,45 +553,31 @@ void nsm::Model::MeshObject::drawTranslucent(const RenderInfo& renderInfo, const
     }
 }
 
-void nsm::Model::MeshObject::growInstanceDataBuffer(const std::size_t newSize) {
-    mInstanceDataDirty = true;
-
-    for (const auto& [name, child] : mChildren) {
-        child->growInstanceDataBuffer(newSize);
-    }
-
-    if (mInstanceDataBuffer == nullptr) {
-        mInstanceDataBuffer = std::malloc(mInstanceDataBufferEntrySize * newSize);
-        return;
-    }
-
-    mInstanceDataBuffer = std::realloc(mInstanceDataBuffer, mInstanceDataBufferEntrySize * newSize);
+void nsm::Model::MeshObject::setInstanceDataBufferEntrySize(const std::size_t entrySize) {
+    mInstanceDataBuffer.setElementSize(entrySize);
 }
 
-void nsm::Model::MeshObject::shrinkInstanceDataBuffer(const std::size_t newSize, const std::size_t missingIndex) {
-    u8* newBuffer = static_cast<u8*>(std::malloc(mInstanceDataBufferEntrySize * newSize));
+void nsm::Model::MeshObject::growInstanceDataBuffer(const std::size_t newCount) {
+    for (const auto& [name, child] : mChildren) {
+        child->growInstanceDataBuffer(newCount);
+    }
 
-    // Copy the data before the removed instance
-    std::memcpy(newBuffer, mInstanceDataBuffer, mInstanceDataBufferEntrySize * missingIndex);
-
-    // Copy the data after the removed instance (if any) but skip the removed instance
-    std::memcpy(newBuffer + mInstanceDataBufferEntrySize * missingIndex, static_cast<u8*>(mInstanceDataBuffer) + mInstanceDataBufferEntrySize * (missingIndex + 1), mInstanceDataBufferEntrySize * (newSize - missingIndex));
-
-    // Free the old buffer
-    std::free(mInstanceDataBuffer);
-
-    mInstanceDataBuffer = newBuffer;
+    mInstanceDataBuffer.addElement(newCount);
     mInstanceDataDirty = true;
+    mTransformBuffer.resize(newCount, glm::mat4(1.0f));
+}
+
+void nsm::Model::MeshObject::shrinkInstanceDataBuffer(const std::size_t newCount, const std::size_t missingIndex) {
+    mInstanceDataBuffer.removeElement(newCount, missingIndex);
+    mInstanceDataDirty = true;
+    mTransformBuffer.erase(mTransformBuffer.begin() + missingIndex);
 
     for (const auto& [name, child] : mChildren) {
-        child->shrinkInstanceDataBuffer(newSize, missingIndex);
+        child->shrinkInstanceDataBuffer(newCount, missingIndex);
     }
 }
 
 void nsm::Model::MeshObject::setInstanceData(const void* data, const std::size_t index) {
-    NSM_ASSERT(mInstanceDataBuffer != nullptr, "Instance data buffer is null");
-    NSM_ASSERT(mInstanceDataBufferEntrySize > 0, "Instance data buffer entry size is 0");
-
-    std::memcpy(static_cast<u8*>(mInstanceDataBuffer) + (mInstanceDataBufferEntrySize * index), data, mInstanceDataBufferEntrySize);
+    mInstanceDataBuffer.setElementData(index, data);
     mInstanceDataDirty = true;
 }

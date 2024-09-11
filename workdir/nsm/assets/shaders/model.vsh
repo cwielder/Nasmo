@@ -12,16 +12,20 @@ out vec3 vNormal;
 uniform mat4 uViewProjMtx;
 uniform mat4 uNodeTransform;
 
-struct InstanceStruct {
-    mat4 transform;
-};
+//struct InstanceStruct {
+//    
+//};
+//
+//layout (std430, binding = 0) buffer InstanceData {
+//    InstanceStruct data[];
+//} instanceData;
 
-layout (std430, binding = 0) buffer InstanceData {
-    InstanceStruct data[];
-} instanceData;
+layout (std430, binding = 1) buffer TransformData {
+    mat4 transform[];
+} transformData;
 
 void main() {
-    mat4 modelMatrix = instanceData.data[gl_InstanceID].transform * uNodeTransform;
+    mat4 modelMatrix = transformData.transform[gl_InstanceID] * uNodeTransform;
 
     vTexCoord = aTexCoord;
     vPosition = (modelMatrix * vec4(aPos, 1.0)).xyz;

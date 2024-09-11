@@ -8,6 +8,7 @@
 #include <nsm/gfx/shaderstorage.h>
 #include <nsm/gfx/renderinfo.h>
 #include <nsm/debug/assert.h>
+#include <nsm/util/anyvector.h>
 
 #include <map>
 #include <string>
@@ -62,14 +63,19 @@ namespace nsm {
             Object(Object* parent, const fastgltf::Asset& gltf, const std::map<std::string, nsm::Model::Mesh*>& meshes, const glm::mat4& transform, const fastgltf::pmr::MaybeSmallVector<size_t>& children, bool transformOnly = true);
             virtual ~Object();
 
-            virtual void growInstanceDataBuffer(const std::size_t newSize);
-            virtual void shrinkInstanceDataBuffer(const std::size_t newSize, const std::size_t missingIndex);
+            virtual void growInstanceDataBuffer(const std::size_t newCount);
+            virtual void shrinkInstanceDataBuffer(const std::size_t newCount, const std::size_t missingIndex);
             virtual void setInstanceData(const void* data, const std::size_t index);
             virtual void setInstanceDataBufferEntrySize(const std::size_t) { }
+
+            void growTransformBuffer();
+            void shrinkTransformBuffer(const std::size_t missingIndex);
+            void setTransform(const glm::mat4& transform, const std::size_t index);
 
             virtual void drawOpaque(const RenderInfo& renderInfo, const std::size_t instanceCount);
             virtual void drawTranslucent(const RenderInfo& renderInfo, const std::size_t instanceCount);
 
+            [[nodiscard]] std::vector<Object*> getAllChildren() const;
             [[nodiscard]] const glm::mat4& getTransform() const { return mTransform; }
             [[nodiscard]] const std::map<std::string, Object*>& getChildren() const { return mChildren; }
             [[nodiscard]] bool isTransformOnly() const { return mTransformOnly; }
@@ -77,9 +83,11 @@ namespace nsm {
             [[nodiscard]] Object* getChild(const std::string& name) const;
             [[nodiscard]] std::size_t getChildCount() const; // Includes children of children
             [[nodiscard]] std::size_t getChildMeshObjectCount() const; // Includes children of children
+            [[nodiscard]] std::vector<glm::mat4>& getTransformBuffer() { return mTransformBuffer; }
 
         protected:
             glm::mat4 mTransform;
+            std::vector<glm::mat4> mTransformBuffer;
             std::map<std::string, Object*> mChildren;
             Object* mParent;
             bool mTransformOnly;
@@ -90,10 +98,10 @@ namespace nsm {
             MeshObject(Object* parent, const fastgltf::Asset& gltf, const std::map<std::string, nsm::Model::Mesh*>& meshes, const std::string& meshName, const glm::mat4& transform, const fastgltf::pmr::MaybeSmallVector<size_t>& children);
             ~MeshObject();
 
-            void growInstanceDataBuffer(const std::size_t newSize) override;
-            void shrinkInstanceDataBuffer(const std::size_t newSize, const std::size_t missingIndex) override;
+            void growInstanceDataBuffer(const std::size_t newCount) override;
+            void shrinkInstanceDataBuffer(const std::size_t newCount, const std::size_t missingIndex) override;
             void setInstanceData(const void* data, const std::size_t index) override;
-            void setInstanceDataBufferEntrySize(const std::size_t entrySize) override { mInstanceDataBufferEntrySize = entrySize; }
+            void setInstanceDataBufferEntrySize(const std::size_t entrySize) override;
 
             void drawOpaque(const RenderInfo& renderInfo, const std::size_t instanceCount) override;
             void drawTranslucent(const RenderInfo& renderInfo, const std::size_t instanceCount) override;
@@ -102,10 +110,10 @@ namespace nsm {
             glm::mat4 preDraw(const std::size_t instanceCount);
 
             Mesh* mMesh;
-            void* mInstanceDataBuffer;
-            std::size_t mInstanceDataBufferEntrySize;
+            AnyVector mInstanceDataBuffer;
             bool mInstanceDataDirty;
-            ShaderStorage mSSBO;
+            ShaderStorage mInstanceDataSSBO;
+            ShaderStorage mTransformSSBO;
         };
 
     public:
@@ -119,6 +127,11 @@ namespace nsm {
         void removeInstance(std::size_t id);
 
         void setInstanceData(const std::string& objectName, void* data, const std::size_t index);
+
+        void setTransformAll(const std::size_t instanceID, const glm::mat4& transform);
+        void setTransform(const std::size_t instanceID, const std::string& objectName, const glm::mat4& transform);
+
+        [[nodiscard]] std::vector<Object*> getAllObjects() const;
 
         [[nodiscard]] const std::vector<std::size_t*>& getInstanceIDs() { return mInstanceIDs; }
         [[nodiscard]] const std::string& getPath() const { return mPath; }

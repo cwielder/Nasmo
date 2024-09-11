@@ -9,38 +9,19 @@
 
 class PlaneModel {
 public:
-    struct InstanceData {
-        glm::mat4 transform;
-    };
-
-    static inline const std::pair<std::string, std::size_t> sObjectInstanceDataSizes[] = {
-        { "Cylinder064_13 - Default_0", sizeof(InstanceData) }
-    };
-
-public:
     PlaneModel(nsm::Entity* owner)
-        : mModelComponent(new nsm::ModelComponent("models/plane.glb", "main", sObjectInstanceDataSizes))
-        , mInstanceData({
-            .transform = glm::mat4(1.0f)
-        })
+        : mModelComponent(new nsm::ModelComponent("models/plane.glb", "main"))
     {
-        this->updateInstanceData();
         owner->addComponent<nsm::DrawableComponent>(mModelComponent);
     }
 
     void setScale(const glm::vec3& scale) {
-        mInstanceData.transform = glm::scale(glm::mat4(1.0f), scale);
-
-        this->updateInstanceData();
+        glm::mat4 transform = glm::scale(glm::mat4(1.0f), scale);
+        mModelComponent->setTransformAll(transform);
     }
 
 private:
-    void updateInstanceData() {
-        mModelComponent->setInstanceData("Cylinder064_13 - Default_0", &mInstanceData);
-    }
-
     nsm::ModelComponent* mModelComponent;
-    InstanceData mInstanceData;
 };
 
 class DemoEntity final : public nsm::Entity {
@@ -60,7 +41,6 @@ public:
         if (ImGui::Begin("Demo Entity")) {
             ImGui::DragFloat("Scale", &mScale, 0.1f);
         } ImGui::End();
-
 
         mModel.setScale(glm::vec3(mScale));
     }
