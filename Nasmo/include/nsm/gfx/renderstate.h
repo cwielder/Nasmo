@@ -29,6 +29,28 @@ namespace nsm {
             Always = GL_ALWAYS
         };
 
+        enum class StencilFunction {
+            Never = GL_NEVER,
+            Less = GL_LESS,
+            Equal = GL_EQUAL,
+            LessEqual = GL_LEQUAL,
+            Greater = GL_GREATER,
+            NotEqual = GL_NOTEQUAL,
+            GreaterEqual = GL_GEQUAL,
+            Always = GL_ALWAYS
+        };
+
+        enum class StencilOperation {
+            Keep = GL_KEEP,
+            Zero = GL_ZERO,
+            Replace = GL_REPLACE,
+            Increment = GL_INCR,
+            IncrementWrap = GL_INCR_WRAP,
+            Decrement = GL_DECR,
+            DecrementWrap = GL_DECR_WRAP,
+            Invert = GL_INVERT
+        };
+
         enum class BlendFactor {
             Zero = GL_ZERO,
             One = GL_ONE,
@@ -69,6 +91,26 @@ namespace nsm {
             NSM_ASSERT(!b, "True value passed to depth disabler. Use the other overload!");
         
             mDepthTest = false;
+
+            return *this;
+        }
+
+        RenderState& stencil(const StencilFunction function, const StencilOperation fail, const StencilOperation depthFail, const StencilOperation depthPass, const u8 mask, const u8 reference) {
+            mStencilTest = true;
+            mStencilFunction = function;
+            mStencilFail = fail;
+            mDepthFail = depthFail;
+            mDepthPass = depthPass;
+            mStencilMask = mask;
+            mStencilReference = reference;
+
+            return *this;
+        }
+
+        RenderState& stencil(const bool b) {
+            NSM_ASSERT(!b, "True value passed to stencil disabler. Use the other overload!");
+        
+            mStencilTest = false;
 
             return *this;
         }
@@ -126,6 +168,12 @@ namespace nsm {
         bool mDepthWrite;
         bool mCullEnabled;
         bool mBlendEnabled;
+        bool mStencilTest;
+
+        u8 mStencilMask;
+        u8 mStencilReference;
+        StencilFunction mStencilFunction;
+        StencilOperation mStencilFail, mDepthFail, mDepthPass;
 
         DepthFunction mDepthFunction;
 

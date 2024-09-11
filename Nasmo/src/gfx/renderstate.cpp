@@ -3,11 +3,18 @@
 nsm::RenderState::RenderState()
     : mDepthTest(true)
     , mDepthWrite(true)
-    , mDepthFunction(DepthFunction::Less)
     , mCullEnabled(false)
+    , mBlendEnabled(false)
+    , mStencilTest(false)
+    , mStencilMask(0xFF)
+    , mStencilReference(0)
+    , mStencilFunction(StencilFunction::Always)
+    , mStencilFail(StencilOperation::Keep)
+    , mDepthFail(StencilOperation::Keep)
+    , mDepthPass(StencilOperation::Keep)
+    , mDepthFunction(DepthFunction::Less)
     , mCullFace(CullFace::Back)
     , mCullDirection(CullDirection::CounterClockwise)
-    , mBlendEnabled(false)
     , mSrcRGB(BlendFactor::SrcAlpha)
     , mSrcA(BlendFactor::SrcAlpha)
     , mDstRGB(BlendFactor::OneMinusSrcAlpha)
@@ -20,6 +27,13 @@ void nsm::RenderState::apply() const {
     if (mDepthTest) {
         glDepthFunc(static_cast<GLenum>(mDepthFunction));
         glDepthMask(mDepthWrite);
+    }
+
+    (mStencilTest ? glEnable : glDisable)(GL_STENCIL_TEST);
+    if (mStencilTest) {
+        glStencilMask(mStencilMask);
+        glStencilFunc(static_cast<GLenum>(mStencilFunction), mStencilReference, mStencilMask);
+        glStencilOp(static_cast<GLenum>(mStencilFail), static_cast<GLenum>(mDepthFail), static_cast<GLenum>(mDepthPass));
     }
 
     (mCullEnabled ? glEnable : glDisable)(GL_CULL_FACE);

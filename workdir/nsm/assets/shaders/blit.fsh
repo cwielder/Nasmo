@@ -4,8 +4,8 @@ layout (binding = 0) uniform sampler2D uFramebuffer;
 
 in vec2 vTexCoords;
 
-out vec4 FragColor;
+out vec4 oFragColor;
 
 void main() {
-    FragColor = texture(uFramebuffer, vTexCoords);
+    oFragColor = texture(uFramebuffer, vTexCoords);
 }

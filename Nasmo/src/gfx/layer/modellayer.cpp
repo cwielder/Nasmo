@@ -10,6 +10,8 @@ nsm::ModelLayer::ModelLayer(const std::string& name)
 {
     mRenderState
         .depth(RenderState::DepthFunction::Less, true)
+        // Use the stencil buffer to create a mask of pixels that are drawn to, so that we can copy only those pixels to the composition
+        .stencil(RenderState::StencilFunction::Always, RenderState::StencilOperation::Keep, RenderState::StencilOperation::Keep, RenderState::StencilOperation::Replace, 0xFF, 0xFF)
         .cull(RenderState::CullFace::Back, RenderState::CullDirection::CounterClockwise)
         .blend(false)
     ;

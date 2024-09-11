@@ -16,7 +16,7 @@ namespace nsm {
         RenderPipeline() = default;
         virtual ~RenderPipeline();
 
-        virtual void render(const Framebuffer* framebuffer) = 0;
+        virtual void render(Framebuffer* framebuffer) = 0;
         virtual void onResize(const glm::u32vec2& size) { }
 
     protected:

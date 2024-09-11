@@ -49,7 +49,20 @@ void nsm::Framebuffer::clear(const glm::u32vec4& value, const Type type, const u
         glClearNamedFramebufferuiv(mId, GL_COLOR, drawBuffer, glm::value_ptr(value));
     }
     
-    NSM_ASSERT((type & Type::Depth) == 0, "Cannot clear depth buffer with integer value!");
+    NSM_ASSERT((type & Type::Depth) == 0, "Cannot clear depth buffer with unsigned integer value!");
+    NSM_ASSERT((type & Type::Stencil) == 0, "Cannot clear stencil buffer with unsigned integer value!");
+}
+
+void nsm::Framebuffer::clear(const glm::i32vec4& value, const Type type, const u32 drawBuffer) const {
+    if (type & Type::Color) {
+        glClearNamedFramebufferiv(mId, GL_COLOR, drawBuffer, glm::value_ptr(value));
+    }
+
+    if (type & Type::Stencil) {
+        glClearNamedFramebufferiv(mId, GL_STENCIL, 0, glm::value_ptr(value));
+    }
+
+    NSM_ASSERT((type & Type::Depth) == 0, "Cannot clear depth buffer with signed integer value!");
 }
 
 void nsm::Framebuffer::resize(const glm::u32vec2& size) {
@@ -111,6 +124,21 @@ void nsm::Framebuffer::addTextureBuffer(const Texture::Format fmt, const glm::u3
         mTextureBuffers.push_back(new Texture2D(size, fmt, enlargeFilter));
         glNamedFramebufferTexture(mId, GL_COLOR_ATTACHMENT0 + static_cast<u32>(mTextureBuffers.size()) - 1, mTextureBuffers.back()->getID(), 0);
     }
+}
+
+void nsm::Framebuffer::takeDepthStencil(Framebuffer& other) {
+    NSM_ASSERT(mId != GL_NONE, "Cannot take depth/stencil buffer to backbuffer!");
+    NSM_ASSERT(other.mDepthStencil != nullptr, "Other framebuffer does not have depth/stencil attachment!");
+
+    if (mDepthStencil != nullptr) {
+        delete mDepthStencil;
+    }
+
+    mDepthStencil = other.mDepthStencil;
+    other.mDepthStencil = nullptr;
+
+    glNamedFramebufferTexture(mId, GL_DEPTH_STENCIL_ATTACHMENT, mDepthStencil->getID(), 0);
+    glNamedFramebufferTexture(other.mId, GL_DEPTH_STENCIL_ATTACHMENT, 0, 0);
 }
 
 void nsm::Framebuffer::finalize() const {

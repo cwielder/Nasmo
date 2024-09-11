@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <nsm/gfx/renderinfo.h>
 #include <nsm/entity/component/cameracomponent.h>
+#include <nsm/entity/component/skyboxcomponent.h>
 
 class IndicatorComponent : public nsm::DrawableComponent {
 public:
@@ -80,6 +81,10 @@ public:
         mIndicatorComponent = new IndicatorComponent(glm::vec3(5.0f, 0.0f, 5.0f));
         mIndicatorComponent->setTargetLayer("debug");
         this->addComponent<nsm::DrawableComponent>(mIndicatorComponent);
+
+        mSkyboxComponent = new nsm::SkyboxComponent("textures/skybox1/", ".jpg");
+        mSkyboxComponent->setTargetLayer("skybox");
+        this->addComponent<nsm::DrawableComponent>(mSkyboxComponent);
     }
 
     void onUpdate(const f32 timeStep) override {
@@ -113,6 +118,7 @@ private:
     f32 mIntensity;
     nsm::DirectionalLightComponent* mLightComponent;
     IndicatorComponent* mIndicatorComponent;
+    nsm::SkyboxComponent* mSkyboxComponent;
 };
 
 NSM_REGISTER_ENTITY(SunEntity);

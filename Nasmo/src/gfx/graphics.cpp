@@ -49,6 +49,8 @@ nsm::Graphics::Graphics(const GraphicsInfo& info)
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     #endif
 
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
     PrimitiveShape::init();
 
     mRenderer = new Renderer(info.window.size);
