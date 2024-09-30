@@ -522,6 +522,11 @@ glm::mat4 nsm::Model::MeshObject::preDraw(const std::size_t instanceCount) {
             hierarchyTransformInstanced[i] = instanceTransform;
         }
     }
+    else {
+        for (std::size_t i = 0; i < instanceCount; i++) {
+            hierarchyTransformInstanced[i] = mTransformBuffer[i];
+        }
+    }
 
     mTransformSSBO.setData(sizeof(glm::mat4) * instanceCount, hierarchyTransformInstanced);
 
