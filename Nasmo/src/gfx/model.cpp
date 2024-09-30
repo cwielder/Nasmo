@@ -130,10 +130,6 @@ void nsm::Model::setTransformAll(const std::size_t instanceID, const glm::mat4& 
             continue;
         }
 
-        if (object->getChildCount() > 0) {
-            continue;
-        }
-
         object->setTransform(transform, instanceID);
     }
 }
