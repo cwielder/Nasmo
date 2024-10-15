@@ -20,6 +20,13 @@ vec3 aces(vec3 v) {
 void main() {
     vec4 color = texture(uFramebuffer, vTexCoords);
 
+    color = vec4(
+        max(0.0f, color.r),
+        max(0.0f, color.g),
+        max(0.0f, color.b),
+        1.0f
+    );
+
     vec3 cc = aces(color.rgb); // Apply ACES tonemapping
     cc = pow(cc, vec3(1.0f / uExponent)); // Apply gamma correction
     
