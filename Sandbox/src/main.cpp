@@ -14,9 +14,9 @@
 
 #include <imgui.h>
 
-class DebugLayer : public nsm::Layer {
+class ForwardLayer : public nsm::Layer {
 public:
-    DebugLayer(const std::string& name)
+    ForwardLayer(const std::string& name)
         : Layer(name)
     {
         mRenderState
@@ -30,6 +30,10 @@ public:
         for (auto& drawable : mDrawables) {
             drawable->drawOpaque(renderInfo);
         }
+
+        for (auto& drawable : mDrawables) {
+            drawable->drawTranslucent(renderInfo);
+        }
     }
 };
 
@@ -42,9 +46,9 @@ public:
         mLayerMain = this->pushLayer<nsm::ModelLayer>("main");
         mLayerLightingDirectional = this->pushLayer<nsm::LightingLayer>("lighting_directional", nsm::LightingLayer::Type::Directional);
         mLayerLightingPoint = this->pushLayer<nsm::LightingLayer>("lighting_point", nsm::LightingLayer::Type::Point);
+        mLayerDebug = this->pushLayer<ForwardLayer>("debug");
         mLayerBloom = this->pushLayer<nsm::BloomLayer>("bloom");
         mLayerTonemap = this->pushLayer<nsm::TonemapLayer>("cc");
-        mLayerDebug = this->pushLayer<DebugLayer>("debug");
         mLayerImGui = this->pushLayer<nsm::ImGuiLayer>("imgui");
 
         glm::u32vec2 size = nsm::Graphics::getFramebufferSize();
@@ -95,13 +99,13 @@ public:
         nsm::PrimitiveShape::getQuadVAO().bind();
         nsm::PrimitiveShape::getQuadIBO().draw();
 
+        // Debug pass
+        mLayerDebug->draw({ mLayerDebug->getCamera(), framebuffer });
+
         // Post-process pass
         mLayerBloom->draw({ nullptr, framebuffer });
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         mLayerTonemap->draw({ nullptr, framebuffer });
-
-        // Debug pass
-        mLayerDebug->draw({ mLayerDebug->getCamera(), framebuffer });
 
         // ImGui pass
         mLayerImGui->draw({ nullptr, framebuffer });
@@ -118,7 +122,7 @@ public:
     nsm::LightingLayer* mLayerLightingPoint;
     nsm::BloomLayer* mLayerBloom;
     nsm::TonemapLayer* mLayerTonemap;
-    DebugLayer* mLayerDebug;
+    ForwardLayer* mLayerDebug;
     nsm::ImGuiLayer* mLayerImGui;
 
     nsm::Framebuffer mGeometryBuffer;
