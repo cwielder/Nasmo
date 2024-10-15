@@ -12,6 +12,7 @@ out vec3 vNormal;
 uniform mat4 uViewProjMtx;
 uniform mat4 uNodeTransform;
 
+// TODO: Re-enable this
 //struct InstanceStruct {
 //    
 //};
