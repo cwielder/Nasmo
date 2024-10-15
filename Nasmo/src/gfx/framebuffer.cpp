@@ -118,10 +118,10 @@ void nsm::Framebuffer::addTextureBuffer(const Texture::Format fmt, const glm::u3
 
     if (fmt == Texture::Format::Depth24Stencil8 || fmt == Texture::Format::Depth32FStencil8) {
         NSM_ASSERT(mDepthStencil == nullptr, "Framebuffer already has depth/stencil attachment!");
-        mDepthStencil = new Texture2D(size, fmt, enlargeFilter);
+        mDepthStencil = new Texture2D(size, fmt, enlargeFilter, shrinkFilter, Texture::WrapMode::ClampToEdge, Texture::WrapMode::ClampToEdge);
         glNamedFramebufferTexture(mId, GL_DEPTH_STENCIL_ATTACHMENT, mDepthStencil->getID(), 0);
     } else {
-        mTextureBuffers.push_back(new Texture2D(size, fmt, enlargeFilter));
+        mTextureBuffers.push_back(new Texture2D(size, fmt, enlargeFilter, shrinkFilter, Texture::WrapMode::ClampToEdge, Texture::WrapMode::ClampToEdge));
         glNamedFramebufferTexture(mId, GL_COLOR_ATTACHMENT0 + static_cast<u32>(mTextureBuffers.size()) - 1, mTextureBuffers.back()->getID(), 0);
     }
 }

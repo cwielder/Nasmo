@@ -10,7 +10,7 @@ namespace nsm {
 
     class BloomLayer final : public Layer {
     public:
-        static constexpr u32 cPasses = 9;
+        static constexpr u32 cPasses = 9; // TODO: Fix crash when resolution is too low for this number of passes
     
     public:
         BloomLayer(const std::string& name);
