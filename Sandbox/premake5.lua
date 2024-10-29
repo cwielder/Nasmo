@@ -39,7 +39,6 @@ project "Sandbox"
 
     flags {
         "MultiProcessorCompile",
-        "ShadowedVariables",
         "FatalWarnings"
     }
 

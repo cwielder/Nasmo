@@ -40,7 +40,6 @@ project "Nasmo"
 
     flags {
         "MultiProcessorCompile",
-        "ShadowedVariables",
         "FatalWarnings"
     }
 

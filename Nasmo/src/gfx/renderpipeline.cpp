@@ -10,7 +10,7 @@ nsm::RenderPipeline::~RenderPipeline() {
 }
 
 nsm::Layer* nsm::RenderPipeline::getLayer(const std::size_t hash) {
-    auto it = std::find_if(mLayers.begin(), mLayers.end(), [hash](const auto& pair) {
+    auto it = std::ranges::find_if(mLayers.begin(), mLayers.end(), [hash](const auto& pair) {
         return pair.first == hash;
     });
 

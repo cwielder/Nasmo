@@ -107,7 +107,7 @@ void nsm::PointLightComponent::drawOpaque(const RenderInfo& renderInfo) {
         const f32 maxChannel = glm::max(glm::max(mColor.r, mColor.g), mColor.b);
 
         // TODO: This calculation needs to be improved
-        const f32 radius = (-cAttenuationLinear + std::sqrtf(cAttenuationLinear * cAttenuationLinear - 4 * cAttenuationExp * (cAttenuationExp - 256 * mIntensity)));
+        const f32 radius = (-cAttenuationLinear + std::sqrt(cAttenuationLinear * cAttenuationLinear - 4 * cAttenuationExp * (cAttenuationExp - 256 * mIntensity)));
 
         mModelMatrix = glm::translate(glm::mat4(1.0f), mPosition);
         mModelMatrix = glm::scale(mModelMatrix, glm::vec3(radius));
