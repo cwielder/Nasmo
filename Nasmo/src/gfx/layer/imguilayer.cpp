@@ -99,7 +99,11 @@ nsm::ImGuiLayer::ImGuiLayer(const std::string& name)
 {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGui::GetIO().ConfigFlags |= (ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable);
+    ImGui::GetIO().ConfigFlags |= (ImGuiConfigFlags_DockingEnable
+	#ifdef NSM_PLATFORM_WINDOWS
+	 | ImGuiConfigFlags_ViewportsEnable
+	#endif
+	);
     ImGui_ImplGlfw_InitForOpenGL(glfwGetCurrentContext(), true);
     ImGui_ImplOpenGL3_Init("#version 460");
 
