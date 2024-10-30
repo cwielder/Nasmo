@@ -92,8 +92,8 @@ project "Nasmo"
         }
 
 group "Dependencies"
-    include "vendor/glfw"
-    include "vendor/glad"
-    include "vendor/simdjson"
-    include "vendor/fastgltf"
+    include "vendor/support/glfw"
+    include "vendor/support/glad"
+    include "vendor/support/simdjson"
+    include "vendor/support/fastgltf"
 group ""

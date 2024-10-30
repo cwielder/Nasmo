@@ -1,15 +1,15 @@
 [submodule "Nasmo/vendor/glfw"]
 	path = Nasmo/vendor/glfw
-	url = https://github.com/TheCherno/glfw.git
+	url = https://github.com/glfw/glfw.git
 [submodule "Nasmo/vendor/glad"]
 	path = Nasmo/vendor/glad
-	url = https://github.com/Lumis-Submodules/glad.git
+	url = https://github.com/premake-libs/glad.git
 [submodule "Nasmo/vendor/glm"]
 	path = Nasmo/vendor/glm
 	url = https://github.com/g-truc/glm.git
 [submodule "Nasmo/vendor/simdjson"]
 	path = Nasmo/vendor/simdjson
-	url = https://github.com/Lumis-Submodules/simdjson
+	url = https://github.com/simdjson/simdjson
 [submodule "Nasmo/vendor/stb"]
 	path = Nasmo/vendor/stb
 	url = https://github.com/nothings/stb
@@ -19,4 +19,4 @@
 	branch = docking
 [submodule "Nasmo/vendor/fastgltf"]
 	path = Nasmo/vendor/fastgltf
-	url = https://github.com/lumis-submodules/fastgltf.git
+	url = https://github.com/spnda/fastgltf.git
