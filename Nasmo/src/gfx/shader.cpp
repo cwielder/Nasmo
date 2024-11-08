@@ -130,7 +130,7 @@ nsm::ShaderProgram::~ShaderProgram() {
         nsm::trace("Deleting shader program: ", mId, "...");
 
         glDeleteProgram(mId);
-        sProgramCache.erase(std::find_if(sProgramCache.begin(), sProgramCache.end(), [this](const auto& program) {
+        sProgramCache.erase(std::ranges::find_if(sProgramCache.begin(), sProgramCache.end(), [this](const auto& program) {
             return program.second.first == mId;
         }));
 
