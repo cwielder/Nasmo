@@ -9,7 +9,8 @@ project "simdjson"
     objdir ("bin/%{prj.name}-%{cfg.buildcfg}/int")
 
     includedirs {
-        "../../simdjson/include"
+        "../../simdjson/include",
+        "../../simdjson/src"
     }
 
     files {
