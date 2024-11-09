@@ -1,21 +1,25 @@
 #include <nsm/entity/entity.h>
 #include <nsm/entity/component/lightcomponent.h>
+#include <nsm/entity/component/transformcomponent.h>
 #include <nsm/util/jsonhelpers.h>
 #include <imgui.h>
 
 class LightEntity final : public nsm::Entity {
 public:
     LightEntity(nsm::Entity::Properties& properties)
-        : mPosition(nsm::JsonHelpers::getVec3(properties, "position"))
+        : mTransform(nullptr)
         , mIntensity(nsm::JsonHelpers::getFloat(properties, "intensity"))
         , mLightComponent(nullptr)
     { }
 
     ~LightEntity() override = default;
 
-    void onCreate() override {
+    void onCreate(nsm::Entity::Properties& properties) override {
+        mTransform = new nsm::TransformComponent(nsm::JsonHelpers::getVec3(properties, "position"));
+        this->addComponent<nsm::TransformComponent>(mTransform);
+
         mLightComponent = new nsm::PointLightComponent(
-            mPosition,
+            mTransform->getPosition(),
             glm::vec3(1.0f, 1.0f, 1.0f),
             mIntensity
         );
@@ -24,7 +28,7 @@ public:
     }
 
     void onUpdate(const f32 timeStep) override {
-        static f32 posX = mPosition.x, posY = mPosition.y, posZ = mPosition.z;
+        static f32 posX = mTransform->getPosition().x, posY = mTransform->getPosition().y, posZ = mTransform->getPosition().z;
         static f32 colorR = 1.0f, colorG = 1.0f, colorB = 1.0f;
         static f32 intensity = mIntensity;
 
@@ -38,13 +42,15 @@ public:
             ImGui::DragFloat("Intensity", &intensity, 0.1f);
         } ImGui::End();
 
+        mTransform->setPosition(glm::vec3(posX, posY, posZ));
+
         mLightComponent->setPosition(glm::vec3(posX, posY, posZ));
         mLightComponent->setColor(glm::vec3(colorR, colorG, colorB));
         mLightComponent->setIntensity(intensity);
     }
 
 private:
-    glm::vec3 mPosition;
+    nsm::TransformComponent* mTransform;
     f32 mIntensity;
     nsm::PointLightComponent* mLightComponent;
 };

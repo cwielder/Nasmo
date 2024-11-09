@@ -69,7 +69,7 @@ public:
 
     ~SunEntity() override = default;
 
-    void onCreate() override {
+    void onCreate(nsm::Entity::Properties&) override {
         mLightComponent = new nsm::DirectionalLightComponent(
             0.0f, 0.0f,
             glm::vec3(1.0f, 1.0f, 1.0f),

@@ -95,7 +95,7 @@ namespace nsm {
     private:
         friend class Scene;
 
-        virtual void onCreate() { }
+        virtual void onCreate(Entity::Properties& properties) { }
         virtual void onUpdate(const f32 timeStep) { }
         virtual void onEvent(const Event* event) { }
 

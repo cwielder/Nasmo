@@ -89,7 +89,7 @@ nsm::Entity* nsm::Scene::spawnEntity(const std::string_view type, Entity::Proper
     newEntity->mScene = this;
     auto tags = properties["tags"].get_array();
     if (tags.error() == simdjson::NO_SUCH_FIELD) {
-        newEntity->onCreate();
+        newEntity->onCreate(properties);
         mEntities.push_back(newEntity);
         return newEntity;
     }
@@ -97,7 +97,7 @@ nsm::Entity* nsm::Scene::spawnEntity(const std::string_view type, Entity::Proper
         newEntity->addComponent<nsm::TagComponent>(new nsm::TagComponent(std::string{tag.get_string().value()}));
     }
 
-    newEntity->onCreate();
+    newEntity->onCreate(properties);
     mEntities.push_back(newEntity);
     return newEntity;
 }

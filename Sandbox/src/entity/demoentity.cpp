@@ -2,6 +2,7 @@
 #include <nsm/debug/log.h>
 #include <nsm/event/events.h>
 #include <nsm/entity/component/modelcomponent.h>
+#include <nsm/entity/component/transformcomponent.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -27,26 +28,33 @@ private:
 class DemoEntity final : public nsm::Entity {
 public:
     DemoEntity(nsm::Entity::Properties&)
-        : mScale(1.0f)
+        : mTransform(nullptr)
         , mModel(this)
     { }
 
     ~DemoEntity() override = default;
 
-    void onCreate() override {
+    void onCreate(nsm::Entity::Properties& properties) override {
+        mTransform = new nsm::TransformComponent();
+        this->addComponent<nsm::TransformComponent>(mTransform);
 
+        mModel.setScale(mTransform->getScale());
     }
 
     void onUpdate(const f32 timeStep) override {
+        glm::vec3 scale = mTransform->getScale();
+        
         if (ImGui::Begin("Demo Entity")) {
-            ImGui::DragFloat("Scale", &mScale, 0.1f);
+            ImGui::DragFloat3("Scale", &scale.x, 0.1f);
         } ImGui::End();
 
-        mModel.setScale(glm::vec3(mScale));
+        mTransform->setScale(scale);
+
+        mModel.setScale(mTransform->getScale());
     }
 
 private:
-    f32 mScale;
+    nsm::TransformComponent* mTransform;
     PlaneModel mModel;
 };
 
