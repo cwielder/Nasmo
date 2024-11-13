@@ -49,6 +49,7 @@ public:
         mLayerDebug = this->pushLayer<ForwardLayer>("debug");
         mLayerBloom = this->pushLayer<nsm::BloomLayer>("bloom");
         mLayerTonemap = this->pushLayer<nsm::TonemapLayer>("cc");
+        mLayerUI = this->pushLayer<ForwardLayer>("ui");
         mLayerImGui = this->pushLayer<nsm::ImGuiLayer>("imgui");
 
         glm::u32vec2 size = nsm::Graphics::getFramebufferSize();
@@ -107,6 +108,9 @@ public:
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         mLayerTonemap->draw({ nullptr, framebuffer });
 
+        // UI pass
+        mLayerUI->draw({ nullptr, framebuffer });
+
         // ImGui pass
         mLayerImGui->draw({ nullptr, framebuffer });
     }
@@ -123,6 +127,7 @@ public:
     nsm::BloomLayer* mLayerBloom;
     nsm::TonemapLayer* mLayerTonemap;
     ForwardLayer* mLayerDebug;
+    ForwardLayer* mLayerUI;
     nsm::ImGuiLayer* mLayerImGui;
 
     nsm::Framebuffer mGeometryBuffer;
@@ -144,8 +149,6 @@ public:
     }
 
     void onUpdate(const f32 timeStep) override {
-        ImGui::ShowDemoWindow();
-
         mGraphics.getWindow().setTitle("Nasmo Sandbox | " + std::to_string(1.0f / timeStep) + " FPS");
     }
 };
@@ -157,7 +160,7 @@ int main(int argc, char** argv) {
         .size = {1280, 720},
         .type = nsm::Window::WindowType::Windowed
     };
-    info.initialScene = "scenes/demo.json";
+    info.initialScene = "scenes/ui_test.json";
 
     SandboxApplication app(info);
     app.run();    

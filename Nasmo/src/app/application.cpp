@@ -15,11 +15,6 @@ nsm::Application::Application(const ApplicationInfo& info)
 
 nsm::Application::~Application() { }
 
-#include <nsm/gfx/shader.h>
-#include <nsm/gfx/vertexarray.h>
-#include <nsm/gfx/vertexbuffer.h>
-#include <nsm/gfx/indexbuffer.h>
-
 void nsm::Application::run() {
     this->intermoduleDataTransfer();
 
