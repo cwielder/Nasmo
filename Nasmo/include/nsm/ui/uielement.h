@@ -2,6 +2,7 @@
 
 #include <nsm/common.h>
 #include <nsm/ui/uirenderer.h>
+#include <nsm/gfx/renderinfo.h>
 
 #include <glm/vec2.hpp>
 
@@ -18,8 +19,7 @@ namespace nsm {
 
         virtual ~UIElement() { }
 
-        virtual void draw() = 0;
-        virtual void update(const f32 timeStep) = 0;
+        virtual void draw(const RenderInfo& renderInfo) = 0;
 
     protected:
         const UIRenderer& getRenderer() const { return mRenderer; }

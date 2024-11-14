@@ -8,5 +8,4 @@ out vec4 oFragColor;
 
 void main() {
     oFragColor = texture(uTexture, vTexCoords);
-    oFragColor = vec4(1.0, 0.0, 1.0, 1.0);
 }

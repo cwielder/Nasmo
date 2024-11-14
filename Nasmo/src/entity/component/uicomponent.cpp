@@ -8,7 +8,7 @@ nsm::UIComponent::~UIComponent() {
 
 void nsm::UIComponent::drawOpaque(const RenderInfo& renderInfo) {
     for (auto& [name, element] : mElements) {
-        element->draw();
+        element->draw(renderInfo);
     }
 }
 
