@@ -137,7 +137,7 @@ int main(int argc, char** argv) {
         .size = {1000, 1000},
         .type = nsm::Window::WindowType::Windowed
     };
-    info.initialScene = "scenes/ui_test.json";
+    info.initialScene = "scenes/demo.json";
 
     SandboxApplication app(info);
     app.run();    
