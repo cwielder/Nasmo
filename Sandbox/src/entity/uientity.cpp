@@ -19,8 +19,8 @@ public:
     ~TestComponent() override = default;
 
     void draw(const nsm::RenderInfo& renderInfo) override {
-        this->getRenderer().drawTexture(renderInfo, mTexture, glm::vec2(0.821f, 0.333f), glm::radians(0.0f), glm::vec2(0.0f, 0.0f));
         // 1. Draw a texture (which is a rectangular image) of any resolution with a specific width/height/rotation (transform) at a specific position
+        this->getRenderer().drawTexture(renderInfo, mTexture, glm::vec2(0.821f, 0.333f), glm::radians(0.0f), glm::vec2(0.0f, 0.0f));
 
         // 2. Draw a free-form polygon shape using a list of vertices and filled with either a solid color or used as a mask for a texture (gradients added later)
 
@@ -44,7 +44,7 @@ public:
         mUIComponent = new nsm::UIComponent();
         mUIComponent->setTargetLayer("ui");
         (*mUIComponent) // build UI layout here (can make a function to build it all later)
-            .addElement("test_component", new TestComponent(glm::vec2(0.5f, 0.5f)))
+            .addElement("test_component", new TestComponent(glm::vec2(0.0f, 0.0f)))
         ;
 
         this->addComponent<nsm::DrawableComponent>(mUIComponent);
