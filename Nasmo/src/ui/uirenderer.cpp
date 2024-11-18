@@ -3,11 +3,12 @@
 #include <nsm/gfx/texture2D.h>
 #include <nsm/gfx/primitiveshape.h>
 #include <nsm/gfx/renderinfo.h>
+#include <nsm/ui/uiposition.h>
 #include <nsm/entity/component/cameracomponent.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
-nsm::UIRenderer::UIRenderer(glm::vec2* const position)
+nsm::UIRenderer::UIRenderer(const UIPosition* const position)
     : mPosition(position)
 {
     if (sTextureShader == nullptr) {
@@ -21,7 +22,7 @@ void nsm::UIRenderer::drawTexture(const RenderInfo& renderInfo, const Texture2D&
     glm::mat4 mtx = glm::mat4(1.0f);
     mtx = glm::scale(mtx, glm::vec3(-scale.x, scale.y, 1.0f));
     mtx = glm::rotate(mtx, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
-    mtx = glm::translate(mtx, glm::vec3(*mPosition + translation, 0.0f));
+    mtx = glm::translate(mtx, glm::vec3(mPosition->resolve() + translation, 0.0f));
 
     sTextureShader->setMat4(0, mtx);
     sTextureShader->setMat4(1, renderInfo.camera->getProjection());
