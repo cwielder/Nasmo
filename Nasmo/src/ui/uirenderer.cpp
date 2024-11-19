@@ -20,9 +20,9 @@ void nsm::UIRenderer::drawTexture(const RenderInfo& renderInfo, const Texture2D&
     sTextureShader->bind();
 
     glm::mat4 mtx = glm::mat4(1.0f);
-    mtx = glm::scale(mtx, glm::vec3(-scale.x, scale.y, 1.0f));
+    mtx = glm::translate(mtx, glm::vec3(mPosition->getXY() + translation, 0.0f));
     mtx = glm::rotate(mtx, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
-    mtx = glm::translate(mtx, glm::vec3(mPosition->resolve() + translation, 0.0f));
+    mtx = glm::scale(mtx, glm::vec3(-scale.x, scale.y, 1.0f));
 
     sTextureShader->setMat4(0, mtx);
     sTextureShader->setMat4(1, renderInfo.camera->getProjection());

@@ -13,8 +13,8 @@ namespace nsm {
 
     class UIElement {
     public:
-        UIElement(const glm::vec2& position);
-        UIElement(const UIElement* anchor, const glm::vec2& offset);
+        UIElement(const glm::vec2& position, const f32 z);
+        UIElement(const UIElement* anchor, const glm::vec2& offset, const f32 z);
         virtual ~UIElement() = default;
 
         virtual void draw(const RenderInfo& renderInfo) = 0;

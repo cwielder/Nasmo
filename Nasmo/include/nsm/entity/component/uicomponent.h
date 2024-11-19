@@ -11,10 +11,9 @@ namespace nsm {
         UIComponent() = default;
         ~UIComponent() override;
 
-        UIComponent& addElement(const std::string& name, UIElement* element) {
-            mElements[name] = element;
-            return *this;
-        }
+        UIComponent& addElement(const std::string& name, UIElement* element);
+        
+        [[nodiscard]] UIElement* getElement(const std::string& name) const;
 
         void drawOpaque(const RenderInfo& renderInfo) override;
         void drawTranslucent(const RenderInfo& renderInfo) override;

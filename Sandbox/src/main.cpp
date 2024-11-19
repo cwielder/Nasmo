@@ -86,6 +86,7 @@ public:
         mLayerTonemap->draw({ nullptr, framebuffer });
 
         // UI pass
+        framebuffer->clear(glm::f32vec4{ 1.0f }, nsm::Framebuffer::Type::Depth);
         mLayerUI->draw({ nullptr, framebuffer });
 
         // ImGui pass
