@@ -29,7 +29,7 @@ public:
         mLayerUI = this->pushLayer<nsm::UILayer>("ui");
         mLayerImGui = this->pushLayer<nsm::ImGuiLayer>("imgui");
 
-        glm::u32vec2 size = nsm::Graphics::getFramebufferSize();
+        const glm::u32vec2 size = nsm::Graphics::getFramebufferSize();
         
         mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::RGBA16F, size); // normal+metallic
         mGeometryBuffer.addTextureBuffer(nsm::Texture::Format::RGBA16F, size); // albedo+roughness

@@ -32,6 +32,11 @@ namespace nsm {
             return static_cast<u32>(lhs) & static_cast<u32>(rhs);
         }
 
+        // Allow implicit conversion to u32 for argument passing
+        friend u32 operator&(const nsm::Framebuffer::Type lhs, const u32 rhs) {
+            return static_cast<u32>(lhs) & rhs;
+        }
+
     public:
         Framebuffer();
         ~Framebuffer();

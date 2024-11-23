@@ -15,11 +15,9 @@ public:
     LogoComponent(const nsm::UIElement* anchor, const glm::vec2& position)
         : UIElement(anchor, position, 10.0f)
         , mTexture("textures/nsmbu.png", false)
-        , mShape()
+        , mStarShape()
     {
-        mShape.setVertices(
-            // Star shape
-			
+        mStarShape.setVertices(
 			{
 				glm::vec2(0.0f, 1.0f),
 				glm::vec2(0.3f, 0.25f),
@@ -33,11 +31,15 @@ public:
 				glm::vec2(-0.3f, 0.25f)
 			}
         );
-
-		auto t = mShape.getVerticesTriangulated();
-		for (auto& v : t) {
-			nsm::info("t: ", v.x, ", ", v.y);
-		}
+        
+        mSquareShape.setVertices(
+            {
+                glm::vec2(-0.5f, 0.5f),
+                glm::vec2(0.5f, 0.5f),
+                glm::vec2(0.5f, -0.5f),
+                glm::vec2(-0.5f, -0.5f)
+            }
+        );
     }
 
     ~LogoComponent() override = default;
@@ -57,15 +59,21 @@ public:
         size = glm::vec2(0.5f, 0.5f);
         rotation = glm::radians(0.0f);
         position = glm::vec2(0.0f, -0.5f);
-        glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-        this->getRenderer().drawPolygonSolid(renderInfo, mShape, color, size, rotation, position);
+        glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+        this->getRenderer().drawPolygonSolid(renderInfo, mStarShape, color, size, rotation, position, nsm::UIRenderer::MaskMode::AsMask);
+
+        size = glm::vec2(0.75f, 0.75f);
+        rotation = glm::radians(45.0f);
+        position = glm::vec2(0.0f, -0.5f);
+        color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        this->getRenderer().drawPolygonSolid(renderInfo, mSquareShape, color, size, rotation, position, nsm::UIRenderer::MaskMode::InvertedMasked);
 
         // 3. Later, advanced users can create components which render with more direct control with opengl to draw using shader code
     }
 
 private:
     nsm::Texture2D mTexture;
-    nsm::UIShape mShape;
+    nsm::UIShape mStarShape, mSquareShape;
 };
 
 class HotbarComponent : public nsm::UIElement {

@@ -76,6 +76,23 @@ namespace nsm {
             Max = GL_MAX
         };
 
+        enum class StateBit : u8 {
+            Depth = 1 << 0,
+            Stencil = 1 << 1,
+            Cull = 1 << 2,
+            Blend = 1 << 3,
+
+            All = Depth | Stencil | Cull | Blend
+        };
+
+        friend constexpr StateBit operator|(const StateBit a, const StateBit b) {
+            return static_cast<StateBit>(static_cast<u8>(a) | static_cast<u8>(b));
+        }
+
+        friend constexpr u8 operator&(const StateBit a, const StateBit b) {
+            return static_cast<u8>(a) & static_cast<u8>(b);
+        }
+
     public:
         RenderState();
 
@@ -161,7 +178,7 @@ namespace nsm {
             return *this;
         }
 
-        void apply() const;
+        void apply(const StateBit states = StateBit::All) const;
 
     private:
         bool mDepthTest;
