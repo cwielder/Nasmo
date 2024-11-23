@@ -6,9 +6,9 @@ nsm::UIComponent::~UIComponent() {
     }
 }
 
-nsm::UIComponent& nsm::UIComponent::addElement(const std::string& name, UIElement* element) {
+nsm::UIComponent* nsm::UIComponent::addElement(const std::string& name, UIElement* element) {
     mElements[name] = element;
-    return *this;
+    return this;
 }
 
 [[nodiscard]] nsm::UIElement* nsm::UIComponent::getElement(const std::string& name) const {

@@ -4,6 +4,7 @@
 #include <nsm/ui/uielement.h>
 
 #include <nsm/gfx/texture2D.h>
+#include <nsm/ui/uishape.h>
 
 #include <nsm/debug/log.h>
 
@@ -14,21 +15,57 @@ public:
     LogoComponent(const nsm::UIElement* anchor, const glm::vec2& position)
         : UIElement(anchor, position, 10.0f)
         , mTexture("textures/nsmbu.png", false)
-    { }
+        , mShape()
+    {
+        mShape.setVertices(
+            // Star shape
+			
+			{
+				glm::vec2(0.0f, 1.0f),
+				glm::vec2(0.3f, 0.25f),
+				glm::vec2(1.0f, 0.0f),
+				glm::vec2(0.5f, -0.2f),
+				glm::vec2(0.6f, -1.0f),
+				glm::vec2(0.0f, -0.25f),
+				glm::vec2(-0.8f, -1.0f),
+				glm::vec2(-0.5f, 0.0f),
+				glm::vec2(-1.0f, 0.1f),
+				glm::vec2(-0.3f, 0.25f)
+			}
+        );
+
+		auto t = mShape.getVerticesTriangulated();
+		for (auto& v : t) {
+			nsm::info("t: ", v.x, ", ", v.y);
+		}
+    }
 
     ~LogoComponent() override = default;
 
     void draw(const nsm::RenderInfo& renderInfo) override {
+        glm::vec2 size;
+        f32 rotation;
+        glm::vec2 position;
+
         // 1. Draw a texture (which is a rectangular image) of any resolution with a specific width/height/rotation (transform) at a specific position
-        this->getRenderer().drawTexture(renderInfo, mTexture, glm::vec2(0.821f, 0.333f), glm::radians(0.0f), glm::vec2(0.0f, 0.0f));
+        size = glm::vec2(0.821f, 0.333f);
+        rotation = glm::radians(0.0f);
+        position = glm::vec2(0.0f, 0.0f);
+        this->getRenderer().drawTexture(renderInfo, mTexture, size, rotation, position);
 
         // 2. Draw a free-form polygon shape using a list of vertices and filled with either a solid color or used as a mask for a texture (gradients added later)
+        size = glm::vec2(0.5f, 0.5f);
+        rotation = glm::radians(0.0f);
+        position = glm::vec2(0.0f, -0.5f);
+        glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
+        this->getRenderer().drawPolygonSolid(renderInfo, mShape, color, size, rotation, position);
 
         // 3. Later, advanced users can create components which render with more direct control with opengl to draw using shader code
     }
 
 private:
     nsm::Texture2D mTexture;
+    nsm::UIShape mShape;
 };
 
 class HotbarComponent : public nsm::UIElement {
@@ -41,13 +78,7 @@ public:
     ~HotbarComponent() override = default;
 
     void draw(const nsm::RenderInfo& renderInfo) override {
-        static double time = 0.0;
-        time += 0.01;
-
-        // wobble
-        f32 rotation = glm::sin(time) * (glm::pi<f32>() / 2.0f);
-
-        this->getRenderer().drawTexture(renderInfo, mTexture, glm::vec2(8.27f * 0.1f, 1.0f * 0.1f), glm::radians(rotation), glm::vec2(0.0f, 0.0f));
+        this->getRenderer().drawTexture(renderInfo, mTexture, glm::vec2(0.827f, 0.1f), glm::radians(0.0f), glm::vec2(0.0f, 0.0f));
     }
 
 private:
@@ -70,10 +101,10 @@ public:
         nsm::UIElement* logo = new LogoComponent(nullptr, glm::vec2(0.0f, 0.66f));
         nsm::UIElement* hotbar = new HotbarComponent(logo, glm::vec2(0.0f,-1.5f));
 
-        (*mUIComponent)
-            .addElement("logo", logo)
-            .addElement("hotbar", hotbar)
-        ;
+        mUIComponent
+            ->addElement("logo", logo)
+            ->addElement("hotbar", hotbar)
+        ; 
     }
 
 private:

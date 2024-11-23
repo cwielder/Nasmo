@@ -11,7 +11,7 @@ namespace nsm {
         UIComponent() = default;
         ~UIComponent() override;
 
-        UIComponent& addElement(const std::string& name, UIElement* element);
+        UIComponent* addElement(const std::string& name, UIElement* element);
         
         [[nodiscard]] UIElement* getElement(const std::string& name) const;
 

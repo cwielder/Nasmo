@@ -22,7 +22,7 @@ namespace nsm {
         [[nodiscard]] const UIPosition& getPosition() const { return mPosition; }
 
     protected:
-        const UIRenderer& getRenderer() const { return mRenderer; }
+        UIRenderer& getRenderer() { return mRenderer; }
 
     protected:
         UIPosition mPosition;

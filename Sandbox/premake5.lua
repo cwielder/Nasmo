@@ -17,6 +17,7 @@ project "Sandbox"
         "glad",
         "simdjson",
         "fastgltf",
+        "poly2tri",
     }
 
     includedirs {
@@ -31,6 +32,7 @@ project "Sandbox"
         "../Nasmo/vendor/stb",
         "../Nasmo/vendor/imgui",
         "../Nasmo/vendor/fastgltf/include",
+        "../Nasmo/vendor/poly2tri",
     }
 
     files {
