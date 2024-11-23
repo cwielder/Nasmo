@@ -18,6 +18,8 @@ const std::vector<glm::vec2>& nsm::UIShape::getVertices() const {
 }
 
 const std::vector<glm::vec2> nsm::UIShape::getVerticesTriangulated() const {
+	// TODO: This should be cached for non-animated shapes
+
     std::vector<glm::vec2> inputVertices = this->getVertices();
 
 	NSM_ASSERT(inputVertices.size() >= 3, "Cannot triangulate a shape with less than 3 vertices.");
