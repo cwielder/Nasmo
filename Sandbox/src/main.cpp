@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
     auto info = nsm::Application::ApplicationInfo(argc, argv);
     info.graphics.window = {
         .title = "Nasmo Sandbox",
-        .size = {1000, 1000},
+        .size = {1920, 1080},
         .type = nsm::Window::WindowType::Windowed
     };
     info.initialScene = "scenes/demo.json";

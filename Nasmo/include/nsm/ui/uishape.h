@@ -16,6 +16,9 @@ namespace nsm {
         UIShape() = default;
         ~UIShape() = default;
 
+        /**
+         * @note Ensure list is in clockwise order
+         */
         void setVertices(const std::vector<glm::vec2>& vertices);
 
         const std::vector<glm::vec2>& getVertices() const;

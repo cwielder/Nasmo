@@ -48,27 +48,30 @@ public:
         glm::vec2 size;
         f32 rotation;
         glm::vec2 position;
+        glm::vec4 color;
 
-        // 1. Draw a texture (which is a rectangular image) of any resolution with a specific width/height/rotation (transform) at a specific position
+        nsm::UIRenderer& renderer = this->getRenderer();
+
+        //* 1. Draw a texture (which is a rectangular image) of any resolution with a specific width/height/rotation (transform) at a specific position
         size = glm::vec2(0.821f, 0.333f);
         rotation = glm::radians(0.0f);
         position = glm::vec2(0.0f, 0.0f);
-        this->getRenderer().drawTexture(renderInfo, mTexture, size, rotation, position);
+        renderer.drawTexture(renderInfo, mTexture, size, rotation, position);
 
-        // 2. Draw a free-form polygon shape using a list of vertices and filled with either a solid color or used as a mask for a texture (gradients added later)
+        //* 2. Draw a free-form polygon shape using a list of vertices and filled with either a solid color or used as a mask for a texture (gradients added later)
         size = glm::vec2(0.5f, 0.5f);
         rotation = glm::radians(0.0f);
         position = glm::vec2(0.0f, -0.5f);
-        glm::vec4 color = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
-        this->getRenderer().drawPolygonSolid(renderInfo, mStarShape, color, size, rotation, position, nsm::UIRenderer::MaskMode::AsMask);
+        color = glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+        renderer.drawPolygonSolid(renderInfo, mStarShape, color, size, rotation, position, nsm::UIRenderer::MaskMode::AsMask);
 
         size = glm::vec2(0.75f, 0.75f);
         rotation = glm::radians(45.0f);
         position = glm::vec2(0.0f, -0.5f);
         color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-        this->getRenderer().drawPolygonSolid(renderInfo, mSquareShape, color, size, rotation, position, nsm::UIRenderer::MaskMode::InvertedMasked);
+        renderer.drawPolygonSolid(renderInfo, mSquareShape, color, size, rotation, position, nsm::UIRenderer::MaskMode::Masked);
 
-        // 3. Later, advanced users can create components which render with more direct control with opengl to draw using shader code
+        //* 3. Render text
     }
 
 private:
