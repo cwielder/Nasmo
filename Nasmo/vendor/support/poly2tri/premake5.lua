@@ -15,7 +15,7 @@ project "poly2tri"
     }
 
     files {
-        "../../poly2tri/poly2tri/**.cc"
+        "../../poly2tri/poly2tri/**/**.cc"
     }
 
     filter "configurations:Debug"
