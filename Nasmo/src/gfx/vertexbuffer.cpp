@@ -1,6 +1,6 @@
 #include <nsm/gfx/vertexbuffer.h>
 
-#include <nsm/debug/log.h>
+#include <nsm/debug/assert.h>
 
 nsm::VertexBuffer::VertexBuffer()
     : mId(GL_NONE)
@@ -14,6 +14,8 @@ nsm::VertexBuffer::VertexBuffer(const void* data, const std::size_t size, const 
 }
 
 nsm::VertexBuffer::~VertexBuffer() {
+    NSM_ASSERT(mId != GL_NONE, "Attempting to delete uninitialized vertex buffer.");
+
     nsm::trace("Deleting vertex buffer with id: ", mId);
     glDeleteBuffers(1, &mId);
 }

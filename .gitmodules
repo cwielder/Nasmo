@@ -20,3 +20,6 @@
 [submodule "Nasmo/vendor/fastgltf"]
 	path = Nasmo/vendor/fastgltf
 	url = https://github.com/spnda/fastgltf.git
+[submodule "Nasmo/vendor/poly2tri"]
+	path = Nasmo/vendor/poly2tri
+	url = https://github.com/jhasse/poly2tri.git

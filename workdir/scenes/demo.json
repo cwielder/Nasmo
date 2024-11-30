@@ -24,6 +24,12 @@
             "properties": {
                 "intensity": 0.6
             }
+        },
+        {
+            "type": "UIRankUpEntity",
+            "properties": {
+                
+            }
         }
     ]
 }

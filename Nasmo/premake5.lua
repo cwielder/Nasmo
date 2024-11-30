@@ -16,6 +16,7 @@ project "Nasmo"
         "glad",
         "simdjson",
         "fastgltf",
+        "poly2tri",
     }
 
     includedirs {
@@ -28,6 +29,7 @@ project "Nasmo"
         "vendor/stb",
         "vendor/imgui",
         "vendor/fastgltf/include",
+        "vendor/poly2tri",
     }
 
     libdirs {
@@ -68,6 +70,7 @@ project "Nasmo"
         runtime "Debug"
         optimize "off"
         symbols "on"
+        sanitize "Address"
     
     filter "configurations:Release"
         defines "NSM_RELEASE"
@@ -96,4 +99,5 @@ group "Dependencies"
     include "vendor/support/glad"
     include "vendor/support/simdjson"
     include "vendor/support/fastgltf"
+    include "vendor/support/poly2tri"
 group ""
