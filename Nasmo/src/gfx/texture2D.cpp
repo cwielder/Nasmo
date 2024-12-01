@@ -92,6 +92,8 @@ void nsm::Texture2D::initFromMemory(const u8* data, const std::size_t length, bo
     // TODO: Cache this data
 
     this->initFromData(loadedData, channels, { static_cast<u32>(width), static_cast<u32>(height) }, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
+
+    stbi_image_free(loadedData);
 }
 
 void nsm::Texture2D::initFromData(const u8* data, const u32 channelCount, const glm::u32vec2& size, bool srgb, const Texture::FilterMode enlargeFilter, const Texture::FilterMode shrinkFilter, const Texture::WrapMode wrapS, const Texture::WrapMode wrapT) {

@@ -71,6 +71,10 @@ nsm::Model::~Model() {
     for (auto& [name, mesh] : mMeshes) {
         delete mesh;
     }
+
+    for (auto& [name, object] : mObjects) {
+        delete object;
+    }
 }
 
 void nsm::Model::drawOpaque(const RenderInfo& renderInfo) {
