@@ -2,6 +2,10 @@
 
 #include <nsm/debug/assert.h>
 
+#ifndef P2T_STATIC_EXPORTS
+#define P2T_STATIC_EXPORTS
+#endif
+
 #include <poly2tri/poly2tri.h>
 
 void nsm::UIShape::setVertices(const std::vector<glm::vec2>& vertices) {

@@ -101,5 +101,5 @@ void nsm::UIRenderer::drawPolygonSolid(const RenderInfo& renderInfo, const UISha
 
     mVAO->bind();
 
-    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(vertices.size()));
 }
