@@ -10,8 +10,8 @@ namespace nsm {
     class Color {
     public:
         Color(const std::string& hex);
-        Color(glm::vec4& rgba);
-        virtual ~Color() = default;
+        Color(const glm::vec4& rgba);
+        ~Color() = default;
 
         std::string getHex() const;
         glm::vec4 getRGBA() const;
