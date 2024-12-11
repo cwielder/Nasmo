@@ -2,12 +2,10 @@
 
 namespace nsm {
     Color::Color(const std::string& hex) {
-        if (hex.empty() || (hex.length() != 4 && hex.length() != 5 && hex.length() != 7 && hex.length() != 9) || hex[0] != '#') {
-            NSM_ASSERT(hex.empty(), "Hex string can't be empty");
-            NSM_ASSERT((hex.length() != 4 && hex.length() != 5 && hex.length() != 7 && hex.length() != 9), "Invalid hex string length");
-            NSM_ASSERT(hex[0] != '#', "Hex string must start with #");
-        }
-
+        NSM_ASSERT(hex.empty(), "Hex string can't be empty");
+        NSM_ASSERT((hex.length() != 4 && hex.length() != 5 && hex.length() != 7 && hex.length() != 9), "Invalid hex string length");
+        NSM_ASSERT(hex[0] != '#', "Hex string must start with #");
+        
         std::string expandedHex;
 
         if (hex.length() == 4 || hex.length() == 5) {
