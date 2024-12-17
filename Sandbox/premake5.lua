@@ -18,6 +18,9 @@ project "Sandbox"
         "simdjson",
         "fastgltf",
         "poly2tri",
+        "msdf-atlas-gen",
+        "msdfgen",
+        "freetype"
     }
 
     includedirs {
@@ -33,6 +36,9 @@ project "Sandbox"
         "../Nasmo/vendor/imgui",
         "../Nasmo/vendor/fastgltf/include",
         "../Nasmo/vendor/poly2tri",
+        "../Nasmo/vendor/msdf-atlas-gen/msdf-atlas-gen",
+        "../Nasmo/vendor/msdf-atlas-gen/msdfgen",
+        "../Nasmo/vendor/msdf-atlas-gen/msdfgen/freetype/include"
     }
 
     files {

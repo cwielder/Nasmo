@@ -17,6 +17,7 @@ project "Nasmo"
         "simdjson",
         "fastgltf",
         "poly2tri",
+        "msdf-atlas-gen"
     }
 
     includedirs {
@@ -30,6 +31,9 @@ project "Nasmo"
         "vendor/imgui",
         "vendor/fastgltf/include",
         "vendor/poly2tri",
+        "vendor/msdf-atlas-gen/msdf-atlas-gen",
+        "vendor/msdf-atlas-gen/msdfgen",
+        "vendor/msdf-atlas-gen/msdfgen/freetype/include"
     }
 
     libdirs {
@@ -100,4 +104,5 @@ group "Dependencies"
     include "vendor/support/simdjson"
     include "vendor/support/fastgltf"
     include "vendor/support/poly2tri"
+    include "vendor/support/msdf-atlas-gen"
 group ""
