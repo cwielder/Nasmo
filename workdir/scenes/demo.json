@@ -26,7 +26,7 @@
             }
         },
         {
-            "type": "UIRankUpEntity",
+            "type": "UIEntity",
             "properties": {
                 
             }

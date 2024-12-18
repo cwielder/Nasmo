@@ -42,7 +42,7 @@ public:
             }
         );
 
-        mFont = nsm::Font::get("nsm/assets/font/SegoeUI.ttf");
+        mFont = nsm::Font::get("nsm/assets/fonts/SegoeUI.ttf");
         NSM_ASSERT(mFont != nullptr, "Font is null!");
     }
 
