@@ -1,7 +1,6 @@
 # Prerequisites
 *.d
 Makefile
-*.make
 
 # Compiled Object files
 *.slo
