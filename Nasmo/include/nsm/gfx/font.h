@@ -21,19 +21,6 @@ namespace nsm {
         Font(const std::string& path);
         ~Font();
 
-    public:
-        [[nodiscard]] const msdf_atlas::FontGeometry& getGeometry() const {
-            return mGeometry;
-        }
-
-        [[nodiscard]] const std::vector<msdf_atlas::GlyphGeometry>& getGlyphGeometry() const {
-            return mGlyphGeometry;
-        }
-
-        [[nodiscard]] Texture2D* getAtlas() const {
-            return mAtlas;
-        }
-
     private:
         static msdfgen::FreetypeHandle* sFreeType;
 

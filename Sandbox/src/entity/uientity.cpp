@@ -6,7 +6,6 @@
 #include <nsm/gfx/texture2D.h>
 #include <nsm/gfx/font.h>
 #include <nsm/ui/uishape.h>
-#include <nsm/ui/uitext.h>
 
 #include <nsm/debug/log.h>
 
@@ -18,7 +17,6 @@ public:
         : UIElement(anchor, position, 10.0f)
         , mTexture("textures/nsmbu.png", false)
         , mStarShape()
-        , mText("Hello, world!")
     {
         mStarShape.setVertices(
 			{
@@ -78,18 +76,13 @@ public:
         renderer.drawPolygonSolid(renderInfo, mSquareShape, color, size, rotation, position, nsm::UIRenderer::MaskMode::Masked);
 
         //* 3. Render text
-        size = glm::vec2(0.1f, 0.1f);
-        rotation = glm::radians(0.0f);
-        position = glm::vec2(-0.5f, -0.5f);
-        color = glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);
-        renderer.drawText(renderInfo, mText, *mFont, color, size, rotation, position);
+        
     }
 
 private:
     nsm::Texture2D mTexture;
     nsm::UIShape mStarShape, mSquareShape;
     nsm::Font* mFont;
-    nsm::UIText mText;
 };
 
 class HotbarComponent : public nsm::UIElement {
