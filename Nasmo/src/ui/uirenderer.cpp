@@ -143,27 +143,27 @@ void nsm::UIRenderer::drawText(const RenderInfo& renderInfo, const UIText& text,
         texCoordMin *= glm::vec2(texelWidth, texelHeight);
         texCoordMax *= glm::vec2(texelWidth, texelHeight);
 
+        // render
         glm::vec2 center = (quadMin + quadMax) * 0.5f;
         glm::vec2 size = quadMax - quadMin;
 
         glm::mat4 mtx = glm::mat4(1.0f);
-        mtx = glm::scale(mtx, glm::vec3(-scale.x * size.x, scale.y * size.y, 1.0f));
-        mtx = glm::rotate(mtx, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
-        mtx = glm::translate(mtx, glm::vec3(mPosition->getXY() + translation, 0.0f));
         mtx = glm::translate(mtx, glm::vec3(center, 0.0f));
+        mtx = glm::translate(mtx, glm::vec3(mPosition->getXY() + translation, 0.0f));
+        mtx = glm::rotate(mtx, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
+        mtx = glm::scale(mtx, glm::vec3(-scale.x, scale.y, 1.0f));
 
         sTextShader->setMat4("uMtx", mtx);
         sTextShader->setVec4("uTexCoords", glm::vec4(texCoordMin, texCoordMax));
 
         PrimitiveShape::getQuadIBO().draw();
+        //
 
         if (nextCharacter != '\0') {
             f64 advance = glyph->getAdvance();
             fontGeometry.getAdvance(advance, character, nextCharacter);
 
-            x += advance * fsScale;
-
-            nsm::trace("Character: ", character, " Advance: ", advance, " x: ", x);
+            x -= advance * fsScale;
         }
     }
 }

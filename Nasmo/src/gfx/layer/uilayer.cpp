@@ -15,7 +15,6 @@ nsm::UILayer::UILayer(const std::string& name)
 {
     mRenderState
         .depth(false)
-        .blend(RenderState::BlendFactor::SrcAlpha, RenderState::BlendFactor::OneMinusSrcAlpha, RenderState::BlendEquation::Add)
     ;
 
     const glm::u32vec2 size = Graphics::getFramebufferSize();
