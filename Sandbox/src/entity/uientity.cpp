@@ -78,10 +78,10 @@ public:
         renderer.drawPolygonSolid(renderInfo, mSquareShape, color, size, rotation, position, nsm::UIRenderer::MaskMode::Masked);
 
         //* 3. Render text
-        size = glm::vec2(0.1f, 0.1f);
+        size = glm::vec2(0.2f, 0.2f);
         rotation = glm::radians(0.0f);
-        position = glm::vec2(-0.5f, -0.5f);
-        color = glm::vec4(0.0f, 1.0f, 1.0f, 1.0f);
+        position = glm::vec2(0.0f, 1.5f);
+        color = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
         renderer.drawText(renderInfo, mText, *mFont, color, size, rotation, position);
     }
 

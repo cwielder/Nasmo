@@ -34,6 +34,7 @@ nsm::Font::Font(const std::string& path)
 
     msdfgen::FontHandle* font = msdfgen::loadFont(sFreeType, path.c_str());
     NSM_ASSERT(font != nullptr, "Failed to load font ", path);
+    nsm::trace("Loaded font ", path);
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -42,9 +43,10 @@ nsm::Font::Font(const std::string& path)
         charset.add(i);
     }
 
-    constexpr double fontScale = 1.0;
+    constexpr f64 fontScale = 1.0;
     i32 numChars = mGeometry.loadCharset(font, fontScale, charset);
 
+    NSM_ASSERT(numChars > 0, "Failed to load glyphs from ", path);
     nsm::trace("Loaded ", numChars, " glyphs from ", path);
 
     msdf_atlas::TightAtlasPacker packer;
@@ -82,7 +84,9 @@ nsm::Font::Font(const std::string& path)
 
     auto end = std::chrono::high_resolution_clock::now();
 
-    nsm::trace("Generated atlas in ", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count(), "ms");
+    nsm::trace("Generated atlas in ", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count(), "ms [", width, "x", height, "]");
+
+    NSM_ASSERT(width > 0 && height > 0, "Failed to generate atlas");
 
     mAtlas = new nsm::Texture2D();
     mAtlas->initFromData(atlas.pixels, 3, {width, height}, false);
