@@ -4,7 +4,6 @@
 #include <nsm/ui/uielement.h>
 
 #include <nsm/gfx/texture2D.h>
-#include <nsm/gfx/font.h>
 #include <nsm/ui/uishape.h>
 
 #include <nsm/debug/log.h>
@@ -41,9 +40,6 @@ public:
                 glm::vec2(-0.5f, -0.5f)
             }
         );
-
-        mFont = nsm::Font::get("nsm/assets/font/SegoeUI.ttf");
-        NSM_ASSERT(mFont != nullptr, "Font is null!");
     }
 
     ~LogoComponent() override = default;
@@ -76,13 +72,11 @@ public:
         renderer.drawPolygonSolid(renderInfo, mSquareShape, color, size, rotation, position, nsm::UIRenderer::MaskMode::Masked);
 
         //* 3. Render text
-        
     }
 
 private:
     nsm::Texture2D mTexture;
     nsm::UIShape mStarShape, mSquareShape;
-    nsm::Font* mFont;
 };
 
 class HotbarComponent : public nsm::UIElement {

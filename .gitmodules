@@ -23,6 +23,3 @@
 [submodule "Nasmo/vendor/poly2tri"]
 	path = Nasmo/vendor/poly2tri
 	url = https://github.com/jhasse/poly2tri.git
-[submodule "Nasmo/vendor/msdf-atlas-gen"]
-	path = Nasmo/vendor/msdf-atlas-gen
-	url = https://github.com/TheCherno/msdf-atlas-gen

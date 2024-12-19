@@ -3,7 +3,6 @@
 #include <nsm/gfx/opengl.h>
 #include <nsm/debug/log.h>
 #include <nsm/event/events.h>
-#include <nsm/gfx/font.h>
 #include <nsm/gfx/texture2D.h>
 #include <nsm/gfx/renderer.h>
 #include <nsm/gfx/layer/layer.h>
@@ -64,7 +63,6 @@ nsm::Graphics::~Graphics() {
     Texture2D::clearCache();
     Material::clearCache();
     PrimitiveShape::destroy();
-    Font::destroy();
 }
 
 bool nsm::Graphics::update() {
