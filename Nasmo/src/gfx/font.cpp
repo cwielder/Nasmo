@@ -7,7 +7,6 @@
 #include <msdfgen.h>
 
 #include <thread>
-#include <chrono>
 
 msdfgen::FreetypeHandle* nsm::Font::sFreeType = nullptr;
 
@@ -35,8 +34,6 @@ nsm::Font::Font(const std::string& path)
     msdfgen::FontHandle* font = msdfgen::loadFont(sFreeType, path.c_str());
     NSM_ASSERT(font != nullptr, "Failed to load font ", path);
 
-    auto start = std::chrono::high_resolution_clock::now();
-
     msdf_atlas::Charset charset; // TODO: Cache this
     for (int i = 0x20; i <= 0xFF; i++) {
         charset.add(i);
@@ -58,17 +55,6 @@ nsm::Font::Font(const std::string& path)
     i32 width, height;
     packer.getDimensions(width, height);
 
-    u64 coloringSeed = 0;
-    constexpr f32 cDefaultAngleThreshold = 3.0f;
-    constexpr u64 cLcgMultiplier = 6364136223846793005ULL;
-    constexpr u64 cLcgIncrement = 1442695040888963407ULL;
-
-    msdf_atlas::Workload([&glyphs = mGlyphGeometry, &coloringSeed](i32 i, i32 threadNum) -> bool {
-        u64 seed = (cLcgMultiplier * (coloringSeed ^ i) + cLcgIncrement) * !!coloringSeed;
-        glyphs[i].edgeColoring(msdfgen::edgeColoringInkTrap, cDefaultAngleThreshold, seed);
-        return true;
-    }, mGlyphGeometry.size()).finish(std::thread::hardware_concurrency());
-
     msdf_atlas::GeneratorAttributes attributes;
     attributes.config.overlapSupport = true;
     attributes.scanlinePass = true;
@@ -80,12 +66,7 @@ nsm::Font::Font(const std::string& path)
 
     msdfgen::BitmapConstRef<u8, 3> atlas = generator.atlasStorage();
 
-    auto end = std::chrono::high_resolution_clock::now();
-
-    nsm::trace("Generated atlas in ", std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count(), "ms");
-
-    mAtlas = new nsm::Texture2D();
-    mAtlas->initFromData(atlas.pixels, 3, {width, height}, false);
+    mAtlas = new nsm::Texture2D(atlas.pixels, width * height * 3);
 
     msdfgen::destroyFont(font);
 }
