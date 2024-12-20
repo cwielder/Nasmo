@@ -34,7 +34,15 @@ void nsm::Scene::update(const f32 timeStep) {
     }
 
     for (int i = 0; i < mEntities.size(); ++i) {
-        mEntities[i]->onUpdate(timeStep);
+        nsm::Entity* entity = mEntities[i];
+
+        entity->onUpdate(timeStep);
+
+        for (auto [hash, componentVector] : entity->mComponents) {
+            for (nsm::EntityComponent* component : componentVector) {
+                component->onUpdate(timeStep);
+            }
+        }
     }
 }
 

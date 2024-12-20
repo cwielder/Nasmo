@@ -19,6 +19,7 @@ namespace nsm {
         virtual ~EntityComponent() = default;
 
         virtual void onEvent(const Event* event) { }
+        virtual void onUpdate(const f32 timeStep) { }
     };
 
     class Entity {
