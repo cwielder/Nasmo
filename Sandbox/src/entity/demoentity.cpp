@@ -3,6 +3,7 @@
 #include <nsm/event/events.h>
 #include <nsm/entity/component/modelcomponent.h>
 #include <nsm/entity/component/transformcomponent.h>
+#include <nsm/entity/component/particlecomponent.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -16,8 +17,8 @@ public:
         owner->addComponent<nsm::DrawableComponent>(mModelComponent);
     }
 
-    void setScale(const glm::vec3& scale) {
-        glm::mat4 transform = glm::scale(glm::mat4(1.0f), scale);
+    void setTrans(const glm::vec3& scale, const glm::vec3& pos) {
+        glm::mat4 transform = glm::scale(glm::translate(glm::mat4(1.0f), pos), scale);
         mModelComponent->setTransformAll(transform);
     }
 
@@ -38,24 +39,56 @@ public:
         mTransform = new nsm::TransformComponent();
         this->addComponent<nsm::TransformComponent>(mTransform);
 
-        mModel.setScale(mTransform->getScale());
+        mParticle = new nsm::ParticleComponent();
+        mParticle->setTargetLayer("forward");
+        this->addComponent<nsm::DrawableComponent>(mParticle);
+
+        mModel.setTrans(mTransform->getScale(), mTransform->getPosition());
     }
 
     void onUpdate(const f32 timeStep) override {
+        nsm::ParticleEmitter& emitter = mParticle->getEmitter();
+        
         glm::vec3 scale = mTransform->getScale();
+        glm::vec3 position = mTransform->getPosition();
+
+        f32 emitRadius = emitter.getEmitRadius(), emitRate = emitter.getEmitRate(), lifeSpan = emitter.getLifeSpan();
+        glm::vec3 initialVelocity = emitter.getInitialVelocity(), acceleration = emitter.getAcceleration();
+        bool localSpace = emitter.getLocalSpace();
         
         if (ImGui::Begin("Demo Entity")) {
             ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+            ImGui::DragFloat3("Position", &position.x, 0.1f);
+
+            ImGui::DragFloat("Emit Radius", &emitRadius, 0.1f);
+            ImGui::DragFloat("Emit Rate", &emitRate, 0.1f);
+            ImGui::DragFloat("Life Span", &lifeSpan, 0.1f);
+
+            ImGui::DragFloat3("Initial Velocity", &initialVelocity.x, 0.1f);
+            ImGui::DragFloat3("Acceleration", &acceleration.x, 0.1f);
+
+            ImGui::Checkbox("Local Space", &localSpace);
         } ImGui::End();
 
         mTransform->setScale(scale);
+        mTransform->setPosition(position);
 
-        mModel.setScale(mTransform->getScale());
+        mParticle->getEmitter()
+            .setPosition(position)
+            .setEmitRadius(emitRadius)
+            .setEmitRate(emitRate)
+            .setLifeSpan(lifeSpan)
+            .setInitialVelocity(initialVelocity)
+            .setAcceleration(acceleration)
+            .setLocalSpace(localSpace);
+
+        mModel.setTrans(scale, position);
     }
 
 private:
     nsm::TransformComponent* mTransform;
     PlaneModel mModel;
+    nsm::ParticleComponent* mParticle;
 };
 
 NSM_REGISTER_ENTITY(DemoEntity);

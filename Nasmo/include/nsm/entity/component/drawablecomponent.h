@@ -8,6 +8,9 @@ namespace nsm {
 
     class DrawableComponent : public EntityComponent {
     public:
+        DrawableComponent() = default;
+        ~DrawableComponent() override = default;
+
         virtual void drawOpaque(const RenderInfo& renderInfo) = 0;
         virtual void drawTranslucent(const RenderInfo& renderInfo) = 0;
 
