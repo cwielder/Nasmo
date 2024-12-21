@@ -31,7 +31,7 @@ public:
             10000.0f
         );
         cameraComponent->addTargetLayer("main");
-        cameraComponent->addTargetLayer("debug");
+        cameraComponent->addTargetLayer("forward");
 
         this->addComponent<nsm::CameraComponent>(cameraComponent);
     }

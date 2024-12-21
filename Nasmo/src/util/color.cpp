@@ -3,9 +3,9 @@
 #include <cmath>
 
 nsm::Color::Color(const std::string& hex) {
-    NSM_ASSERT(hex.empty(), "Hex string can't be empty");
-    NSM_ASSERT((hex.length() != 4 && hex.length() != 5 && hex.length() != 7 && hex.length() != 9), "Invalid hex string length");
-    NSM_ASSERT(hex[0] != '#', "Hex string must start with #");
+    NSM_ASSERT(!hex.empty(), "Hex string can't be empty: ", hex);
+    NSM_ASSERT(hex.length() == 4 || hex.length() == 5 || hex.length() == 7 || hex.length() == 9, "Invalid hex string length of ", hex.length());
+    NSM_ASSERT(hex[0] == '#', "Hex string must start with #");
     
     std::string expandedHex;
 

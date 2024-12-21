@@ -23,7 +23,7 @@ public:
         mLayerMain = this->pushLayer<nsm::ModelLayer>("main");
         mLayerLightingDirectional = this->pushLayer<nsm::LightingLayer>("lighting_directional", nsm::LightingLayer::Type::Directional);
         mLayerLightingPoint = this->pushLayer<nsm::LightingLayer>("lighting_point", nsm::LightingLayer::Type::Point);
-        mLayerDebug = this->pushLayer<nsm::ForwardLayer>("debug");
+        mLayerForward = this->pushLayer<nsm::ForwardLayer>("forward");
         mLayerBloom = this->pushLayer<nsm::BloomLayer>("bloom");
         mLayerTonemap = this->pushLayer<nsm::TonemapLayer>("cc");
         mLayerUI = this->pushLayer<nsm::UILayer>("ui");
@@ -78,7 +78,7 @@ public:
         nsm::PrimitiveShape::getQuadIBO().draw();
 
         // Debug pass
-        mLayerDebug->draw({ mLayerDebug->getCamera(), framebuffer });
+        mLayerForward->draw({ mLayerForward->getCamera(), framebuffer });
 
         // Post-process pass
         mLayerBloom->draw({ nullptr, framebuffer });
@@ -104,7 +104,7 @@ public:
     nsm::LightingLayer* mLayerLightingPoint;
     nsm::BloomLayer* mLayerBloom;
     nsm::TonemapLayer* mLayerTonemap;
-    nsm::ForwardLayer* mLayerDebug;
+    nsm::ForwardLayer* mLayerForward;
     nsm::UILayer* mLayerUI;
     nsm::ImGuiLayer* mLayerImGui;
 

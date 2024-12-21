@@ -79,7 +79,7 @@ public:
         this->addComponent<nsm::DrawableComponent>(mLightComponent);
 
         mIndicatorComponent = new IndicatorComponent(glm::vec3(5.0f, 0.0f, 5.0f));
-        mIndicatorComponent->setTargetLayer("debug");
+        mIndicatorComponent->setTargetLayer("forward");
         this->addComponent<nsm::DrawableComponent>(mIndicatorComponent);
 
         mSkyboxComponent = new nsm::SkyboxComponent("textures/skybox1/", ".jpg");
