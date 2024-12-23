@@ -100,8 +100,6 @@ void nsm::ParticleEmitter::update(const f64 timeStep) {
         particle.size.y = fastgltf::math::lerp(particle.startSize.y, particle.endSize.y, particle.lifeTime);
         particle.size.z = fastgltf::math::lerp(particle.startSize.z, particle.endSize.z, particle.lifeTime);
 
-        nsm::trace("Particle start size: ", particle.startSize.x, ", Particle end size: ", particle.endSize.x, ", Particle size: ", particle.size.x);
-
         particle.lifeTime += timeStep / particle.lifeSpan;
     }
 

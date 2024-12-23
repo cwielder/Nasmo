@@ -1,4 +1,5 @@
 #include <nsm/app/application.h>
+#include <nsm/event/events.h>
 #include <nsm/gfx/renderer.h>
 #include <nsm/gfx/layer/modellayer.h>
 #include <nsm/gfx/layer/bloomlayer.h>
@@ -39,21 +40,33 @@ public:
         mLitObjectsBuffer.addTextureBuffer(nsm::Texture::Format::RGB16F, size);
         mLitObjectsBuffer.finalize();
 
+        mGameBuffer.addTextureBuffer(nsm::Texture::Format::RGB16F, size);
+        mGameBuffer.addTextureBuffer(nsm::Texture::Format::Depth32FStencil8, size);
+        mGameBuffer.finalize();
+
         mBlitRenderState
             .blend(false)
             .stencil(nsm::RenderState::StencilFunction::Equal, nsm::RenderState::StencilOperation::Keep, nsm::RenderState::StencilOperation::Keep, nsm::RenderState::StencilOperation::Keep, 0xFF, 0xFF)
             .depth(false)
         ;
+
+        if (mDevMode) {
+            ImGui::DockSpaceOverViewport();
+        }
     }
 
     void render(nsm::Framebuffer* framebuffer) override {
+        nsm::Framebuffer* accumulator = mDevMode ? &mGameBuffer : framebuffer;
+
+        accumulator->bind();
+
         // Skybox pass
-        mLayerSkybox->draw({ mLayerMain->getCamera(), framebuffer });
+        mLayerSkybox->draw({ mLayerMain->getCamera(), accumulator });
 
         // Build geometry buffer
         mGeometryBuffer.bind();
         if (!mFirstFrame) {
-            mGeometryBuffer.takeDepthStencil(*framebuffer);
+            mGeometryBuffer.takeDepthStencil(*accumulator);
         }
         mFirstFrame = false;
         mGeometryBuffer.clear(glm::f32vec4{ 0.0f }, nsm::Framebuffer::Type::Color, 0);
@@ -69,8 +82,8 @@ public:
         mLayerLightingPoint->draw({ mLayerMain->getCamera(), &mGeometryBuffer });
 
         // Blit lit objects to main framebuffer with stencil mask
-        framebuffer->bind();
-        framebuffer->takeDepthStencil(mGeometryBuffer);
+        accumulator->bind();
+        accumulator->takeDepthStencil(mGeometryBuffer);
         mBlitShader.bind();
         mBlitRenderState.apply();
         mLitObjectsBuffer.getTextureBuffer(0)->bind(0);
@@ -78,24 +91,42 @@ public:
         nsm::PrimitiveShape::getQuadIBO().draw();
 
         // Debug pass
-        mLayerForward->draw({ mLayerForward->getCamera(), framebuffer });
+        mLayerForward->draw({ mLayerForward->getCamera(), accumulator });
 
         // Post-process pass
-        mLayerBloom->draw({ nullptr, framebuffer });
+        mLayerBloom->draw({ nullptr, accumulator });
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-        mLayerTonemap->draw({ nullptr, framebuffer });
+        mLayerTonemap->draw({ nullptr, accumulator });
 
         // UI pass
-        framebuffer->clear(glm::f32vec4{ 1.0f }, nsm::Framebuffer::Type::Depth);
-        mLayerUI->draw({ nullptr, framebuffer });
+        accumulator->clear(glm::f32vec4{ 1.0f }, nsm::Framebuffer::Type::Depth);
+        mLayerUI->draw({ nullptr, accumulator });
 
-        // ImGui pass
-        mLayerImGui->draw({ nullptr, framebuffer });
+        if (mDevMode) {
+            framebuffer->bind();
+
+            // ImGui pass
+
+            ImGui::Begin("Viewport");
+                const nsm::Texture2D* gameBufferTexture = mGameBuffer.getTextureBuffer(0);
+
+                ImGui::Image(gameBufferTexture->getID(), ImVec2(gameBufferTexture->getSize().x, gameBufferTexture->getSize().y), ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::End();
+
+            mLayerImGui->draw({ nullptr, framebuffer });
+
+            ImGui::GetWindowSize();
+
+            ImGui::DockSpaceOverViewport();
+        } else {
+            mLayerImGui->draw({ nullptr, framebuffer });
+        }
     }
 
     void onResize(const glm::u32vec2& size) override {
         mGeometryBuffer.resize(size);
         mLitObjectsBuffer.resize(size);
+        mGameBuffer.resize(size);
     }
 
     nsm::SkyboxLayer* mLayerSkybox;
@@ -110,11 +141,13 @@ public:
 
     nsm::Framebuffer mGeometryBuffer;
     nsm::Framebuffer mLitObjectsBuffer;
+    nsm::Framebuffer mGameBuffer;
 
     nsm::ShaderProgram mBlitShader;
     nsm::RenderState mBlitRenderState;
 
     bool mFirstFrame = true;
+    bool mDevMode = true; // TODO: Add a way to toggle this globally
 };
 
 class SandboxApplication : public nsm::Application {

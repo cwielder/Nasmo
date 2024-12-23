@@ -4,6 +4,7 @@
 #include <nsm/entity/component/modelcomponent.h>
 #include <nsm/entity/component/transformcomponent.h>
 #include <nsm/entity/component/particlecomponent.h>
+#include <nsm/util/jsonhelpers.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -28,15 +29,17 @@ private:
 
 class DemoEntity final : public nsm::Entity {
 public:
-    DemoEntity(nsm::Entity::Properties&)
+    DemoEntity(nsm::Entity::Properties& properties)
         : mTransform(nullptr)
         , mModel(this)
+        , mStartPosition(nsm::JsonHelpers::getVec3(properties, "position"))
     { }
 
     ~DemoEntity() override = default;
 
     void onCreate(nsm::Entity::Properties& properties) override {
         mTransform = new nsm::TransformComponent();
+        mTransform->setPosition(mStartPosition);
         this->addComponent<nsm::TransformComponent>(mTransform);
 
         mParticle = new nsm::ParticleComponent();
@@ -50,7 +53,7 @@ public:
             .setAcceleration(glm::vec3(0.0f, -9.8f, 0.0f))
             .setInitialVelocity(glm::vec3(0.0f, 5.0f, 2.0f))
             .setStartSize(glm::vec3(1.0f))
-            .setEndSize(glm::vec3(1.0f))
+            .setEndSize(glm::vec3(0.0f, 0.0f, 1.0f))
         ;
 
         mModel.setTrans(mTransform->getScale(), mTransform->getPosition());
@@ -120,6 +123,7 @@ public:
     }
 
 private:
+    glm::vec3 mStartPosition;
     nsm::TransformComponent* mTransform;
     PlaneModel mModel;
     nsm::ParticleComponent* mParticle;

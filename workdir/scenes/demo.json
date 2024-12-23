@@ -3,13 +3,13 @@
         {
             "type": "CameraEntity",
             "properties": {
-                "position": [8.3, 4.8, 13.0]
+                "position": [4.9, 4.8, 15.4]
             }
         },
         {
             "type": "DemoEntity",
             "properties": {
-                
+                "position": [-4.1, 0.0, 0.0]
             }
         },
         {
