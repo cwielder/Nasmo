@@ -39,7 +39,7 @@ namespace nsm {
         Application(const ApplicationInfo& info);
         virtual ~Application();
 
-        virtual void onUpdate(const f32 timeStep) { }
+        virtual void onUpdate(const f64 timeStep) { }
         virtual void onEvent(const Event* event) { }
         virtual void onSystemTransferData() { }
 

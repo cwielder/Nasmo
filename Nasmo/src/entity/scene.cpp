@@ -15,7 +15,7 @@ nsm::Scene::~Scene() {
     }
 }
 
-void nsm::Scene::update(const f32 timeStep) {
+void nsm::Scene::update(const f64 timeStep) {
     std::vector<nsm::Entity*> entitiesToDestroy;
     for (auto& entity : mEntities) {
         if (entity->mIsAlive) {

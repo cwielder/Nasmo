@@ -11,7 +11,7 @@ namespace nsm {
         ParticleComponent() = default;
         ~ParticleComponent() override = default;
 
-        void onUpdate(const f32 timeStep) override;
+        void onUpdate(const f64 timeStep) override;
 
         void drawOpaque(const RenderInfo& renderInfo) override;
         void drawTranslucent(const RenderInfo& renderInfo) override;

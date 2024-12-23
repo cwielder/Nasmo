@@ -5,27 +5,48 @@
 #include <nsm/entity/component/cameracomponent.h>
 
 #include <random>
+#include <limits>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <fastgltf/math.hpp>
 
 nsm::ParticleEmitter::ParticleEmitter()
     : mParticles()
     , mRandom(std::random_device()())
+    , mSSBO()
+    , mParticleAccumulator(0.0f)
     , mPosition(0.0f)
     , mEmitRadius(0.0f)
     , mEmitRate(0.0f)
     , mInitialVelocity(0.0f)
+    , mInitialVelocityVariance(0.0f)
     , mLifeSpan(0.0f)
+    , mLifeSpanVariance(0.0f)
     , mAcceleration(0.0f)
+    , mAccelerationVariance(0.0f)
     , mLocalSpace(false)
+    , mParticleLimit(1000)
 {
     if (sShader == nullptr) {
         sShader = new ShaderProgram("nsm/assets/shaders/particle.vsh", "nsm/assets/shaders/particle.fsh");
     }
 }
 
-void nsm::ParticleEmitter::update(const f32 timeStep) {
-    u32 numParticlesToEmit = static_cast<u32>(mEmitRate * timeStep);
+void nsm::ParticleEmitter::update(const f64 timeStep) {
+    // 1. Emit new particles
+
+    f64 particlesToEmit = mEmitRate * timeStep + mParticleAccumulator;
+
+    u32 numParticlesToEmit = static_cast<u32>(particlesToEmit);
+    mParticleAccumulator = particlesToEmit - static_cast<f64>(numParticlesToEmit);
+
+    if (mParticles.size() >= mParticleLimit) {
+        numParticlesToEmit = 0;
+        mParticleAccumulator = 0.0f;
+    } else if (numParticlesToEmit + mParticles.size() > mParticleLimit) {
+        numParticlesToEmit = mParticleLimit - mParticles.size();
+        mParticleAccumulator = 0.0f;
+    }
 
     for (u32 i = 0; i < numParticlesToEmit; i++) {
         mParticles.push_back(Particle());
@@ -46,16 +67,42 @@ void nsm::ParticleEmitter::update(const f32 timeStep) {
         }
 
         particle.velocity = mInitialVelocity;
+
+        particle.velocity.x += mRandom.getF32(-mInitialVelocityVariance.x, mInitialVelocityVariance.x);
+        particle.velocity.y += mRandom.getF32(-mInitialVelocityVariance.y, mInitialVelocityVariance.y);
+        particle.velocity.z += mRandom.getF32(-mInitialVelocityVariance.z, mInitialVelocityVariance.z);
+
+        particle.acceleration = mAcceleration;
+        particle.acceleration.x += mRandom.getF32(-mAccelerationVariance.x, mAccelerationVariance.x);
+        particle.acceleration.y += mRandom.getF32(-mAccelerationVariance.y, mAccelerationVariance.y);
+        particle.acceleration.z += mRandom.getF32(-mAccelerationVariance.z, mAccelerationVariance.z);
+
+        particle.startSize = mStartSize;
+        particle.startSize.x += mRandom.getF32(-mStartSizeVariance.x, mStartSizeVariance.x);
+        particle.startSize.y += mRandom.getF32(-mStartSizeVariance.y, mStartSizeVariance.y);
+        particle.startSize.z += mRandom.getF32(-mStartSizeVariance.z, mStartSizeVariance.z);
+
+        particle.endSize = mEndSize;
+        particle.endSize.x += mRandom.getF32(-mEndSizeVariance.x, mEndSizeVariance.x);
+        particle.endSize.y += mRandom.getF32(-mEndSizeVariance.y, mEndSizeVariance.y);
+        particle.endSize.z += mRandom.getF32(-mEndSizeVariance.z, mEndSizeVariance.z);
+
         particle.lifeTime = 0.0f;
+        particle.lifeSpan = mLifeSpan + mRandom.getF32(-mLifeSpanVariance, mLifeSpanVariance);
     }
 
-    // 2. Update existing particles
+    // Update existing particles
     for (Particle& particle : mParticles) {
-        particle.velocity += mAcceleration * timeStep; 
+        particle.velocity += particle.acceleration * static_cast<f32>(timeStep);
+        particle.position += particle.velocity * static_cast<f32>(timeStep);
 
-        particle.position += particle.velocity * timeStep;
+        particle.size.x = fastgltf::math::lerp(particle.startSize.x, particle.endSize.x, particle.lifeTime);
+        particle.size.y = fastgltf::math::lerp(particle.startSize.y, particle.endSize.y, particle.lifeTime);
+        particle.size.z = fastgltf::math::lerp(particle.startSize.z, particle.endSize.z, particle.lifeTime);
 
-        particle.lifeTime += timeStep / mLifeSpan;
+        nsm::trace("Particle start size: ", particle.startSize.x, ", Particle end size: ", particle.endSize.x, ", Particle size: ", particle.size.x);
+
+        particle.lifeTime += timeStep / particle.lifeSpan;
     }
 
     // 3. Remove dead particles
@@ -65,20 +112,33 @@ void nsm::ParticleEmitter::update(const f32 timeStep) {
 }
 
 void nsm::ParticleEmitter::render(const RenderInfo& renderInfo) {
+    if (mParticles.empty()) {
+        return;
+    }
+
     PrimitiveShape::getQuadVAO().bind();
 
     sShader->bind();
     sShader->setMat4("uViewProjMtx", renderInfo.camera->getViewProjection());
 
-    nsm::trace("Particle count: ", mParticles.size());
+    std::vector<glm::mat4> particleData(mParticles.size());
 
-    for (const Particle& particle : mParticles) {
-        glm::mat4 mtx = glm::mat4(1.0f);
-        mtx = glm::translate(mtx, particle.position);
-        mtx = glm::scale(mtx, glm::vec3(0.1f));
+    for (u32 i = 0; i < mParticles.size(); i++) {
+        const Particle& particle = mParticles[i];
 
-        sShader->setMat4("uModelMtx", mtx);
+        glm::vec3 effectivePosition = particle.position;
 
-        PrimitiveShape::getQuadIBO().draw();
+        if (mLocalSpace) {
+            effectivePosition += mPosition;
+        }
+        
+        particleData[i] = glm::translate(glm::mat4(1.0f), effectivePosition) *
+                          glm::scale(glm::mat4(1.0f), particle.size);
     }
+
+    mSSBO.setData(sizeof(glm::mat4) * mParticles.size(), particleData.data(), BufferUsage::StreamDraw);
+
+    mSSBO.bind(0);
+
+    PrimitiveShape::getQuadIBO().drawInstanced(mParticles.size());
 }

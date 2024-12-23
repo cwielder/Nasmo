@@ -14,7 +14,7 @@ namespace nsm {
         Scene(const std::string& path);
         ~Scene();
 
-        void update(const f32 timeStep);
+        void update(const f64 timeStep);
         void onEvent(const Event* event);
 
         void switchScene(const std::string& path);

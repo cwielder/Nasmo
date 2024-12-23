@@ -36,7 +36,7 @@ public:
         this->addComponent<nsm::CameraComponent>(cameraComponent);
     }
 
-    void onUpdate(const f32 timeStep) override {
+    void onUpdate(const f64 timeStep) override {
         glm::vec3 position = mTransform->getPosition();
 
         if (ImGui::Begin("Camera Controls")) {

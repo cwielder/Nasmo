@@ -19,7 +19,7 @@ namespace nsm {
         virtual ~EntityComponent() = default;
 
         virtual void onEvent(const Event* event) { }
-        virtual void onUpdate(const f32 timeStep) { }
+        virtual void onUpdate(const f64 timeStep) { }
     };
 
     class Entity {
@@ -97,7 +97,7 @@ namespace nsm {
         friend class Scene;
 
         virtual void onCreate(Entity::Properties& properties) { }
-        virtual void onUpdate(const f32 timeStep) { }
+        virtual void onUpdate(const f64 timeStep) { }
         virtual void onEvent(const Event* event) { }
 
         std::map<std::type_index, std::vector<EntityComponent*>> mComponents;

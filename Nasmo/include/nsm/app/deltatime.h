@@ -8,11 +8,11 @@ namespace nsm {
 
     class DeltaTime final {
     public:
-        f32 update();
+        f64 update();
 
     private:
         std::chrono::time_point<std::chrono::steady_clock> mLastTime;
-        f32 mTimeStep;
+        f64 mTimeStep;
     };
 
 }

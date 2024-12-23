@@ -126,7 +126,7 @@ public:
         mGraphics.getWindow().setVsync(false);
     }
 
-    void onUpdate(const f32 timeStep) override {
+    void onUpdate(const f64 timeStep) override {
         mGraphics.getWindow().setTitle("Nasmo Sandbox | " + std::to_string(1.0f / timeStep) + " FPS");
     }
 };

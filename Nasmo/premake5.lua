@@ -70,7 +70,7 @@ project "Nasmo"
         runtime "Debug"
         optimize "off"
         symbols "on"
-        sanitize "Address"
+        --sanitize "Address"
     
     filter "configurations:Release"
         defines "NSM_RELEASE"

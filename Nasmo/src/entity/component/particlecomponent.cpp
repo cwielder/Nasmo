@@ -1,11 +1,10 @@
 #include <nsm/entity/component/particlecomponent.h>
 
-void nsm::ParticleComponent::onUpdate(const f32 timeStep) {
+void nsm::ParticleComponent::onUpdate(const f64 timeStep) {
     mEmitter.update(timeStep);
 }
 
 void nsm::ParticleComponent::drawOpaque(const RenderInfo& renderInfo) {
-    nsm::trace("Drawing opaque particles");
     mEmitter.render(renderInfo);
 }
 

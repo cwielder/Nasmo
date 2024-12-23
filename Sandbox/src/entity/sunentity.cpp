@@ -87,7 +87,7 @@ public:
         this->addComponent<nsm::DrawableComponent>(mSkyboxComponent);
     }
 
-    void onUpdate(const f32 timeStep) override {
+    void onUpdate(const f64 timeStep) override {
         static f32 colorR = 1.0f, colorG = 1.0f, colorB = 1.0f;
         static f32 intensity = mIntensity;
         static f32 yaw = 0.0f, pitch = -124.0f;
