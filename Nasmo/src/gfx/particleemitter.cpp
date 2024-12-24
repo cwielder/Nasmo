@@ -26,6 +26,7 @@ nsm::ParticleEmitter::ParticleEmitter()
     , mAccelerationVariance(0.0f)
     , mLocalSpace(false)
     , mParticleLimit(1000)
+    , mTexture(nullptr)
 {
     if (sShader == nullptr) {
         sShader = new ShaderProgram("nsm/assets/shaders/particle.vsh", "nsm/assets/shaders/particle.fsh");
@@ -88,7 +89,7 @@ void nsm::ParticleEmitter::update(const f64 timeStep) {
         particle.endSize.z += mRandom.getF32(-mEndSizeVariance.z, mEndSizeVariance.z);
 
         particle.lifeTime = 0.0f;
-        particle.lifeSpan = mLifeSpan + mRandom.getF32(-mLifeSpanVariance, mLifeSpanVariance);
+        particle.lifeSpan = glm::max(mLifeSpan + mRandom.getF32(-mLifeSpanVariance, mLifeSpanVariance), std::numeric_limits<f32>::epsilon());
     }
 
     // Update existing particles
@@ -117,9 +118,10 @@ void nsm::ParticleEmitter::render(const RenderInfo& renderInfo) {
     PrimitiveShape::getQuadVAO().bind();
 
     sShader->bind();
-    sShader->setMat4("uViewProjMtx", renderInfo.camera->getViewProjection());
+    sShader->setMat4(0, renderInfo.camera->getViewProjection());
+    sShader->setInt(4, mTexture->getFrames());
 
-    std::vector<glm::mat4> particleData(mParticles.size());
+    mTexture->bind(0);
 
     for (u32 i = 0; i < mParticles.size(); i++) {
         const Particle& particle = mParticles[i];
@@ -130,13 +132,11 @@ void nsm::ParticleEmitter::render(const RenderInfo& renderInfo) {
             effectivePosition += mPosition;
         }
         
-        particleData[i] = glm::translate(glm::mat4(1.0f), effectivePosition) *
-                          glm::scale(glm::mat4(1.0f), particle.size);
+        sShader->setMat4(1, glm::translate(glm::mat4(1.0f), effectivePosition) *
+                          glm::scale(glm::mat4(1.0f), particle.size));
+
+        sShader->setFloat(2, particle.lifeTime);
+
+        PrimitiveShape::getQuadIBO().draw();
     }
-
-    mSSBO.setData(sizeof(glm::mat4) * mParticles.size(), particleData.data(), BufferUsage::StreamDraw);
-
-    mSSBO.bind(0);
-
-    PrimitiveShape::getQuadIBO().drawInstanced(mParticles.size());
 }

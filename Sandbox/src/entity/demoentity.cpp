@@ -47,13 +47,14 @@ public:
         this->addComponent<nsm::DrawableComponent>(mParticle);
 
         mParticle->getEmitter()
-            .setEmitRadius(0.5f)
-            .setEmitRate(40.0f)
-            .setLifeSpan(2.0f)
-            .setAcceleration(glm::vec3(0.0f, -9.8f, 0.0f))
+            .setEmitRadius(3.2f)
+            .setEmitRate(24.0f)
+            .setLifeSpan(1.5f)
+            .setLifeSpanVariance(0.5f)
             .setInitialVelocity(glm::vec3(0.0f, 5.0f, 2.0f))
             .setStartSize(glm::vec3(1.0f))
             .setEndSize(glm::vec3(0.0f, 0.0f, 1.0f))
+            .setTexture("textures/animatlas.png", 2.0f)
         ;
 
         mModel.setTrans(mTransform->getScale(), mTransform->getPosition());
@@ -77,25 +78,41 @@ public:
         if (ImGui::Begin("Demo Entity")) {
             ImGui::DragFloat3("Scale", &scale.x, 0.1f);
             ImGui::DragFloat3("Position", &position.x, 0.1f);
+        } ImGui::End();
 
+        if (ImGui::Begin("Emission")) {
             ImGui::DragFloat("Emit Radius", &emitRadius, 0.1f);
             ImGui::DragFloat("Emit Rate", &emitRate, 0.1f);
             ImGui::DragFloat("Life Span", &lifeSpan, 0.1f);
-            ImGui::DragFloat("Life Span Variance", &lifeSpanVariance, 0.1f);
+            ImGui::PushID("Life Span Variance");
+            ImGui::DragFloat("Variance", &lifeSpanVariance, 0.1f);
+            ImGui::PopID();
+            ImGui::DragInt("Particle Limit", reinterpret_cast<int*>(&particleLimit), 1);
+            ImGui::Checkbox("Local Space", &localSpace);
+        } ImGui::End();
 
+        if (ImGui::Begin("Motion")) {
             ImGui::DragFloat3("Initial Velocity", &initialVelocity.x, 0.1f);
-            ImGui::DragFloat3("Initial Velocity Variance", &initialVelocityVariance.x, 0.1f);
+            ImGui::PushID("Initial Velocity Variance");
+            ImGui::DragFloat3("Variance", &initialVelocityVariance.x, 0.1f);
+            ImGui::PopID();
+
             ImGui::DragFloat3("Acceleration", &acceleration.x, 0.1f);
-            ImGui::DragFloat3("Acceleration Variance", &accelerationVariance.x, 0.1f);
+            ImGui::PushID("Acceleration Variance");
+            ImGui::DragFloat3("Variance", &accelerationVariance.x, 0.1f);
+            ImGui::PopID();
+
+            ImGui::Separator();
 
             ImGui::DragFloat3("Start Size", &startSize.x, 0.1f);
-            ImGui::DragFloat3("Start Size Variance", &startSizeVariance.x, 0.1f);
+            ImGui::PushID("Start Size Variance");
+            ImGui::DragFloat3("Variance", &startSizeVariance.x, 0.1f);
+            ImGui::PopID();
 
             ImGui::DragFloat3("End Size", &endSize.x, 0.1f);
-            ImGui::DragFloat3("End Size Variance", &endSizeVariance.x, 0.1f);
-
-            ImGui::Checkbox("Local Space", &localSpace);
-            ImGui::DragInt("Particle Limit", reinterpret_cast<int*>(&particleLimit), 1);
+            ImGui::PushID("End Size Variance");
+            ImGui::DragFloat3("Variance", &endSizeVariance.x, 0.1f);
+            ImGui::PopID();
         } ImGui::End();
 
         mTransform->setScale(scale);

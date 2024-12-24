@@ -4,10 +4,12 @@
 #include <nsm/util/randomsource.h>
 #include <nsm/gfx/shader.h>
 #include <nsm/gfx/shaderstorage.h>
+#include <nsm/gfx/animatedtexture.h>
 
 #include <glm/glm.hpp>
 
 #include <vector>
+#include <memory>
 
 namespace nsm {
 
@@ -90,8 +92,6 @@ namespace nsm {
             return mParticleLimit;
         }
 
-        // variances
-
         ParticleEmitter& setInitialVelocityVariance(const glm::vec3& variance) {
             mInitialVelocityVariance = variance;
             return *this;
@@ -155,35 +155,16 @@ namespace nsm {
             return *this;
         }
 
+        ParticleEmitter& setTexture(const std::string& path, const f32 duration) {
+            mTexture = std::make_unique<AnimatedTexture>(path, duration);
+            return *this;
+        }
+
         void update(const f64 timeStep);
         void render(const RenderInfo& renderInfo);
 
     private:
         static inline ShaderProgram* sShader = nullptr;
-
-        /*
-            Per-particle data:
-            motion:
-            - world-position or offset from emitter position
-            - velocity
-            - current lifetime (0.0f to 1.0f)
-            visual:
-        */
-
-        /*
-            Asterisk denotes "supports variance"
-            ParticleEmitter data:
-            emission:
-            - position
-            - world-space or local-space
-            - emit radius
-            - emit volume
-            - emit rate
-            creation params:
-            - initial velocity*
-            - life span*
-            - acceleration*
-        */
 
         struct Particle {
             union {
@@ -204,22 +185,28 @@ namespace nsm {
         ShaderStorage mSSBO;
         f32 mParticleAccumulator;
         
+        // Emission
         glm::vec3 mPosition;
         f32 mEmitRadius; // TODO: Support cubic bounding volume
         f32 mEmitRate;
-
-        u32 mParticleLimit;
-        glm::vec3 mInitialVelocity;
-        glm::vec3 mInitialVelocityVariance;
         f32 mLifeSpan;
         f32 mLifeSpanVariance;
+        u32 mParticleLimit;
+        bool mLocalSpace = false;
+
+        // Motion
+        glm::vec3 mInitialVelocity;
+        glm::vec3 mInitialVelocityVariance;
         glm::vec3 mAcceleration;
         glm::vec3 mAccelerationVariance;
         glm::vec3 mStartSize;
         glm::vec3 mStartSizeVariance;
         glm::vec3 mEndSize;
         glm::vec3 mEndSizeVariance;
-        bool mLocalSpace = false;
+
+        // Visuals
+        std::unique_ptr<AnimatedTexture> mTexture;
+        // glm::vec4 mColorMultiplier;
     };
 
 }

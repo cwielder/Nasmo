@@ -7,6 +7,7 @@ nsm::ForwardLayer::ForwardLayer(const std::string& name)
 {
     mRenderState
         .depth(nsm::RenderState::DepthFunction::Less, true)
+        .blend(RenderState::BlendFactor::SrcAlpha, RenderState::BlendFactor::OneMinusSrcAlpha, RenderState::BlendEquation::Add)
     ;
 }
 
