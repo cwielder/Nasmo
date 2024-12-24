@@ -38,13 +38,13 @@ void nsm::ParticleEmitter::update(const f64 timeStep) {
     f64 particlesToEmit = mEmitRate * timeStep + mParticleAccumulator;
 
     u32 numParticlesToEmit = static_cast<u32>(particlesToEmit);
-    mParticleAccumulator = particlesToEmit - static_cast<f64>(numParticlesToEmit);
+    mParticleAccumulator = static_cast<f32>(particlesToEmit - static_cast<f64>(numParticlesToEmit));
 
     if (mParticles.size() >= mParticleLimit) {
         numParticlesToEmit = 0;
         mParticleAccumulator = 0.0f;
     } else if (numParticlesToEmit + mParticles.size() > mParticleLimit) {
-        numParticlesToEmit = mParticleLimit - mParticles.size();
+        numParticlesToEmit = mParticleLimit - static_cast<u32>(mParticles.size());
         mParticleAccumulator = 0.0f;
     }
 
@@ -100,7 +100,7 @@ void nsm::ParticleEmitter::update(const f64 timeStep) {
         particle.size.y = fastgltf::math::lerp(particle.startSize.y, particle.endSize.y, particle.lifeTime);
         particle.size.z = fastgltf::math::lerp(particle.startSize.z, particle.endSize.z, particle.lifeTime);
 
-        particle.lifeTime += timeStep / particle.lifeSpan;
+        particle.lifeTime += static_cast<f32>(timeStep) / particle.lifeSpan;
     }
 
     // 3. Remove dead particles
