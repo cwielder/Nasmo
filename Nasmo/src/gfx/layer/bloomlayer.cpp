@@ -20,6 +20,7 @@ nsm::BloomLayer::BloomLayer(const std::string& name)
     for (u32 i = 0; i < cPasses; ++i) {
         mFramebuffers[i].addTextureBuffer(Texture::Format::R11G11B10F, size);
         size /= 2;
+        size = glm::max(size, glm::u32vec2(1));
         mFramebuffers[i].finalize();
     }
 }
@@ -68,7 +69,9 @@ void nsm::BloomLayer::upsample(const nsm::RenderInfo& renderInfo, nsm::Viewport&
         .blend(RenderState::BlendFactor::One, RenderState::BlendFactor::One, RenderState::BlendEquation::Add)
         .apply()    
     ;
+
     mShaderUpsample.bind();
+
     for (u32 i = cPasses - 1; i > 0; i--) {
         viewport.resize(mFramebuffers[i - 1].getTextureBuffer(0)->getSize());
         viewport.apply();
@@ -101,5 +104,6 @@ void nsm::BloomLayer::resize(const glm::u32vec2& size) {
     for (u32 i = 0; i < cPasses; ++i) {
         mFramebuffers[i].resize(sizemt);
         sizemt /= 2;
+        sizemt = glm::max(sizemt, glm::u32vec2(1));
     }
 }
