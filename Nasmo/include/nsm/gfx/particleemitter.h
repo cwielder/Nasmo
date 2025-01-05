@@ -155,8 +155,8 @@ namespace nsm {
             return *this;
         }
 
-        ParticleEmitter& setTexture(const std::string& path, const f32 duration) {
-            mTexture = std::make_unique<AnimatedTexture>(path, duration);
+        ParticleEmitter& setTexture(const std::string& path) {
+            mTexture = std::make_unique<AnimatedTexture>(path);
             return *this;
         }
 

@@ -2,9 +2,8 @@
 
 #include <nsm/debug/assert.h>
 
-nsm::AnimatedTexture::AnimatedTexture(const std::string& path, const f32 duration)
+nsm::AnimatedTexture::AnimatedTexture(const std::string& path)
     : mAtlas(path, true) // TODO: Support filter configurations with a TextureProps struct
-    , mDuration(duration)
     , mFrames(0)
 {
     u32 textureSize = static_cast<u32>(mAtlas.getSize().x);
