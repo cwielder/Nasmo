@@ -190,6 +190,8 @@ std::vector<nsm::Model::Object*> nsm::Model::getAllObjects() const {
         for (nsm::Model::Object* child : allChildren) {
             objects.push_back(child);
         }
+
+        objects.push_back(object);
     }
 
     return objects;
