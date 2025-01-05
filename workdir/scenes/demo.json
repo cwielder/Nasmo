@@ -3,26 +3,22 @@
         {
             "type": "CameraEntity",
             "properties": {
-                "position": [-1.0, 4.8, 21.4]
+                "position": [5.8, 25.6, 21.6]
             }
         },
         {
-            "type": "DemoEntity",
+            "type": "PlayerEntity",
             "properties": {
-                "position": [-8.1, 0.0, 0.0]
-            }
-        },
-        {
-            "type": "LightEntity",
-            "properties": {
-                "position": [-18.889, 5.556, -11.334],
-                "intensity": 440.0
+                "position": [-8.1, 0.0, 0.0],
+                "scale": [0.1, 0.1, 0.1]
             }
         },
         {
             "type": "SunEntity",
             "properties": {
-                "intensity": 0.6
+                "intensity": 2.3,
+                "yaw": 67.602,
+                "pitch": 296.471
             }
         }
     ]
