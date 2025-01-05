@@ -132,11 +132,8 @@ void nsm::ParticleEmitter::render(const RenderInfo& renderInfo) {
             effectivePosition += mPosition;
         }
         
-        sShader->setMat4(1, glm::translate(glm::mat4(1.0f), effectivePosition) *
-                          glm::scale(glm::mat4(1.0f), particle.size));
-
+        sShader->setVec3(1, particle.size);
         sShader->setFloat(2, particle.lifeTime);
-
         sShader->setVec3(5, effectivePosition);
 
         PrimitiveShape::getQuadIBO().draw();

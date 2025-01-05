@@ -5,7 +5,6 @@ in vec2 vTexCoords;
 out vec4 oFragColor;
 
 layout (location = 0) uniform mat4 uViewProjMtx;
-layout (location = 1) uniform mat4 uMtx;
 layout (location = 2) uniform float uLifeTime;
 layout (location = 3, binding = 0) uniform sampler2D uTexture;
 layout (location = 4) uniform int uFrameCount;
