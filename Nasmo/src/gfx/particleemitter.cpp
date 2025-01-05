@@ -137,6 +137,8 @@ void nsm::ParticleEmitter::render(const RenderInfo& renderInfo) {
 
         sShader->setFloat(2, particle.lifeTime);
 
+        sShader->setVec3(5, effectivePosition);
+
         PrimitiveShape::getQuadIBO().draw();
     }
 }
