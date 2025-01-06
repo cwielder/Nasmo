@@ -16,6 +16,21 @@ nsm::Scene::~Scene() {
 }
 
 void nsm::Scene::update(const f64 timeStep) {
+    for (auto& [type, propertiesJson, out] : mEntitiesToSpawn) {
+        simdjson::ondemand::parser parser;
+        simdjson::padded_string padded_string = propertiesJson;
+        simdjson::ondemand::document doc = parser.iterate(padded_string);
+        auto properties = doc.get_object();
+        NSM_ASSERT(properties.error() == simdjson::SUCCESS, "Failed to create properties from string");
+
+        Entity* spawnedEntity = this->spawnEntity(type, properties);
+        if (out) {
+            *out = spawnedEntity;
+        }
+    }
+
+    mEntitiesToSpawn.clear();
+
     std::vector<nsm::Entity*> entitiesToDestroy;
     for (auto& entity : mEntities) {
         if (entity->mIsAlive) {
@@ -74,14 +89,8 @@ void nsm::Scene::switchScene(const std::string& path) {
     nsm::Application::raiseEvent(new SceneSwitchEvent(path));
 }
 
-nsm::Entity* nsm::Scene::spawnEntity(const std::string_view type, const std::string& propertiesJson) {
-    simdjson::ondemand::parser parser;
-    simdjson::padded_string padded_string = propertiesJson;
-    simdjson::ondemand::document doc = parser.iterate(padded_string);
-    auto r = doc.get_object();
-    NSM_ASSERT(r.error() == simdjson::SUCCESS, "Failed to create properties from string");
-
-    return this->spawnEntity(type, r);
+void nsm::Scene::spawnEntity(const std::string_view type, const std::string& propertiesJson, Entity** out) {
+    mEntitiesToSpawn.push_back(std::make_tuple(std::string{type}, propertiesJson, out));
 }
 
 nsm::Entity* nsm::Scene::spawnEntity(const std::string_view type, Entity::Properties& properties) {

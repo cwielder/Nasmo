@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <tuple>
 
 namespace nsm {
 
@@ -18,7 +19,7 @@ namespace nsm {
         void onEvent(const Event* event);
 
         void switchScene(const std::string& path);
-        Entity* spawnEntity(const std::string_view type, const std::string& propertiesJson);
+        void spawnEntity(const std::string_view type, const std::string& propertiesJson, Entity** out = nullptr);
 
         [[nodiscard]] const std::vector<Entity*>& getEntities() const { return mEntities; }
 
@@ -29,6 +30,7 @@ namespace nsm {
         void loadScene(const std::string& path);
 
         std::vector<Entity*> mEntities;
+        std::vector<std::tuple<std::string, std::string, Entity**>> mEntitiesToSpawn;
         std::string mPath;
     };
 
