@@ -1,6 +1,7 @@
 #include <nsm/gfx/particleemitter.h>
 
 #include <nsm/gfx/renderinfo.h>
+#include <nsm/gfx/renderstate.h>
 #include <nsm/gfx/primitiveshape.h>
 #include <nsm/entity/component/cameracomponent.h>
 
@@ -13,7 +14,6 @@
 nsm::ParticleEmitter::ParticleEmitter()
     : mParticles()
     , mRandom(std::random_device()())
-    , mSSBO()
     , mParticleAccumulator(0.0f)
     , mPosition(0.0f)
     , mEmitRadius(0.0f)
@@ -27,6 +27,7 @@ nsm::ParticleEmitter::ParticleEmitter()
     , mLocalSpace(false)
     , mParticleLimit(1000)
     , mTexture(nullptr)
+    , mDepth(true)
 {
     if (sShader == nullptr) {
         sShader = new ShaderProgram("nsm/assets/shaders/particle.vsh", "nsm/assets/shaders/particle.fsh");
@@ -116,6 +117,15 @@ void nsm::ParticleEmitter::render(const RenderInfo& renderInfo) {
     }
 
     PrimitiveShape::getQuadVAO().bind();
+
+    RenderState renderState;
+    if (mDepth) {
+        renderState.depth(RenderState::DepthFunction::LessEqual, true);
+    } else {
+        renderState.depth(false);
+    }
+
+    renderState.apply(RenderState::StateBit::Depth);
 
     sShader->bind();
     sShader->setMat4(0, renderInfo.camera->getViewProjection());

@@ -160,6 +160,11 @@ namespace nsm {
             return *this;
         }
 
+        ParticleEmitter& setDepth(const bool depth) {
+            mDepth = depth;
+            return *this;
+        }
+
         void update(const f64 timeStep);
         void render(const RenderInfo& renderInfo);
 
@@ -182,7 +187,6 @@ namespace nsm {
 
         std::vector<Particle> mParticles;
         RandomSource mRandom;
-        ShaderStorage mSSBO;
         f32 mParticleAccumulator;
         
         // Emission
@@ -206,6 +210,7 @@ namespace nsm {
 
         // Visuals
         std::unique_ptr<AnimatedTexture> mTexture;
+        bool mDepth;
         // glm::vec4 mColorMultiplier;
     };
 
