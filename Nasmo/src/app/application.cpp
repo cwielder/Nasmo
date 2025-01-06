@@ -18,6 +18,8 @@ nsm::Application::~Application() { }
 void nsm::Application::run() {
     this->intermoduleDataTransfer();
 
+    mDeltaTime.update();
+
     do { // Main loop
         const f64 ts = mDeltaTime.update();
 
