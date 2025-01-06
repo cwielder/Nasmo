@@ -6,6 +6,7 @@
 #include <nsm/entity/component/particlecomponent.h>
 #include <nsm/entity/component/inputcomponent.h>
 #include <nsm/entity/component/lightcomponent.h>
+#include <nsm/entity/scene.h>
 #include <nsm/util/jsonhelpers.h>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,17 +14,17 @@
 #include <imgui.h>
 
 namespace {
-    static void CreateExhaustParticle(nsm::ParticleComponent* ptcl) {
+    static void CreateB2ExhaustParticle(nsm::ParticleComponent* ptcl) {
         ptcl->getEmitter()
             .setEmitRadius(0.9f)
             .setEmitRate(980.0f)
-            .setLifeSpan(0.21f)
-            .setLifeSpanVariance(0.2f)
+            .setLifeSpan(0.151f)
+            .setLifeSpanVariance(0.15f)
             .setInitialVelocity(glm::vec3(-64.0f, 0.0f, 0.0f))
             .setAcceleration(glm::vec3(0.0f, 0.5f, 0.0f))
             .setStartSize(glm::vec3(1.0f))
             .setEndSize(glm::vec3(0.0f, 0.0f, 1.0f))
-            .setTexture("textures/exhaust.png")
+            .setTexture("textures/exhaust_b2.png")
             .setDepth(false)
         ;
     }
@@ -52,12 +53,12 @@ public:
         mExhaustParticleLeft = new nsm::ParticleComponent();
         mExhaustParticleLeft->setTargetLayer("forward");
         this->addComponent<nsm::DrawableComponent>(mExhaustParticleLeft);
-        CreateExhaustParticle(mExhaustParticleLeft);
+        CreateB2ExhaustParticle(mExhaustParticleLeft);
 
         mExhaustParticleRight = new nsm::ParticleComponent();
         mExhaustParticleRight->setTargetLayer("forward");
         this->addComponent<nsm::DrawableComponent>(mExhaustParticleRight);
-        CreateExhaustParticle(mExhaustParticleRight);
+        CreateB2ExhaustParticle(mExhaustParticleRight);
 
         mExhaustLightLeft = new nsm::PointLightComponent(mTransform->getPosition() + glm::vec3(-7.0f, -0.5f, -4.0f), glm::vec3(1.0f, 0.5f, 4.0f), 1.0f);
         mExhaustLightLeft->setTargetLayer("lighting_point");
@@ -80,6 +81,11 @@ public:
                 case GLFW_KEY_D:
                 case GLFW_KEY_RIGHT: {
                     mRightPressed = true;
+                    break;
+                }
+
+                case GLFW_KEY_SPACE: {
+                    this->spawnMissile();
                     break;
                 }
             }
@@ -137,7 +143,7 @@ public:
         }
 
         glm::vec3 position = mTransform->getPosition();
-        position += glm::vec3(0.0f, 0.0f, mVelocity);
+        position += glm::vec3(0.0f, 0.0f, mVelocity * 1000.0f * static_cast<f32>(timeStep));
 
         mTransform->setPosition(position);
 
@@ -149,10 +155,25 @@ public:
 
         glm::mat4 mtx = glm::mat4(1.0f);
         mtx = glm::translate(mtx, mTransform->getPosition());
-        mtx = glm::rotate(mtx, glm::radians(-mVelocity * 400.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+        mtx = glm::rotate(mtx, glm::radians(-mVelocity * 500.0f), glm::vec3(-1.0f, 1.0f, 0.0f));
         mtx = glm::scale(mtx, mTransform->getScale());
 
         mModel->setTransformAll(mtx);
+    }
+
+private:
+    void spawnMissile() {
+        nsm::info("Spawning missile");
+
+        f32 velocity = mVelocity;
+        glm::vec3 position = mTransform->getPosition();
+
+        const std::string properties = R"({
+            "position": [)" + std::to_string(position.x) + ", " + std::to_string(position.y - 4.0f) + ", " + std::to_string(position.z) + R"(],
+            "velocity": )" + std::to_string(velocity) + R"(
+        })";
+
+        mScene->spawnEntity("MissileEntity", properties);
     }
 
 private:

@@ -70,6 +70,7 @@ void nsm::Texture2D::initFromFile(const std::string& path, bool srgb, const Text
         stbi_set_flip_vertically_on_load(true);
         u8* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
         NSM_ASSERT(data != nullptr, "Failed to load texture from file: ", path);
+        nsm::trace("Loaded texture from file: ", path);
 
         sCache.emplace(path, std::make_tuple(data, glm::u32vec2(width, height), static_cast<u32>(channels)));
 
@@ -80,7 +81,6 @@ void nsm::Texture2D::initFromFile(const std::string& path, bool srgb, const Text
 
     this->initFromData(data, channels, size, srgb, enlargeFilter, shrinkFilter, wrapS, wrapT);
 
-    nsm::trace("Loaded texture from file: ", path);
 }
 
 void nsm::Texture2D::initFromMemory(const u8* data, const std::size_t length, bool srgb, const Texture::FilterMode enlargeFilter, const Texture::FilterMode shrinkFilter, const Texture::WrapMode wrapS, const Texture::WrapMode wrapT) {

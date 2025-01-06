@@ -30,7 +30,7 @@ public:
         NSM_ASSERT(mPlayerEntity != nullptr, "Player entity not found!");
 
         const glm::vec3 playerPosition = mPlayerEntity->getComponents<nsm::TransformComponent>()[0]->getPosition();
-        mTargetPosition = playerPosition + sOffset;
+        mTargetPosition = playerPosition + cOffset;
         const glm::vec3 initialPosition = playerPosition + glm::vec3(-328.0f, 128.0f, 0.0f);
 
         mTransform = new nsm::TransformComponent(initialPosition);
@@ -54,18 +54,12 @@ public:
 
     void onUpdate(const f64 timeStep) override {
         const glm::vec3 position = mPlayerEntity->getComponents<nsm::TransformComponent>()[0]->getPosition();
-        static f32 followSpeed = 2.0f;
 
-        if (ImGui::Begin("Camera")) {
-            ImGui::DragFloat3("Position", &sOffset.x, 0.1f);
-            ImGui::DragFloat("Follow Speed", &followSpeed, 0.01f, 0.0f, 1.0f);
-        } ImGui::End();
-
-        mTargetPosition = position + sOffset;
+        mTargetPosition = position + cOffset;
 
         glm::vec3 currentPosition = mTransform->getPosition();
         glm::vec3 displacement = mTargetPosition - currentPosition;
-        glm::vec3 smoothedStep = displacement * (1.0f - glm::exp(-followSpeed * static_cast<f32>(timeStep)));
+        glm::vec3 smoothedStep = displacement * (1.0f - glm::exp(-cFollowSpeed * static_cast<f32>(timeStep)));
 
         // Update the position
         currentPosition += smoothedStep;
@@ -76,7 +70,8 @@ public:
     }
 
 private:
-    static inline glm::vec3 sOffset = glm::vec3(-64.0f, 64.0f, 0.0f);
+    static constexpr glm::vec3 cOffset = glm::vec3(-54.0f, 64.0f, 0.0f);
+    static constexpr f32 cFollowSpeed = 2.0f;
 
 private:
     nsm::TransformComponent* mTransform;

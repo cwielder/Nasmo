@@ -57,7 +57,11 @@ namespace nsm {
 
 
     template <typename... Args>
-    void trace(Args... args) {
+    void trace(Args...
+        #ifndef NSM_DISABLE_LOG_TRACE
+        args
+        #endif
+    ) {
         #ifndef NSM_DISABLE_LOG_TRACE
             internal::timestamp(); std::cout << LogColor::Gray <<
             #ifdef NSM_INTERNAL
@@ -67,13 +71,15 @@ namespace nsm {
             #endif
             ; internal::print(args...);
             std::cout << LogColor::Reset << std::endl;
-        #else
-            (void)args;
         #endif
     }
 
     template <typename... Args>
-    void info(Args... args) {
+    void info(Args...
+        #ifndef NSM_DISABLE_LOG_INFO
+        args
+        #endif
+    ) {
         #ifndef NSM_DISABLE_LOG_INFO
             internal::timestamp(); std::cout <<
             #ifdef NSM_INTERNAL
@@ -83,14 +89,16 @@ namespace nsm {
             #endif
             ; internal::print(args...);
             std::cout << std::endl;
-        #else
-            (void)args;
         #endif
     }
 
 
     template <typename... Args>
-    void warn(Args... args) {
+    void warn(Args...
+        #ifndef NSM_DISABLE_LOG_WARN
+        args
+        #endif
+    ) {
         #ifndef NSM_DISABLE_LOG_WARN
             internal::timestamp(); std::cout << LogColor::Yellow <<
             #ifdef NSM_INTERNAL
@@ -100,13 +108,15 @@ namespace nsm {
             #endif
             ; internal::print(args...);
             std::cout << LogColor::Reset << std::endl;
-        #else
-            (void)args;
         #endif
     }
 
     template <typename... Args>
-    void error(Args... args) {
+    void error(Args... 
+        #ifndef NSM_DISABLE_LOG_ERROR
+        args
+        #endif
+    ) {
         #ifndef NSM_DISABLE_LOG_ERROR
             internal::timestamp(); std::cout << LogColor::Red <<
             #ifdef NSM_INTERNAL
@@ -116,8 +126,6 @@ namespace nsm {
             #endif
             ; internal::print(args...);
             std::cout << LogColor::Reset << std::endl;
-        #else
-            (void)args;
         #endif
     }
 
