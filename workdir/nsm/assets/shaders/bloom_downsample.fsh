@@ -65,8 +65,8 @@ void main() {
         groups[4] *= karisAvg(groups[4]);
         final = groups[0] + groups[1] + groups[2] + groups[3] + groups[4];
 
-        if (final.r < 1.1 && final.g < 1.1 && final.b < 1.1) {
-            final = vec3(0.0);
+        if (!(final.r > 1.0 || final.g > 1.0 || final.b > 1.0)) {
+            discard;
         }
     } else {
         final = e * 0.125;

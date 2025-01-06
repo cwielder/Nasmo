@@ -5,7 +5,7 @@ uniform float uExponent;
 
 in vec2 vTexCoords;
 
-out vec4 FragColor;
+out vec4 oFragColor;
 
 vec3 aces(vec3 v) {
     v *= 0.6f;
@@ -30,5 +30,5 @@ void main() {
     vec3 cc = aces(color.rgb); // Apply ACES tonemapping
     cc = pow(cc, vec3(1.0f / uExponent)); // Apply gamma correction
     
-    FragColor = vec4(cc, color.a);
+    oFragColor = vec4(cc, color.a);
 }

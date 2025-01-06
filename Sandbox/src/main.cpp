@@ -9,6 +9,7 @@
 #include <nsm/gfx/layer/skyboxlayer.h>
 #include <nsm/gfx/layer/forwardlayer.h>
 #include <nsm/gfx/layer/uilayer.h>
+#include <nsm/gfx/layer/fxaalayer.h>
 #include <nsm/entity/component/modelcomponent.h>
 #include <nsm/gfx/renderpipeline.h>
 #include <nsm/gfx/primitiveshape.h>
@@ -25,6 +26,7 @@ public:
         mLayerLightingDirectional = this->pushLayer<nsm::LightingLayer>("lighting_directional", nsm::LightingLayer::Type::Directional);
         mLayerLightingPoint = this->pushLayer<nsm::LightingLayer>("lighting_point", nsm::LightingLayer::Type::Point);
         mLayerForward = this->pushLayer<nsm::ForwardLayer>("forward");
+        mLayerFXAA = this->pushLayer<nsm::FXAALayer>("fxaa");
         mLayerBloom = this->pushLayer<nsm::BloomLayer>("bloom");
         mLayerTonemap = this->pushLayer<nsm::TonemapLayer>("cc");
         mLayerUI = this->pushLayer<nsm::UILayer>("ui");
@@ -94,8 +96,9 @@ public:
         mLayerForward->draw({ mLayerForward->getCamera(), accumulator });
 
         // Post-process pass
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT | GL_FRAMEBUFFER_BARRIER_BIT);
+        mLayerFXAA->draw({ nullptr, accumulator });
         mLayerBloom->draw({ nullptr, accumulator });
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         mLayerTonemap->draw({ nullptr, accumulator });
 
         // UI pass
@@ -136,6 +139,7 @@ public:
     nsm::BloomLayer* mLayerBloom;
     nsm::TonemapLayer* mLayerTonemap;
     nsm::ForwardLayer* mLayerForward;
+    nsm::FXAALayer* mLayerFXAA;
     nsm::UILayer* mLayerUI;
     nsm::ImGuiLayer* mLayerImGui;
 
