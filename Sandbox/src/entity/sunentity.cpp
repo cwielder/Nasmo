@@ -34,28 +34,6 @@ public:
         this->addComponent<nsm::DrawableComponent>(mSkyboxComponent);
     }
 
-    void onUpdate(const f64 timeStep) override {
-        static f32 colorR = 1.0f, colorG = 1.0f, colorB = 1.0f;
-        static f32 intensity = mIntensity;
-        static f32 yaw = 0.0f, pitch = -124.0f;
-
-        static f32 indicatorLength = 1.5f;
-
-        if (ImGui::Begin("Sun")) {
-            ImGui::SliderFloat("Yaw", &yaw, 0.0f, 180.0f);
-            ImGui::SliderFloat("Pitch", &pitch, 0.0f, 360.0f);
-            ImGui::SliderFloat("Color R", &colorR, 0.0f, 1.0f);
-            ImGui::SliderFloat("Color G", &colorG, 0.0f, 1.0f);
-            ImGui::SliderFloat("Color B", &colorB, 0.0f, 1.0f);
-            ImGui::DragFloat("Intensity", &intensity, 0.1f);
-            ImGui::DragFloat("Indicator Length", &indicatorLength, 0.1f);
-        } ImGui::End();
-
-        mLightComponent->setColor(glm::vec3(colorR, colorG, colorB));
-        mLightComponent->setIntensity(intensity);
-        mLightComponent->setDirection(yaw, pitch);
-    }
-
 private:
     f32 mIntensity, mYaw, mPitch;
     nsm::DirectionalLightComponent* mLightComponent;

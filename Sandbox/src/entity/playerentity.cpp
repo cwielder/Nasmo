@@ -5,6 +5,7 @@
 #include <nsm/entity/component/transformcomponent.h>
 #include <nsm/entity/component/particlecomponent.h>
 #include <nsm/entity/component/inputcomponent.h>
+#include <nsm/entity/component/lightcomponent.h>
 #include <nsm/util/jsonhelpers.h>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -16,13 +17,14 @@ namespace {
         ptcl->getEmitter()
             .setEmitRadius(0.9f)
             .setEmitRate(980.0f)
-            .setLifeSpan(0.4f)
-            .setLifeSpanVariance(0.05f)
+            .setLifeSpan(0.21f)
+            .setLifeSpanVariance(0.2f)
             .setInitialVelocity(glm::vec3(-64.0f, 0.0f, 0.0f))
             .setAcceleration(glm::vec3(0.0f, 0.5f, 0.0f))
             .setStartSize(glm::vec3(1.0f))
             .setEndSize(glm::vec3(0.0f, 0.0f, 1.0f))
             .setTexture("textures/exhaust.png")
+            .setDepth(false)
         ;
     }
 }
@@ -56,6 +58,14 @@ public:
         mExhaustParticleRight->setTargetLayer("forward");
         this->addComponent<nsm::DrawableComponent>(mExhaustParticleRight);
         CreateExhaustParticle(mExhaustParticleRight);
+
+        mExhaustLightLeft = new nsm::PointLightComponent(mTransform->getPosition() + glm::vec3(-7.0f, -0.5f, -4.0f), glm::vec3(1.0f, 0.5f, 4.0f), 1.0f);
+        mExhaustLightLeft->setTargetLayer("lighting_point");
+        this->addComponent<nsm::DrawableComponent>(mExhaustLightLeft);
+
+        mExhaustLightRight = new nsm::PointLightComponent(mTransform->getPosition() + glm::vec3(-7.0f, -0.5f, 4.0f), glm::vec3(1.0f, 0.5f, 4.0f), 1.0f);
+        mExhaustLightRight->setTargetLayer("lighting_point");
+        this->addComponent<nsm::DrawableComponent>(mExhaustLightRight);
 
         mInput = new nsm::InputComponent();
         this->addComponent<nsm::InputComponent>(mInput);
@@ -104,12 +114,12 @@ public:
 
         static constexpr f32 cMaxVelocity = 0.06f;
         static constexpr f32 cAcceleration = 0.25f;
-        static constexpr f32 cFriction = 0.1f;
+        static constexpr f32 cFriction = 0.2f;
 
         if (mLeftPressed) {
-            mAcceleration = cAcceleration;
-        } else if (mRightPressed) {
             mAcceleration = -cAcceleration;
+        } else if (mRightPressed) {
+            mAcceleration = cAcceleration;
         } else {
             mAcceleration = 0.0f;
         }
@@ -126,8 +136,6 @@ public:
             mVelocity = glm::min(mVelocity, 0.0f);
         }
 
-        nsm::info("Velocity: ", mVelocity);
-
         glm::vec3 position = mTransform->getPosition();
         position += glm::vec3(0.0f, 0.0f, mVelocity);
 
@@ -135,6 +143,9 @@ public:
 
         mExhaustParticleLeft->getEmitter().setPosition(position + glm::vec3(-7.0f, -0.5f, -4.0f));
         mExhaustParticleRight->getEmitter().setPosition(position + glm::vec3(-7.0f, -0.5f, 4.0f));
+
+        mExhaustLightLeft->setPosition(position + glm::vec3(-8.1f, -0.5f, -3.5f));
+        mExhaustLightRight->setPosition(position + glm::vec3(-8.1f, -0.5f, 5.5f));
 
         glm::mat4 mtx = glm::mat4(1.0f);
         mtx = glm::translate(mtx, mTransform->getPosition());
@@ -151,6 +162,8 @@ private:
     nsm::ParticleComponent* mExhaustParticleLeft;
     nsm::ParticleComponent* mExhaustParticleRight;
     nsm::InputComponent* mInput;
+    nsm::LightComponent* mExhaustLightLeft;
+    nsm::LightComponent* mExhaustLightRight;
 
     bool mLeftPressed = false, mRightPressed = false;
     f32 mAcceleration = 0.0f;
