@@ -57,33 +57,35 @@ public:
         this->addComponent<nsm::DrawableComponent>(mExhaustParticleRight);
         CreateExhaustParticle(mExhaustParticleRight);
 
-        static constexpr f32 cAcceleration = 0.25f;
-
         mInput = new nsm::InputComponent();
         this->addComponent<nsm::InputComponent>(mInput);
-        mInput->setOnKeyPress([&](const nsm::KeyPressEvent* event) {
+        mInput->setOnKeyPress([this](const nsm::KeyPressEvent* event) {
             switch (event->getKey()) {
                 case GLFW_KEY_A:
                 case GLFW_KEY_LEFT: {
-                    mAcceleration = -cAcceleration;
+                    mLeftPressed = true;
                     break;
                 }
 
                 case GLFW_KEY_D:
                 case GLFW_KEY_RIGHT: {
-                    mAcceleration = cAcceleration;
+                    mRightPressed = true;
                     break;
                 }
             }
         });
 
-        mInput->setOnKeyRelease([&](const nsm::KeyReleaseEvent* event) {
+        mInput->setOnKeyRelease([this](const nsm::KeyReleaseEvent* event) {
             switch (event->getKey()) {
                 case GLFW_KEY_A:
-                case GLFW_KEY_LEFT:
+                case GLFW_KEY_LEFT: {
+                    mLeftPressed = false;
+                    break;
+                }
+
                 case GLFW_KEY_D:
                 case GLFW_KEY_RIGHT: {
-                    mAcceleration = 0.0f;
+                    mRightPressed = false;
                     break;
                 }
             }
@@ -101,14 +103,21 @@ public:
         nsm::ParticleEmitter& emitter = mExhaustParticleLeft->getEmitter();
 
         static constexpr f32 cMaxVelocity = 0.06f;
+        static constexpr f32 cAcceleration = 0.25f;
+        static constexpr f32 cFriction = 0.1f;
 
-        if (mAcceleration != 0.0f) {
-            mVelocity += mAcceleration * timeStep;
-            mVelocity = glm::clamp(mVelocity, -cMaxVelocity, cMaxVelocity);
+        if (mLeftPressed) {
+            mAcceleration = cAcceleration;
+        } else if (mRightPressed) {
+            mAcceleration = -cAcceleration;
+        } else {
+            mAcceleration = 0.0f;
         }
 
+        mVelocity += mAcceleration * timeStep;
+        mVelocity = glm::clamp(mVelocity, -cMaxVelocity, cMaxVelocity);
+
         // Friction
-        static constexpr f32 cFriction = 0.1f;
         if (mVelocity > 0.0f) {
             mVelocity -= cFriction * timeStep;
             mVelocity = glm::max(mVelocity, 0.0f);
@@ -143,6 +152,7 @@ private:
     nsm::ParticleComponent* mExhaustParticleRight;
     nsm::InputComponent* mInput;
 
+    bool mLeftPressed = false, mRightPressed = false;
     f32 mAcceleration = 0.0f;
     f32 mVelocity = 0.0f;
 };
