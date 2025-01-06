@@ -23,3 +23,6 @@
 [submodule "Nasmo/vendor/poly2tri"]
 	path = Nasmo/vendor/poly2tri
 	url = https://github.com/jhasse/poly2tri.git
+[submodule "Nasmo/vendor/tracy"]
+	path = Nasmo/vendor/tracy
+	url = https://github.com/wolfpld/tracy.git

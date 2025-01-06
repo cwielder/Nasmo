@@ -18,6 +18,7 @@ project "Sandbox"
         "simdjson",
         "fastgltf",
         "poly2tri",
+        "tracy",
     }
 
     includedirs {
@@ -33,6 +34,7 @@ project "Sandbox"
         "../Nasmo/vendor/imgui",
         "../Nasmo/vendor/fastgltf/include",
         "../Nasmo/vendor/poly2tri",
+        "../Nasmo/vendor/tracy/public",
     }
 
     files {

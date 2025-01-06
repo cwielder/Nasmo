@@ -17,6 +17,7 @@ project "Nasmo"
         "simdjson",
         "fastgltf",
         "poly2tri",
+        "tracy",
     }
 
     includedirs {
@@ -30,6 +31,7 @@ project "Nasmo"
         "vendor/imgui",
         "vendor/fastgltf/include",
         "vendor/poly2tri",
+        "vendor/tracy/public",
     }
 
     libdirs {
@@ -100,4 +102,5 @@ group "Dependencies"
     include "vendor/support/simdjson"
     include "vendor/support/fastgltf"
     include "vendor/support/poly2tri"
+    include "vendor/support/tracy"
 group ""

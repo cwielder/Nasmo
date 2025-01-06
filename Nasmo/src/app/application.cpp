@@ -6,12 +6,16 @@
 #include <nsm/entity/component/cameracomponent.h>
 #include <nsm/gfx/layer/layer.h>
 
+#include <tracy/Tracy.hpp>
+
 std::deque<const nsm::Event*> nsm::Application::sEventQueue;
 
 nsm::Application::Application(const ApplicationInfo& info)
     : mGraphics(info.graphics)
     , mScene(info.initialScene)
-{ }
+{
+    TracyNoop;
+}
 
 nsm::Application::~Application() { }
 
