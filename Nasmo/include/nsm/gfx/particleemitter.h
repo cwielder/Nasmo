@@ -178,11 +178,13 @@ namespace nsm {
 
         void setVisual(std::shared_ptr<EmitterVisual> visual) { mVisual = visual; }
 
-        static constexpr u8 cGarbageCollectInterval = 4;
+    private:
+        void removeDeadParticles();
+        void emitParticles(const f64 timeStep);
+        void updateParticles(const f64 timeStep);
+        void uploadParticles();
 
     private:
-        u8 mGarbageCollectCounter = 0;
-
         // Packed vec3
         std::vector<f32> mParticlePositions;
         std::vector<f32> mParticleVelocities;

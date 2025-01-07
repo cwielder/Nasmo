@@ -63,8 +63,6 @@ void nsm::ParticleRenderer::render(const nsm::RenderInfo& renderInfo) {
             continue;
         }
 
-        nsm::trace("Particle count: ", particleCount);
-
         gpuParticles.clear();
         gpuParticles.reserve(particleCount);
         for (const auto& emitter : emitterVisual->emitters) {

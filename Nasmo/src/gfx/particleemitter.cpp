@@ -45,8 +45,13 @@ nsm::ParticleEmitter::~ParticleEmitter() {
 }
 
 void nsm::ParticleEmitter::update(const f64 timeStep) {
-    auto start = std::chrono::high_resolution_clock::now();
+    removeDeadParticles();
+    emitParticles(timeStep);
+    updateParticles(timeStep);
+    uploadParticles();
+}
 
+void nsm::ParticleEmitter::removeDeadParticles() {
     // Mark dead particles
     std::vector<std::size_t> deadIndices;
     deadIndices.reserve(mParticleLifeTimes.size());
@@ -92,12 +97,10 @@ void nsm::ParticleEmitter::update(const f64 timeStep) {
 
     remove_dead_single(mParticleLifeTimes);
     remove_dead_single(mParticleLifeSpans);
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-    nsm::trace("Particle garbage collection took ", duration.count(), " nanoseconds");
+}
 
+void nsm::ParticleEmitter::emitParticles(const f64 timeStep) {
     // Emit new particles
-
     f64 particlesToEmit = mEmitRate * timeStep + mParticleAccumulator;
 
     u32 numParticlesToEmit = static_cast<u32>(particlesToEmit);
@@ -110,8 +113,6 @@ void nsm::ParticleEmitter::update(const f64 timeStep) {
         numParticlesToEmit = mParticleLimit - static_cast<u32>(mParticlePositions.size());
         mParticleAccumulator = 0.0f;
     }
-
-    start = std::chrono::high_resolution_clock::now();
 
     std::vector<f32> newParticleVectors(numParticlesToEmit * 3);
     for (std::size_t i = 0; i < numParticlesToEmit; i++) {
@@ -160,14 +161,10 @@ void nsm::ParticleEmitter::update(const f64 timeStep) {
         lifeSpan = glm::max(mLifeSpan + mRandom.getF32(-mLifeSpanVariance, mLifeSpanVariance), std::numeric_limits<f32>::epsilon());
     }
     mParticleLifeSpans.insert(mParticleLifeSpans.end(), newParticleFloats.begin(), newParticleFloats.end());
+}
 
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-    nsm::trace("Particle emission took ", duration.count(), " nanoseconds");
-
+void nsm::ParticleEmitter::updateParticles(const f64 timeStep) {
     // Update existing particles
-    start = std::chrono::high_resolution_clock::now();
-
     const __m256 timeStepVec = _mm256_set1_ps(static_cast<f32>(timeStep));
 
     // update velocities
@@ -231,11 +228,9 @@ void nsm::ParticleEmitter::update(const f64 timeStep) {
         mParticleLifeTimes[i] += static_cast<f32>(timeStep) / mParticleLifeSpans[i];
     }
     #endif
+}
 
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-    nsm::trace("Particle update took ", duration.count(), " nanoseconds");
-
+void nsm::ParticleEmitter::uploadParticles() {
     mGPUParticles.resize(mParticleLifeTimes.size());
     
     glm::vec3 offset = glm::vec3(0.0f);
@@ -244,7 +239,6 @@ void nsm::ParticleEmitter::update(const f64 timeStep) {
         offset += mPosition;
     }
 
-    start = std::chrono::high_resolution_clock::now();
 
     std::size_t index = 0;
     for (std::size_t i = 0; i < mParticleLifeTimes.size(); i++) {
@@ -264,8 +258,4 @@ void nsm::ParticleEmitter::update(const f64 timeStep) {
 
         index++;
     }
-
-    end = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-    nsm::trace("Particle GPU update took ", duration.count(), " nanoseconds");
 }
