@@ -115,14 +115,6 @@ public:
     }
 
     void onUpdate(const f64 timeStep) override {
-        // spawn a missile every 0.1 seconds
-        static f64 time = 0.0f;
-        time += timeStep;
-        if (time >= 0.01f) {
-            time = 0.0f;
-            this->spawnMissile();
-        }
-
         nsm::ParticleEmitter& emitter = mExhaustParticleLeft->getEmitter();
 
         static constexpr f32 cMaxVelocity = 0.06f;
@@ -154,9 +146,6 @@ public:
 
         mTransform->setPosition(position);
 
-        mExhaustParticleLeft->getEmitter().setPosition(position + glm::vec3(-7.0f, -0.5f, -4.0f));
-        mExhaustParticleRight->getEmitter().setPosition(position + glm::vec3(-7.0f, -0.5f, 4.0f));
-
         mExhaustLightLeft->setPosition(position + glm::vec3(-8.1f, -0.5f, -3.5f));
         mExhaustLightRight->setPosition(position + glm::vec3(-8.1f, -0.5f, 5.5f));
 
@@ -166,6 +155,14 @@ public:
         mtx = glm::scale(mtx, mTransform->getScale());
 
         mModel->setTransformAll(mtx);
+
+        static constexpr glm::vec4 cExhaustOffset(-72.0f, 0.0f, -38.4f, 1.0f);
+
+        glm::vec4 leftExhaustPos = mtx * cExhaustOffset;
+        glm::vec4 rightExhaustPos = mtx * glm::vec4(cExhaustOffset.x, cExhaustOffset.y, -cExhaustOffset.z, cExhaustOffset.w);
+
+        mExhaustParticleLeft->getEmitter().setPosition(glm::vec3(leftExhaustPos));
+        mExhaustParticleRight->getEmitter().setPosition(glm::vec3(rightExhaustPos));
     }
 
 private:
