@@ -178,22 +178,23 @@ namespace nsm {
 
         void setVisual(std::shared_ptr<EmitterVisual> visual) { mVisual = visual; }
 
-    private:
-        struct Particle {
-            union {
-                glm::vec3 position;
-                glm::vec3 offset;
-            };
-            glm::vec3 velocity;
-            glm::vec3 acceleration;
-            glm::vec3 startSize;
-            glm::vec3 endSize;
-            f32 lifeTime;
-            f32 lifeSpan;
-            glm::vec3 size;
-        };
+        static constexpr u8 cGarbageCollectInterval = 4;
 
-        std::vector<Particle> mParticles;
+    private:
+        u8 mGarbageCollectCounter = 0;
+
+        // Packed vec3
+        std::vector<f32> mParticlePositions;
+        std::vector<f32> mParticleVelocities;
+        std::vector<f32> mParticleAccelerations;
+        std::vector<f32> mParticleStartSizes;
+        std::vector<f32> mParticleEndSizes;
+        std::vector<f32> mParticleSizes;
+
+        // True float
+        std::vector<f32> mParticleLifeTimes;
+        std::vector<f32> mParticleLifeSpans;
+
         std::vector<ParticleRenderer::GPUParticle> mGPUParticles;
         RandomSource mRandom;
         f32 mParticleAccumulator;
