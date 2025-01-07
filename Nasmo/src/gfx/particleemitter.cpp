@@ -27,6 +27,7 @@ nsm::ParticleEmitter::ParticleEmitter()
     , mLocalSpace(false)
     , mParticleLimit(1000)
     , mTexture(nullptr)
+    , mEmission(0.0f)
     , mDepth(true)
 {
     if (sShader == nullptr) {
@@ -130,6 +131,7 @@ void nsm::ParticleEmitter::render(const RenderInfo& renderInfo) {
     sShader->bind();
     sShader->setMat4(0, renderInfo.camera->getViewProjection());
     sShader->setInt(4, mTexture->getFrames());
+    sShader->setFloat(6, mEmission);
 
     mTexture->bind(0);
 

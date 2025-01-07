@@ -26,7 +26,7 @@ nsm::BloomLayer::BloomLayer(const std::string& name)
 }
 
 void nsm::BloomLayer::draw(const nsm::RenderInfo& renderInfo) {
-    Viewport viewport(*renderInfo.framebuffer->getTextureBuffer(0));
+    Viewport viewport(*renderInfo.framebuffer->getTextureBuffer(1));
   
     this->downsample(renderInfo, viewport);
     this->upsample(renderInfo, viewport);
@@ -42,7 +42,7 @@ void nsm::BloomLayer::downsample(const nsm::RenderInfo& renderInfo, nsm::Viewpor
     ;
 
     mShaderDownsample.bind();
-    for (u32 i = 0; i < cPasses; ++i) {
+    for (u32 i = 0; i < cPasses; i++) {
         mFramebuffers[i].clear(glm::f32vec4(0.0f), Framebuffer::Type::Color);
         viewport.resize(mFramebuffers[i].getTextureBuffer(0)->getSize());
         viewport.apply();
@@ -50,8 +50,8 @@ void nsm::BloomLayer::downsample(const nsm::RenderInfo& renderInfo, nsm::Viewpor
         mShaderDownsample.setOptionalInt("uPass", i);
 
         if (i == 0) {
-            renderInfo.framebuffer->getTextureBuffer(0)->bind(0);
-            mShaderDownsample.setOptionalVec2("uInvResolution", glm::vec2(1.0) / glm::vec2(renderInfo.framebuffer->getTextureBuffer(0)->getSize()));
+            renderInfo.framebuffer->getTextureBuffer(1)->bind(0);
+            mShaderDownsample.setOptionalVec2("uInvResolution", glm::vec2(1.0) / glm::vec2(renderInfo.framebuffer->getTextureBuffer(1)->getSize()));
         } else {
             mFramebuffers[i - 1].getTextureBuffer(0)->bind(0);
             mShaderDownsample.setOptionalVec2("uInvResolution", glm::vec2(1.0) / glm::vec2(mFramebuffers[i - 1].getTextureBuffer(0)->getSize()));

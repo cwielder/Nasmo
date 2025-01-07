@@ -16,6 +16,9 @@ namespace nsm {
         BloomLayer(const std::string& name);
         ~BloomLayer() override = default;
 
+        /**
+         * @note Expects the thresholded image in the second (index 1) texture buffer of the framebuffer.
+         */
         void draw(const RenderInfo& renderInfo);
         
         void resize(const glm::u32vec2& size) override;

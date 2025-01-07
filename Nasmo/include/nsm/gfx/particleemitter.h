@@ -165,6 +165,11 @@ namespace nsm {
             return *this;
         }
 
+        ParticleEmitter& setEmission(const f32 emission) {
+            mEmission = emission;
+            return *this;
+        }
+
         void update(const f64 timeStep);
         void render(const RenderInfo& renderInfo);
 
@@ -210,6 +215,7 @@ namespace nsm {
 
         // Visuals
         std::unique_ptr<AnimatedTexture> mTexture;
+        f32 mEmission;
         bool mDepth;
         // glm::vec4 mColorMultiplier;
     };

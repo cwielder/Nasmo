@@ -2,12 +2,13 @@
 
 in vec2 vTexCoords;
 
-out vec4 oFragColor;
+layout (location = 0) out vec4 oFragColor;
+layout (location = 1) out vec4 oFragEmission;
 
-layout (location = 0) uniform mat4 uViewProjMtx;
 layout (location = 2) uniform float uLifeTime;
 layout (location = 3, binding = 0) uniform sampler2D uTexture;
 layout (location = 4) uniform int uFrameCount;
+layout (location = 6) uniform float uEmission;
 
 void main() {
     vec2 uv = vTexCoords;
@@ -23,4 +24,5 @@ void main() {
     }
 
     oFragColor = color;
+    oFragEmission = color * uEmission;
 }
