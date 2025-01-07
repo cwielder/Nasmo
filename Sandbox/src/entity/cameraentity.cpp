@@ -31,7 +31,7 @@ public:
 
         const glm::vec3 playerPosition = mPlayerEntity->getComponents<nsm::TransformComponent>()[0]->getPosition();
         mTargetPosition = playerPosition + cOffset;
-        const glm::vec3 initialPosition = playerPosition + glm::vec3(-328.0f, 128.0f, 0.0f);
+        const glm::vec3 initialPosition = playerPosition + glm::vec3(-228.0f, 88.0f, 0.0f);
 
         mTransform = new nsm::TransformComponent(initialPosition);
         this->addComponent<nsm::TransformComponent>(mTransform);
@@ -53,9 +53,9 @@ public:
     }
 
     void onUpdate(const f64 timeStep) override {
-        const glm::vec3 position = mPlayerEntity->getComponents<nsm::TransformComponent>()[0]->getPosition();
+        const glm::vec3 playerPosition = mPlayerEntity->getComponents<nsm::TransformComponent>()[0]->getPosition();
 
-        mTargetPosition = position + cOffset;
+        mTargetPosition = playerPosition + cOffset;
 
         glm::vec3 currentPosition = mTransform->getPosition();
         glm::vec3 displacement = mTargetPosition - currentPosition;
@@ -66,12 +66,12 @@ public:
 
         mTransform->setPosition(currentPosition);
 
-        mCamera->setView(mTransform->getPosition(), (mTransform->getPosition()) + glm::vec3(1.0f, -glm::sin(glm::radians(45.0f)), 0.0f));
+        mCamera->setView(mTransform->getPosition(), playerPosition + glm::vec3(24.0f, 0.0f, 0.0f));
     }
 
 private:
     static constexpr glm::vec3 cOffset = glm::vec3(-54.0f, 64.0f, 0.0f);
-    static constexpr f32 cFollowSpeed = 2.0f;
+    static constexpr f32 cFollowSpeed = 1.0f;
 
 private:
     nsm::TransformComponent* mTransform;
