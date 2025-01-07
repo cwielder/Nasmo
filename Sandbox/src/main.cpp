@@ -10,7 +10,6 @@
 #include <nsm/gfx/layer/forwardlayer.h>
 #include <nsm/gfx/layer/uilayer.h>
 #include <nsm/gfx/layer/fxaalayer.h>
-#include <nsm/gfx/layer/particlelayer.h>
 #include <nsm/entity/component/modelcomponent.h>
 #include <nsm/gfx/renderpipeline.h>
 #include <nsm/gfx/primitiveshape.h>
@@ -26,7 +25,6 @@ public:
         mLayerMain = this->pushLayer<nsm::ModelLayer>("main");
         mLayerLightingDirectional = this->pushLayer<nsm::LightingLayer>("lighting_directional", nsm::LightingLayer::Type::Directional);
         mLayerLightingPoint = this->pushLayer<nsm::LightingLayer>("lighting_point", nsm::LightingLayer::Type::Point);
-        mLayerParticles = this->pushLayer<nsm::ParticleLayer>("particles");
         mLayerForward = this->pushLayer<nsm::ForwardLayer>("forward");
         mLayerFXAA = this->pushLayer<nsm::FXAALayer>("fxaa");
         mLayerBloom = this->pushLayer<nsm::BloomLayer>("bloom");
@@ -94,8 +92,7 @@ public:
         nsm::PrimitiveShape::getQuadVAO().bind();
         nsm::PrimitiveShape::getQuadIBO().draw();
 
-        // Forward pass
-        mLayerParticles->draw({ mLayerMain->getCamera(), accumulator });
+        // Debug pass
         mLayerForward->draw({ mLayerForward->getCamera(), accumulator });
 
         // Post-process pass
@@ -142,7 +139,6 @@ public:
     nsm::BloomLayer* mLayerBloom;
     nsm::TonemapLayer* mLayerTonemap;
     nsm::ForwardLayer* mLayerForward;
-    nsm::ParticleLayer* mLayerParticles;
     nsm::FXAALayer* mLayerFXAA;
     nsm::UILayer* mLayerUI;
     nsm::ImGuiLayer* mLayerImGui;

@@ -24,7 +24,8 @@ namespace {
             .setAcceleration(glm::vec3(0.0f, 0.5f, 0.0f))
             .setStartSize(glm::vec3(1.0f))
             .setEndSize(glm::vec3(0.0f, 0.0f, 1.0f))
-            .setVisual("textures/exhaust_b2.png", false)
+            .setTexture("textures/exhaust_b2.png")
+            .setDepth(false)
         ;
     }
 }
@@ -50,12 +51,12 @@ public:
         this->addComponent<nsm::DrawableComponent>(mModel);
 
         mExhaustParticleLeft = new nsm::ParticleComponent();
-        mExhaustParticleLeft->setTargetLayer("particles");
+        mExhaustParticleLeft->setTargetLayer("forward");
         this->addComponent<nsm::DrawableComponent>(mExhaustParticleLeft);
         CreateB2ExhaustParticle(mExhaustParticleLeft);
 
         mExhaustParticleRight = new nsm::ParticleComponent();
-        mExhaustParticleRight->setTargetLayer("particles");
+        mExhaustParticleRight->setTargetLayer("forward");
         this->addComponent<nsm::DrawableComponent>(mExhaustParticleRight);
         CreateB2ExhaustParticle(mExhaustParticleRight);
 
@@ -115,6 +116,15 @@ public:
     }
 
     void onUpdate(const f64 timeStep) override {
+        static f64 time = 0.0f;
+        // spawn a missile ever 0.1 seconds
+        time += timeStep;
+        if (time >= 0.1f) {
+            time = 0.010f;
+            this->spawnMissile();
+            this->spawnMissile();
+        }
+
         nsm::ParticleEmitter& emitter = mExhaustParticleLeft->getEmitter();
 
         static constexpr f32 cMaxVelocity = 0.06f;

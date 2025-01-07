@@ -20,7 +20,8 @@ namespace {
             .setAcceleration(glm::vec3(0.0f, 0.5f, 0.0f))
             .setStartSize(glm::vec3(1.0f))
             .setEndSize(glm::vec3(0.0f, 0.0f, 1.0f))
-            .setVisual("textures/exhaust_missile.png", false)
+            .setTexture("textures/exhaust_missile.png")
+            .setDepth(true)
         ;
     }
 }
@@ -39,15 +40,15 @@ public:
 
         mInertia = nsm::JsonHelpers::getFloat(properties, "velocity");
         mAcceleration = glm::vec3(12.0f, -9.81f, 0.0f);
-        mVelocity = glm::vec3(10.0f, 0.0f, mInertia * 50.0f);
+        mVelocity = glm::vec3(10.0f, 0.0f, mInertia * 100.0f);
 
         mTransform = new nsm::TransformComponent();
         mTransform->setPosition(nsm::JsonHelpers::getVec3(properties, "position"));
-        mTransform->setScale(glm::vec3(5.0f));
+        mTransform->setScale(glm::vec3(10.0f));
         this->addComponent<nsm::TransformComponent>(mTransform);
 
         mExhaustParticle = new nsm::ParticleComponent();
-        mExhaustParticle->setTargetLayer("particles");
+        mExhaustParticle->setTargetLayer("forward");
         this->addComponent<nsm::DrawableComponent>(mExhaustParticle);
         CreateMissileExhaustParticle(mExhaustParticle);
 
