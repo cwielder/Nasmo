@@ -126,8 +126,8 @@ public:
         nsm::ParticleEmitter& emitter = mExhaustParticleLeft->getEmitter();
 
         static constexpr f32 cMaxVelocity = 0.06f;
-        static constexpr f32 cAcceleration = 0.25f;
-        static constexpr f32 cFriction = 0.2f;
+        static constexpr f32 cAcceleration = 0.2f;
+        static constexpr f32 cFriction = 0.1f;
 
         if (mLeftPressed) {
             mAcceleration = -cAcceleration;
