@@ -5,7 +5,6 @@
 #include <nsm/entity/component/transformcomponent.h>
 #include <nsm/entity/component/particlecomponent.h>
 #include <nsm/entity/component/inputcomponent.h>
-#include <nsm/entity/component/lightcomponent.h>
 #include <nsm/entity/scene.h>
 #include <nsm/util/jsonhelpers.h>
 
@@ -60,14 +59,6 @@ public:
         this->addComponent<nsm::DrawableComponent>(mExhaustParticleRight);
         CreateB2ExhaustParticle(mExhaustParticleRight);
 
-        mExhaustLightLeft = new nsm::PointLightComponent(mTransform->getPosition() + glm::vec3(-7.0f, -0.5f, -4.0f), glm::vec3(1.0f, 0.5f, 4.0f), 1.0f);
-        mExhaustLightLeft->setTargetLayer("lighting_point");
-        this->addComponent<nsm::DrawableComponent>(mExhaustLightLeft);
-
-        mExhaustLightRight = new nsm::PointLightComponent(mTransform->getPosition() + glm::vec3(-7.0f, -0.5f, 4.0f), glm::vec3(1.0f, 0.5f, 4.0f), 1.0f);
-        mExhaustLightRight->setTargetLayer("lighting_point");
-        this->addComponent<nsm::DrawableComponent>(mExhaustLightRight);
-
         mInput = new nsm::InputComponent();
         this->addComponent<nsm::InputComponent>(mInput);
         mInput->setOnKeyPress([this](const nsm::KeyPressEvent* event) {
@@ -116,15 +107,6 @@ public:
     }
 
     void onUpdate(const f64 timeStep) override {
-        static f64 time = 0.0f;
-        // spawn a missile ever 0.1 seconds
-        time += timeStep;
-        if (time >= 0.1f) {
-            time = 0.010f;
-            this->spawnMissile();
-            this->spawnMissile();
-        }
-
         nsm::ParticleEmitter& emitter = mExhaustParticleLeft->getEmitter();
 
         static constexpr f32 cMaxVelocity = 0.06f;
@@ -155,9 +137,6 @@ public:
         position += glm::vec3(0.0f, 0.0f, mVelocity * 1000.0f * static_cast<f32>(timeStep));
 
         mTransform->setPosition(position);
-
-        mExhaustLightLeft->setPosition(position + glm::vec3(-8.1f, -0.5f, -3.5f));
-        mExhaustLightRight->setPosition(position + glm::vec3(-8.1f, -0.5f, 5.5f));
 
         glm::mat4 mtx = glm::mat4(1.0f);
         mtx = glm::translate(mtx, mTransform->getPosition());
@@ -202,8 +181,6 @@ private:
     nsm::ParticleComponent* mExhaustParticleLeft;
     nsm::ParticleComponent* mExhaustParticleRight;
     nsm::InputComponent* mInput;
-    nsm::LightComponent* mExhaustLightLeft;
-    nsm::LightComponent* mExhaustLightRight;
 
     bool mLeftPressed = false, mRightPressed = false;
     f32 mAcceleration = 0.0f;

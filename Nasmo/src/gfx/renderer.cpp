@@ -4,7 +4,7 @@
 #include <nsm/gfx/primitiveshape.h>
 #include <nsm/entity/component/drawablecomponent.h>
 #include <nsm/entity/component/cameracomponent.h>
-#include <nsm/gfx/renderpipeline.h>
+#include <nsm/gfx/pipeline/renderpipeline.h>
 
 nsm::Renderer::Renderer(const glm::u32vec2& size)
     : mPipeline(nullptr)

@@ -1,4 +1,4 @@
-#include <nsm/gfx/renderpipeline.h>
+#include <nsm/gfx/pipeline/renderpipeline.h>
 
 #include <nsm/gfx/layer/layer.h>
 #include <nsm/debug/assert.h>
