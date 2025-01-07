@@ -24,8 +24,7 @@ namespace {
             .setAcceleration(glm::vec3(0.0f, 0.5f, 0.0f))
             .setStartSize(glm::vec3(1.0f))
             .setEndSize(glm::vec3(0.0f, 0.0f, 1.0f))
-            .setTexture("textures/exhaust_b2.png")
-            .setDepth(false)
+            .setVisual("textures/exhaust_b2.png", false)
         ;
     }
 }
@@ -51,12 +50,12 @@ public:
         this->addComponent<nsm::DrawableComponent>(mModel);
 
         mExhaustParticleLeft = new nsm::ParticleComponent();
-        mExhaustParticleLeft->setTargetLayer("forward");
+        mExhaustParticleLeft->setTargetLayer("particles");
         this->addComponent<nsm::DrawableComponent>(mExhaustParticleLeft);
         CreateB2ExhaustParticle(mExhaustParticleLeft);
 
         mExhaustParticleRight = new nsm::ParticleComponent();
-        mExhaustParticleRight->setTargetLayer("forward");
+        mExhaustParticleRight->setTargetLayer("particles");
         this->addComponent<nsm::DrawableComponent>(mExhaustParticleRight);
         CreateB2ExhaustParticle(mExhaustParticleRight);
 
@@ -116,6 +115,14 @@ public:
     }
 
     void onUpdate(const f64 timeStep) override {
+        // spawn a missile every 0.1 seconds
+        static f64 time = 0.0f;
+        time += timeStep;
+        if (time >= 0.01f) {
+            time = 0.0f;
+            this->spawnMissile();
+        }
+
         nsm::ParticleEmitter& emitter = mExhaustParticleLeft->getEmitter();
 
         static constexpr f32 cMaxVelocity = 0.06f;
@@ -163,13 +170,18 @@ public:
 
 private:
     void spawnMissile() {
-        nsm::info("Spawning missile");
-
         f32 velocity = mVelocity;
         glm::vec3 position = mTransform->getPosition();
 
-        const std::string properties = R"({
-            "position": [)" + std::to_string(position.x) + ", " + std::to_string(position.y - 4.0f) + ", " + std::to_string(position.z) + R"(],
+        std::string properties = R"({
+            "position": [)" + std::to_string(position.x + 12.0f) + ", " + std::to_string(position.y - 4.0f) + ", " + std::to_string(position.z - 4.0f) + R"(],
+            "velocity": )" + std::to_string(velocity) + R"(
+        })";
+
+        mScene->spawnEntity("MissileEntity", properties);
+
+        properties = R"({
+            "position": [)" + std::to_string(position.x + 12.0f) + ", " + std::to_string(position.y - 4.0f) + ", " + std::to_string(position.z + 4.0f) + R"(],
             "velocity": )" + std::to_string(velocity) + R"(
         })";
 

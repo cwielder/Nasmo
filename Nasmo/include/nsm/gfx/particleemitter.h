@@ -2,9 +2,7 @@
 
 #include <nsm/common.h>
 #include <nsm/util/randomsource.h>
-#include <nsm/gfx/shader.h>
-#include <nsm/gfx/shaderstorage.h>
-#include <nsm/gfx/animatedtexture.h>
+#include <nsm/gfx/particlerenderer.h>
 
 #include <glm/glm.hpp>
 
@@ -14,11 +12,12 @@
 namespace nsm {
 
     struct RenderInfo;
+    class EmitterVisual;
 
     class ParticleEmitter {
     public:
         ParticleEmitter();
-        ~ParticleEmitter() = default;
+        ~ParticleEmitter();
 
         ParticleEmitter& setPosition(const glm::vec3& position) {
             mPosition = position;
@@ -155,22 +154,31 @@ namespace nsm {
             return *this;
         }
 
-        ParticleEmitter& setTexture(const std::string& path) {
-            mTexture = std::make_unique<AnimatedTexture>(path);
-            return *this;
-        }
-
-        ParticleEmitter& setDepth(const bool depth) {
+        ParticleEmitter& setVisual(const std::string& textureAtlasPath, const bool depth) {
+            mTextureAtlasPath = textureAtlasPath;
             mDepth = depth;
             return *this;
         }
 
+        const std::string& getTextureAtlasPath() const {
+            return mTextureAtlasPath;
+        }
+
+        bool getDepth() const {
+            return mDepth;
+        }
+
         void update(const f64 timeStep);
-        void render(const RenderInfo& renderInfo);
+        
+        [[nodiscard]] bool hasVisual() const { return mVisual != nullptr; }
+        [[nodiscard]] const std::vector<ParticleRenderer::GPUParticle>& getGPUParticles() const { return mGPUParticles; }
 
     private:
-        static inline ShaderProgram* sShader = nullptr;
+        friend class ParticleLayer;
 
+        void setVisual(std::shared_ptr<EmitterVisual> visual) { mVisual = visual; }
+
+    private:
         struct Particle {
             union {
                 glm::vec3 position;
@@ -186,6 +194,7 @@ namespace nsm {
         };
 
         std::vector<Particle> mParticles;
+        std::vector<ParticleRenderer::GPUParticle> mGPUParticles;
         RandomSource mRandom;
         f32 mParticleAccumulator;
         
@@ -209,9 +218,9 @@ namespace nsm {
         glm::vec3 mEndSizeVariance;
 
         // Visuals
-        std::unique_ptr<AnimatedTexture> mTexture;
+        std::string mTextureAtlasPath;
         bool mDepth;
-        // glm::vec4 mColorMultiplier;
+        std::shared_ptr<nsm::EmitterVisual> mVisual;
     };
 
 }

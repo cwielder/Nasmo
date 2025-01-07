@@ -20,8 +20,7 @@ namespace {
             .setAcceleration(glm::vec3(0.0f, 0.5f, 0.0f))
             .setStartSize(glm::vec3(1.0f))
             .setEndSize(glm::vec3(0.0f, 0.0f, 1.0f))
-            .setTexture("textures/exhaust_missile.png")
-            .setDepth(true)
+            .setVisual("textures/exhaust_missile.png", false)
         ;
     }
 }
@@ -36,17 +35,19 @@ public:
     ~MissileEntity() override = default;
 
     void onCreate(nsm::Entity::Properties& properties) override {
+        mLifeTime = 5.0f;
+
         mInertia = nsm::JsonHelpers::getFloat(properties, "velocity");
         mAcceleration = glm::vec3(12.0f, -9.81f, 0.0f);
-        mVelocity = glm::vec3(10.0f, 0.0f, mInertia * 100.0f);
+        mVelocity = glm::vec3(10.0f, 0.0f, mInertia * 50.0f);
 
         mTransform = new nsm::TransformComponent();
         mTransform->setPosition(nsm::JsonHelpers::getVec3(properties, "position"));
-        mTransform->setScale(glm::vec3(10.0f));
+        mTransform->setScale(glm::vec3(5.0f));
         this->addComponent<nsm::TransformComponent>(mTransform);
 
         mExhaustParticle = new nsm::ParticleComponent();
-        mExhaustParticle->setTargetLayer("forward");
+        mExhaustParticle->setTargetLayer("particles");
         this->addComponent<nsm::DrawableComponent>(mExhaustParticle);
         CreateMissileExhaustParticle(mExhaustParticle);
 
@@ -62,6 +63,12 @@ public:
     }
 
     void onUpdate(const f64 timeStep) override {
+        mLifeTime -= static_cast<f32>(timeStep);
+        if (mLifeTime <= 0.0f) {
+            this->setAlive(false);
+            return;
+        }
+
         mVelocity += mAcceleration * glm::vec3(timeStep);
         mVelocity = glm::clamp(mVelocity, -100.0f, 100.0f);
 
@@ -87,6 +94,8 @@ private:
     f32 mInertia;
     glm::vec3 mAcceleration;
     glm::vec3 mVelocity;
+
+    f32 mLifeTime;
 };
 
 NSM_REGISTER_ENTITY(MissileEntity);
