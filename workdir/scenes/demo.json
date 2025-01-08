@@ -16,9 +16,9 @@
         {
             "type": "SunEntity",
             "properties": {
-                "intensity": 2.3,
-                "yaw": 73.602,
-                "pitch": 296.471
+                "intensity": 5.0,
+                "yaw": 338.602,
+                "pitch": 1714.471
             }
         }
     ]
