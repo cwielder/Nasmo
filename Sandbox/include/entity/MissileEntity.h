@@ -19,7 +19,7 @@ private:
     nsm::ModelComponent* mModel;
     nsm::ParticleComponent* mExhaustParticle;
 
-    f32 mInertia;
+    f32 mDirection;
     glm::vec3 mAcceleration;
     glm::vec3 mVelocity;
 

@@ -5,7 +5,6 @@
 #include <nsm/util/JsonHelpers.h>
 #include <nsm/entity/Scene.h>
 
-
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <imgui.h>
@@ -19,7 +18,7 @@ namespace {
             .setLifeSpanVariance(0.15f)
             .setInitialVelocity(glm::vec3(-64.0f, 0.0f, 0.0f))
             .setAcceleration(glm::vec3(0.0f, 0.5f, 0.0f))
-            .setStartSize(glm::vec3(1.0f))
+            .setStartSize(glm::vec3(0.8f))
             .setEndSize(glm::vec3(0.1f, 0.1f, 1.0f))
             .setTexture("textures/exhaust_b2.png")
             .setEmission(0.75f)
@@ -31,14 +30,12 @@ namespace {
 PlayerEntity::PlayerEntity(nsm::Entity::Properties& properties)
     : mTransform(nullptr)
     , mModel(nullptr)
-    , mStartPosition(nsm::JsonHelpers::getVec3(properties, "position"))
-    , mStartScale(nsm::JsonHelpers::getVec3(properties, "scale"))
 { }
 
 void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
     mTransform = new nsm::TransformComponent();
-    mTransform->setPosition(mStartPosition);
-    mTransform->setScale(mStartScale);
+    mTransform->setPosition(nsm::JsonHelpers::getVec3(properties, "position"));
+    mTransform->setScale(nsm::JsonHelpers::getVec3(properties, "scale"));
     this->addComponent<nsm::TransformComponent>(mTransform);
 
     mModel = new nsm::ModelComponent("models/B2.glb", "main");
@@ -53,6 +50,10 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
     mExhaustParticleRight->setTargetLayer("forward");
     this->addComponent<nsm::DrawableComponent>(mExhaustParticleRight);
     CreateB2ExhaustParticle(mExhaustParticleRight);
+
+    mAudio = new nsm::AudioComponent({"BGM_FREEZEFLAME"}, mTransform);
+    this->addComponent<nsm::AudioComponent>(mAudio);
+    mAudio->startSound("BGM_FREEZEFLAME", &mShootSoundHandle);
 
     mInput = new nsm::InputComponent();
     this->addComponent<nsm::InputComponent>(mInput);
@@ -113,8 +114,14 @@ void PlayerEntity::onUpdate(const f64 timeStep) {
     } else if (mRightPressed) {
         mAcceleration = cAcceleration;
     } else {
-            mAcceleration = 0.0f;
+        mAcceleration = 0.0f;
     }
+
+    if (ImGui::Begin("Player")) {
+        if (mShootSoundHandle) {
+            ImGui::Text("PlayPosition: %f", mShootSoundHandle->getPlayPosition());
+        }
+    } ImGui::End();
 
     mVelocity += mAcceleration * timeStep;
     mVelocity = glm::clamp(mVelocity, -cMaxVelocity, cMaxVelocity);
@@ -152,19 +159,30 @@ void PlayerEntity::onUpdate(const f64 timeStep) {
 void PlayerEntity::spawnMissile() {
     mCameraShootCallback();
 
-    f32 velocity = mVelocity;
-    glm::vec3 position = mTransform->getPosition();
+    f32 direction = glm::radians(-mVelocity * 500.0f);
+
+    glm::mat4 mtx = glm::mat4(1.0f);
+    mtx = glm::translate(mtx, mTransform->getPosition());
+    mtx = glm::rotate(mtx, glm::radians(-mVelocity * 500.0f), glm::vec3(-1.0f, 1.0f, 0.0f));
+    mtx = glm::scale(mtx, mTransform->getScale());
+
+    constexpr glm::vec4 cMissileOffset(120.0f, -40.0f, -40.0f, 1.0f);
+
+    glm::vec4 leftMissilePos = mtx * cMissileOffset;
+    glm::vec4 rightMissilePos = mtx * glm::vec4(cMissileOffset.x, cMissileOffset.y, -cMissileOffset.z, cMissileOffset.w);
 
     std::string properties = R"({
-        "position": [)" + std::to_string(position.x + 12.0f) + ", " + std::to_string(position.y - 4.0f) + ", " + std::to_string(position.z - 4.0f) + R"(],
-        "velocity": )" + std::to_string(velocity) + R"(
+        "position": [)" + std::to_string(leftMissilePos.x) + ", " + std::to_string(leftMissilePos.y) + ", " + std::to_string(leftMissilePos.z) + R"(],
+        "direction": )" + std::to_string(direction) + R"(,
+        "velocity": )" + std::to_string(mVelocity) + R"(
     })";
 
     mScene->spawnEntity("MissileEntity", properties);
 
     properties = R"({
-        "position": [)" + std::to_string(position.x + 12.0f) + ", " + std::to_string(position.y - 4.0f) + ", " + std::to_string(position.z + 4.0f) + R"(],
-        "velocity": )" + std::to_string(velocity) + R"(
+        "position": [)" + std::to_string(rightMissilePos.x) + ", " + std::to_string(rightMissilePos.y) + ", " + std::to_string(rightMissilePos.z) + R"(],
+        "direction": )" + std::to_string(direction) + R"(,
+        "velocity": )" + std::to_string(mVelocity) + R"(
     })";
 
     mScene->spawnEntity("MissileEntity", properties);

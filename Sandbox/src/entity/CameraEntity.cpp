@@ -24,7 +24,7 @@ void CameraEntity::onCreate(nsm::Entity::Properties& properties) {
             mPlayerEntity = static_cast<PlayerEntity*>(entity);
 
             mPlayerEntity->setCameraShootCallback([this]() {
-                mQuake = mQuakeBase * 15.0;
+                mQuake = 70.0;
             });
 
             break;
@@ -61,6 +61,17 @@ void CameraEntity::onUpdate(const f64 timeStep) {
 
     mTargetPosition = playerPosition + cOffset;
 
+    const auto noise = [](f64 x, f64(*f)(f64)) -> f64 {
+        return 0.3 * (-3.2 * f(-1.3 * x) - 1.2 * f(-1.7 * std::numbers::e * x) + 1.9 * f(0.7 * std::numbers::pi * x) );
+    };
+
+    mTime += timeStep;
+    f64 quakeX = noise(mTime * 25.0, glm::sin) * mQuake;
+    f64 quakeY = noise(mTime * 25.0, glm::cos) * mQuake;
+
+    mTargetPosition.z += quakeX;
+    mTargetPosition.y += quakeY;
+
     glm::vec3 currentPosition = mTransform->getPosition();
     glm::vec3 displacement = mTargetPosition - currentPosition;
     glm::vec3 smoothedStep = displacement * (1.0f - glm::exp(-cFollowSpeed * static_cast<f32>(timeStep)));
@@ -70,18 +81,7 @@ void CameraEntity::onUpdate(const f64 timeStep) {
 
     mTransform->setPosition(currentPosition);
 
-    const auto noise = [](f64 x, f64(*f)(f64)) -> f64 {
-        return 0.3 * (-3.2 * f(-1.3 * x) - 1.2 * f(-1.7 * std::numbers::e * x) + 1.9 * f(0.7 * std::numbers::pi * x) );
-    };
-
-    mTime += timeStep;
-    f64 quakeX = noise(mTime * 10.0, glm::sin) * mQuake;
-    f64 quakeY = noise(mTime * 10.0, glm::cos) * mQuake;
-
-    currentPosition.z += quakeX;
-    currentPosition.y += quakeY;
-
-    mQuake = glm::mix(mQuake, mQuakeBase, timeStep * 4.0);
+    mQuake = glm::mix(mQuake, mQuakeBase, timeStep * 5.0);
 
     mCamera->setView(currentPosition, playerPosition + glm::vec3(24.0f, 0.0f, 0.0f));
 }

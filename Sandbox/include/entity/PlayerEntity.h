@@ -5,6 +5,8 @@
 #include <nsm/entity/component/TransformComponent.h>
 #include <nsm/entity/component/ParticleComponent.h>
 #include <nsm/entity/component/InputComponent.h>
+#include <nsm/entity/component/AudioComponent.h>
+#include <nsm/audio/SoundHandle.h>
 
 #include <glm/glm.hpp>
 
@@ -22,12 +24,14 @@ private:
     void spawnMissile();
 
 private:
-    glm::vec3 mStartPosition, mStartScale;
     nsm::TransformComponent* mTransform;
     nsm::ModelComponent* mModel;
     nsm::ParticleComponent* mExhaustParticleLeft;
     nsm::ParticleComponent* mExhaustParticleRight;
     nsm::InputComponent* mInput;
+    nsm::AudioComponent* mAudio;
+    std::unique_ptr<nsm::SoundHandle> mShootSoundHandle;
+
     std::function<void()> mCameraShootCallback;
 
     bool mLeftPressed = false, mRightPressed = false;

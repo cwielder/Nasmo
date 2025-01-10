@@ -11,11 +11,10 @@ namespace {
         ptcl->getEmitter()
             .setEmitRadius(0.9f)
             .setEmitRate(980.0f)
-            .setLifeSpan(0.151f)
-            .setLifeSpanVariance(0.15f)
-            .setInitialVelocity(glm::vec3(-64.0f, 0.0f, 0.0f))
+            .setLifeSpan(0.1f)
+            .setLifeSpanVariance(0.09f)
             .setAcceleration(glm::vec3(0.0f, 0.5f, 0.0f))
-            .setStartSize(glm::vec3(1.0f))
+            .setStartSize(glm::vec3(0.75f))
             .setEndSize(glm::vec3(0.0f, 0.0f, 1.0f))
             .setTexture("textures/exhaust_missile.png")
             .setEmission(4.0f)
@@ -32,9 +31,11 @@ MissileEntity::MissileEntity(nsm::Entity::Properties &properties)
 void MissileEntity::onCreate(nsm::Entity::Properties &properties) {
     mLifeTime = 5.0f;
 
-    mInertia = nsm::JsonHelpers::getFloat(properties, "velocity");
-    mAcceleration = glm::vec3(12.0f, -9.81f, 0.0f);
-    mVelocity = glm::vec3(10.0f, 0.0f, mInertia * 100.0f);
+    f32 direction = nsm::JsonHelpers::getFloat(properties, "direction");
+
+    mDirection = direction;
+    mVelocity = glm::vec3(glm::cos(mDirection), 0.0f, -glm::sin(mDirection) + nsm::JsonHelpers::getFloat(properties, "velocity") * 10.0f) * 10.0f;
+    mAcceleration = glm::vec3(12.0f, -9.81f, 0.0f) + glm::vec3(glm::cos(mDirection), 0.0f, -glm::sin(mDirection)) * 10.0f;
 
     mTransform = new nsm::TransformComponent();
     mTransform->setPosition(nsm::JsonHelpers::getVec3(properties, "position"));
@@ -51,7 +52,7 @@ void MissileEntity::onCreate(nsm::Entity::Properties &properties) {
 
     glm::mat4 mtx = glm::mat4(1.0f);
     mtx = glm::translate(mtx, mTransform->getPosition());
-    mtx = glm::rotate(mtx, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    mtx = glm::rotate(mtx, mDirection + glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     mtx = glm::scale(mtx, mTransform->getScale());
 
     mModel->setTransformAll(mtx);
@@ -71,14 +72,18 @@ void MissileEntity::onUpdate(const f64 timeStep) {
     position += mVelocity * glm::vec3(static_cast<f32>(timeStep * 10.0f));
     mTransform->setPosition(position);
 
-    mExhaustParticle->getEmitter().setPosition(position + glm::vec3(-5.0f, -4.0f, 0.0f));
-
     glm::mat4 mtx = glm::mat4(1.0f);
     mtx = glm::translate(mtx, mTransform->getPosition());
-    mtx = glm::rotate(mtx, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    mtx = glm::rotate(mtx, mDirection + glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    mtx = glm::rotate(mtx, glm::radians(mVelocity.y), glm::vec3(1.0f, 0.0f, 0.0f));
     mtx = glm::scale(mtx, mTransform->getScale());
 
     mModel->setTransformAll(mtx);
+
+    glm::vec4 exhaustOffset(0.0f, 0.0f, 1.5f, 1.0f);
+    glm::vec4 exhaustPos = mtx * exhaustOffset;
+
+    mExhaustParticle->getEmitter().setPosition(glm::vec3(exhaustPos));
 }
 
 NSM_REGISTER_ENTITY(MissileEntity);

@@ -23,7 +23,7 @@ private:
     nsm::CameraComponent* mCamera;
     PlayerEntity* mPlayerEntity;
     glm::vec3 mTargetPosition;
-    f64 mQuakeBase = 0.2;
-    f64 mQuake = 0.2;
+    f64 mQuakeBase = 2.0;
+    f64 mQuake = 2.0;
     f64 mTime;
 };
