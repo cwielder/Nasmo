@@ -13,6 +13,7 @@ std::deque<const nsm::Event*> nsm::Application::sEventQueue;
 nsm::Application::Application(const ApplicationInfo& info)
     : mGraphics(info.graphics)
     , mScene(info.initialScene)
+    , mAudio(info.audio)
 {
     TracyNoop;
 }
@@ -31,6 +32,7 @@ void nsm::Application::run() {
         this->handleEvents();
 
         mScene.update(ts);
+        mAudio.update();
 
         this->intermoduleDataTransfer();
     } while (mGraphics.update());
@@ -61,6 +63,7 @@ void nsm::Application::raiseEvent(const Event* event) {
 
 void nsm::Application::intermoduleDataTransfer() {
     mGraphics.transferData(mScene.getEntities());
+    mAudio.transferData(mScene.getEntities());
 
     this->onSystemTransferData();
 }

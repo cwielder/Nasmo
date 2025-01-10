@@ -18,6 +18,7 @@ project "Nasmo"
         "fastgltf",
         "poly2tri",
         "tracy",
+        "soloud",
     }
 
     includedirs {
@@ -32,6 +33,7 @@ project "Nasmo"
         "vendor/fastgltf/include",
         "vendor/poly2tri",
         "vendor/tracy/public",
+        "vendor/soloud/include",
     }
 
     libdirs {
@@ -106,4 +108,5 @@ group "Dependencies"
     include "vendor/support/fastgltf"
     include "vendor/support/poly2tri"
     include "vendor/support/tracy"
+    include "vendor/support/soloud"
 group ""

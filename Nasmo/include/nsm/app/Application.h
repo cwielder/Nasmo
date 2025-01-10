@@ -3,6 +3,7 @@
 #include <nsm/Common.h>
 #include <nsm/gfx/Graphics.h>
 #include <nsm/entity/Scene.h>
+#include <nsm/audio/Audio.h>
 #include <nsm/app/DeltaTime.h>
 
 #include <string>
@@ -32,6 +33,7 @@ namespace nsm {
 
             std::vector<std::string> args;
             nsm::Graphics::GraphicsInfo graphics;
+            nsm::Audio::AudioInfo audio;
             std::string initialScene;
         };
 
@@ -62,6 +64,7 @@ namespace nsm {
         nsm::DeltaTime mDeltaTime;
         nsm::Graphics mGraphics;
         nsm::Scene mScene;
+        nsm::Audio mAudio;
     };
 
 }

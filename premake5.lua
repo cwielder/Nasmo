@@ -4,6 +4,10 @@ workspace "Nasmo"
     configurations { "Debug", "Release", "Dist" }
     startproject "Sandbox"
 
+    defines {
+        "WITH_MINIAUDIO"
+    }
+
     filter "configurations:Debug"
         defines "TRACY_ENABLE"
     

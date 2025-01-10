@@ -26,3 +26,6 @@
 [submodule "Nasmo/vendor/tracy"]
 	path = Nasmo/vendor/tracy
 	url = https://github.com/wolfpld/tracy.git
+[submodule "Nasmo/vendor/soloud"]
+	path = Nasmo/vendor/soloud
+	url = https://github.com/jarikomppa/soloud.git

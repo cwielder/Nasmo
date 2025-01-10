@@ -19,6 +19,7 @@ project "Sandbox"
         "fastgltf",
         "poly2tri",
         "tracy",
+        "soloud",
     }
 
     includedirs {
@@ -35,6 +36,7 @@ project "Sandbox"
         "../Nasmo/vendor/fastgltf/include",
         "../Nasmo/vendor/poly2tri",
         "../Nasmo/vendor/tracy/public",
+        "../Nasmo/vendor/soloud/include",
     }
 
     files {
