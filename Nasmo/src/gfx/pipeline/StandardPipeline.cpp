@@ -100,6 +100,7 @@ void nsm::StandardPipeline::render(nsm::Framebuffer *framebuffer) {
 
     if (mDevMode) {
         // ImGui pass
+        // TODO: Scale render viewport to fit pane
 
         ImGui::Begin("Viewport");
         const nsm::Texture2D *gameBufferTexture = mGameBuffer.getTextureBuffer(0);
@@ -108,8 +109,6 @@ void nsm::StandardPipeline::render(nsm::Framebuffer *framebuffer) {
         ImGui::End();
 
         mLayerImGui->draw({nullptr, framebuffer});
-
-        ImGui::GetWindowSize();
 
         ImGui::DockSpaceOverViewport();
     } else {

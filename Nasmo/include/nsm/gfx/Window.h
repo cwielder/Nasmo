@@ -22,7 +22,7 @@ namespace nsm {
             std::string title;
             glm::u32vec2 size;
             nsm::Window::WindowType type;
-        } window;
+        };
 
     public:
         Window();
