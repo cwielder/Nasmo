@@ -27,6 +27,9 @@ namespace nsm {
         SoundHandle() = default;
         ~SoundHandle() = default;
         
+        void pause(bool pause) const;
+        void stop() const;
+
         void setTrackVolume(u32 trackBitFlag, f32 volume, f32 fade);
 
         [[nodiscard]] f32 getPlayPosition() const { return static_cast<f32>(mSoLoud->getStreamPosition(mVoiceGroupHandle)); }

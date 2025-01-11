@@ -51,9 +51,9 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
     this->addComponent<nsm::DrawableComponent>(mExhaustParticleRight);
     CreateB2ExhaustParticle(mExhaustParticleRight);
 
-    mAudio = new nsm::AudioComponent({"BGM_FREEZEFLAME"}, mTransform);
+    mAudio = new nsm::AudioComponent({ "SE_ENGINE", "SE_SHOOT" }, mTransform);
     this->addComponent<nsm::AudioComponent>(mAudio);
-    mAudio->startSound("BGM_FREEZEFLAME", &mShootSoundHandle);
+    mAudio->startSound("SE_ENGINE");
 
     mInput = new nsm::InputComponent();
     this->addComponent<nsm::InputComponent>(mInput);
@@ -73,6 +73,7 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
 
             case GLFW_KEY_SPACE: {
                 this->spawnMissile();
+                mAudio->startSound("SE_SHOOT", nullptr, mRandom.getF32(1.0f, 1.3f));
                 break;
             }
         }
@@ -116,12 +117,6 @@ void PlayerEntity::onUpdate(const f64 timeStep) {
     } else {
         mAcceleration = 0.0f;
     }
-
-    if (ImGui::Begin("Player")) {
-        if (mShootSoundHandle) {
-            ImGui::Text("PlayPosition: %f", mShootSoundHandle->getPlayPosition());
-        }
-    } ImGui::End();
 
     mVelocity += mAcceleration * timeStep;
     mVelocity = glm::clamp(mVelocity, -cMaxVelocity, cMaxVelocity);

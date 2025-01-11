@@ -7,6 +7,7 @@
 #include <nsm/entity/component/InputComponent.h>
 #include <nsm/entity/component/AudioComponent.h>
 #include <nsm/audio/SoundHandle.h>
+#include <nsm/util/RandomSource.h>
 
 #include <glm/glm.hpp>
 
@@ -30,9 +31,10 @@ private:
     nsm::ParticleComponent* mExhaustParticleRight;
     nsm::InputComponent* mInput;
     nsm::AudioComponent* mAudio;
-    std::unique_ptr<nsm::SoundHandle> mShootSoundHandle;
 
     std::function<void()> mCameraShootCallback;
+
+    nsm::RandomSource mRandom;
 
     bool mLeftPressed = false, mRightPressed = false;
     f32 mAcceleration = 0.0f;

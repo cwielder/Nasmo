@@ -84,10 +84,10 @@ void nsm::Audio::transferData(const std::vector<Entity*>& entities) {
 
             const TransformComponent* transform = audioComponent->getTransform();
 
-            for (const auto& [handlePtr, request] : audioComponent->getRequests()) {
+            for (const auto& request : audioComponent->getRequests()) {
                 std::unique_ptr<SoundHandle> handle = this->startSound(request, transform);
-                if (handlePtr) {
-                    *handlePtr = std::move(handle);
+                if (request.handle) {
+                    *request.handle = std::move(handle);
                 }
             }
 
@@ -96,8 +96,8 @@ void nsm::Audio::transferData(const std::vector<Entity*>& entities) {
     }
 }
 
-std::unique_ptr<nsm::SoundHandle> nsm::Audio::startSound(const std::string& name, const TransformComponent* transform) {
-    const AudioResourceLoader::Resource* res = mResourceLoader.getResource(name);
+std::unique_ptr<nsm::SoundHandle> nsm::Audio::startSound(const AudioComponent::Request& request, const TransformComponent* transform) {
+    const AudioResourceLoader::Resource* res = mResourceLoader.getResource(request.sound);
     NSM_ASSERT(res != nullptr, "Resource not found");
 
     SoLoud::handle voiceGroup = mSoLoud.createVoiceGroup();
@@ -128,6 +128,7 @@ std::unique_ptr<nsm::SoundHandle> nsm::Audio::startSound(const std::string& name
     }
 
     mSoLoud.setPause(voiceGroup, false);
+    mSoLoud.setRelativePlaySpeed(voiceGroup, request.speed);
 
     std::vector<SoundHandle::Track> tracks;
     for (u32 i = 0; i < sources.size(); i++) {

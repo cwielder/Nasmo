@@ -3,6 +3,7 @@
 #include <nsm/Common.h>
 #include <nsm/audio/AudioResourceLoader.h>
 #include <nsm/audio/SoundHandle.h>
+#include <nsm/entity/component/AudioComponent.h>
 
 #include <soloud.h>
 
@@ -39,7 +40,7 @@ namespace nsm {
         static constexpr u32 cSoundTrackNum = 8;
 
     private:
-        std::unique_ptr<SoundHandle> startSound(const std::string& name, const TransformComponent* transform);
+        std::unique_ptr<SoundHandle> startSound(const AudioComponent::Request& request, const TransformComponent* transform);
 
     private:
         SoLoud::Soloud mSoLoud;

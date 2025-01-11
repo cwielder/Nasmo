@@ -6,6 +6,6 @@ nsm::AudioComponent::AudioComponent(const std::vector<std::string>& sounds, cons
     , mInited(false)
 { }
 
-void nsm::AudioComponent::startSound(const std::string& sound, std::unique_ptr<SoundHandle>* handle) {
-    mRequests.emplace_back(handle, sound);
+void nsm::AudioComponent::startSound(const std::string& sound, std::unique_ptr<SoundHandle>* handle, f32 speed) {
+    mRequests.emplace_back(handle, sound, speed);
 }

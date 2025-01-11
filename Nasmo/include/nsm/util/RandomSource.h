@@ -6,6 +6,7 @@ namespace nsm {
 
     class RandomSource {
     public:
+        RandomSource();
         RandomSource(const u64 seed);
         ~RandomSource() = default;
 

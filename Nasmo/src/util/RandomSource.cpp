@@ -1,5 +1,11 @@
 #include <nsm/util/RandomSource.h>
 
+#include <random>
+
+nsm::RandomSource::RandomSource()
+    : mSeed(std::random_device()())
+{ }
+
 nsm::RandomSource::RandomSource(const u64 seed)
     : mSeed(seed)
 { }
