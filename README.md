@@ -6,7 +6,7 @@
 * **Performant**: Optimized code and libraries along with smart techniques such as instancing results in high performance even on low-end devices.
 * **Graphics**: Modern high-fidelity graphics and lighting is available with a deferred physically-based renderer.
 * **Audio**: Low latency spatial audio for music and sound effects allows for an immersive experience.
-* **UI**: 
+* **UI**: Robust anchor based UI system that allows you to make interactive animated interfaces using elements.
 * **Flexibility**: Every aspect of the engine has been built with flexibility and extensibility in mind, so manual control has been provided for every system to cater for advanced use cases. 
 
 # 📚 Documentation
