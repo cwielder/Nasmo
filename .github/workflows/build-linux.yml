@@ -17,4 +17,4 @@ jobs:
     - name: Run premake
       run: ./scripts/setupMake.sh
     - name: Compile
-      run: make config=Release -j8
+      run: make config=release -j8
