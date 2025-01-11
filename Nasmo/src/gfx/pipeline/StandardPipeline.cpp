@@ -41,9 +41,9 @@ nsm::StandardPipeline::StandardPipeline()
         .depth(false)
     ;
 
-    if (mDevMode) {
-        ImGui::DockSpaceOverViewport();
-    }
+#ifdef NSM_DEV_MODE
+    ImGui::DockSpaceOverViewport();
+#endif
 }
 
 void nsm::StandardPipeline::render(nsm::Framebuffer *framebuffer) {
@@ -98,7 +98,7 @@ void nsm::StandardPipeline::render(nsm::Framebuffer *framebuffer) {
 
     framebuffer->bind();
 
-    if (mDevMode) {
+#ifdef NSM_DEV_MODE
         // ImGui pass
         // TODO: Scale render viewport to fit pane
 
@@ -111,11 +111,11 @@ void nsm::StandardPipeline::render(nsm::Framebuffer *framebuffer) {
         mLayerImGui->draw({nullptr, framebuffer});
 
         ImGui::DockSpaceOverViewport();
-    } else {
+#else
         Framebuffer::blit(mGameBuffer, *framebuffer, { 0, 0 }, { framebuffer->getTextureBuffer(0)->getSize() }, { 0, 0 }, { framebuffer->getTextureBuffer(0)->getSize() }, (u32)Framebuffer::Type::Color);
 
         mLayerImGui->draw({nullptr, framebuffer});
-    }
+#endif
 }
 
 void nsm::StandardPipeline::onResize(const glm::u32vec2 &size) {

@@ -10,7 +10,9 @@
 
 nsm::Audio::Audio(const AudioInfo& info) {
     mSoLoud.init(1, SoLoud::Soloud::MINIAUDIO, info.sampleRate, info.bufferSize, info.channelCount);
+#ifdef NSM_DEV_MODE
     mSoLoud.setVisualizationEnable(true);
+#endif
 }
 
 nsm::Audio::~Audio() {
@@ -20,6 +22,7 @@ nsm::Audio::~Audio() {
 void nsm::Audio::update() {
     mSoLoud.update3dAudio();
 
+#ifdef NSM_DEV_MODE
     if (ImGui::Begin("Audio")) {
         static constexpr u32 cWaveBufBlockSize = 480;
         static constexpr u32 cWaveBufBlock = 256;
@@ -63,6 +66,7 @@ void nsm::Audio::update() {
             ImGui::Text("%s", name.c_str());
         }
     } ImGui::End();
+#endif
 }
 
 void nsm::Audio::transferData(const std::vector<Entity*>& entities) {

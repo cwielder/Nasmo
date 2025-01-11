@@ -41,7 +41,6 @@ namespace nsm {
         nsm::RenderState mBlitRenderState;
 
         bool mFirstFrame = true;
-        bool mDevMode = true; // TODO: Add a way to toggle this globally
     };
 
 }
