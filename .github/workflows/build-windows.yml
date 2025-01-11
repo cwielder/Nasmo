@@ -18,6 +18,8 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: recursive
     - name: Setup premake
       uses: abel0b/setup-premake@v2.4
       with:
