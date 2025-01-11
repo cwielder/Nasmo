@@ -5,6 +5,7 @@
 #include <nsm/audio/SoundHandle.h>
 #include <nsm/entity/component/AudioComponent.h>
 
+#undef APIENTRY
 #include <soloud.h>
 
 #include <memory>

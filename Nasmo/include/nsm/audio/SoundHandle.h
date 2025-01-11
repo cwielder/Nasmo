@@ -2,6 +2,7 @@
 
 #include <nsm/Common.h>
 
+#undef APIENTRY
 #include <soloud.h>
 
 #include <vector>
