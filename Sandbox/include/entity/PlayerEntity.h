@@ -6,6 +6,7 @@
 #include <nsm/entity/component/ParticleComponent.h>
 #include <nsm/entity/component/InputComponent.h>
 #include <nsm/entity/component/AudioComponent.h>
+#include <nsm/entity/component/SphereColliderComponent.h>
 #include <nsm/audio/SoundHandle.h>
 #include <nsm/util/RandomSource.h>
 
@@ -31,6 +32,7 @@ private:
     nsm::ParticleComponent* mExhaustParticleRight;
     nsm::InputComponent* mInput;
     nsm::AudioComponent* mAudio;
+    nsm::SphereColliderComponent* mCollider;
 
     std::function<void()> mCameraShootCallback;
 

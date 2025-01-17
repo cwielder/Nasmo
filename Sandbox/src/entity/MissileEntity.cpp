@@ -42,6 +42,11 @@ void MissileEntity::onCreate(nsm::Entity::Properties &properties) {
     mTransform->setScale(glm::vec3(10.0f));
     this->addComponent<nsm::TransformComponent>(mTransform);
 
+    mCollider = new nsm::SphereColliderComponent(this, 20.0f, mTransform, [](nsm::ColliderComponent*){
+        nsm::info("Missile collided!");
+    });
+    this->addComponent<nsm::SphereColliderComponent>(mCollider);
+
     mExhaustParticle = new nsm::ParticleComponent();
     mExhaustParticle->setTargetLayer("forward");
     this->addComponent<nsm::DrawableComponent>(mExhaustParticle);

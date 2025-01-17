@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     info.graphics.window = {
         .title = "Nasmo Sandbox",
         .size = {1920, 1080},
-        .type = nsm::Window::WindowType::Windowed
+        .type = nsm::Window::WindowType::Windowed //! TODO: Fullscreen is broken with framebuffers
     };
     info.initialScene = "scenes/demo.json";
 

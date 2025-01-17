@@ -49,6 +49,7 @@ void CameraEntity::onCreate(nsm::Entity::Properties& properties) {
         0.01f,
         10000.0f
     );
+
     cameraComponent->addTargetLayer("main");
     cameraComponent->addTargetLayer("forward");
 

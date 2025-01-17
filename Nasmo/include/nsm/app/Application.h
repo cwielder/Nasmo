@@ -4,6 +4,7 @@
 #include <nsm/gfx/Graphics.h>
 #include <nsm/entity/Scene.h>
 #include <nsm/audio/Audio.h>
+#include <nsm/physics/Physics.h>
 #include <nsm/app/DeltaTime.h>
 
 #include <string>
@@ -65,6 +66,7 @@ namespace nsm {
         nsm::Graphics mGraphics;
         nsm::Scene mScene;
         nsm::Audio mAudio;
+        nsm::Physics mPhysics;
     };
 
 }

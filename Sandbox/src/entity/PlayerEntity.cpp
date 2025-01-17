@@ -27,7 +27,7 @@ namespace {
     }
 }
 
-PlayerEntity::PlayerEntity(nsm::Entity::Properties& properties)
+PlayerEntity::PlayerEntity(nsm::Entity::Properties&)
     : mTransform(nullptr)
     , mModel(nullptr)
 { }
@@ -54,6 +54,11 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
     mAudio = new nsm::AudioComponent({ "SE_ENGINE", "SE_SHOOT" }, mTransform);
     this->addComponent<nsm::AudioComponent>(mAudio);
     mAudio->startSound("SE_ENGINE");
+
+    mCollider = new nsm::SphereColliderComponent(this, 20.0f, mTransform, [](nsm::ColliderComponent*){
+        nsm::info("Player collided!");
+    });
+    this->addComponent<nsm::SphereColliderComponent>(mCollider);
 
     mInput = new nsm::InputComponent();
     this->addComponent<nsm::InputComponent>(mInput);

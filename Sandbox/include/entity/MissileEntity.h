@@ -5,6 +5,7 @@
 #include <nsm/entity/component/TransformComponent.h>
 #include <nsm/entity/component/ParticleComponent.h>
 #include <nsm/entity/component/LightComponent.h>
+#include <nsm/entity/component/SphereColliderComponent.h>
 
 class MissileEntity final : public nsm::Entity {
 public:
@@ -18,6 +19,7 @@ private:
     nsm::TransformComponent* mTransform;
     nsm::ModelComponent* mModel;
     nsm::ParticleComponent* mExhaustParticle;
+    nsm::SphereColliderComponent* mCollider;
 
     f32 mDirection;
     glm::vec3 mAcceleration;

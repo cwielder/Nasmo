@@ -64,6 +64,7 @@ void nsm::Application::raiseEvent(const Event* event) {
 void nsm::Application::intermoduleDataTransfer() {
     mGraphics.transferData(mScene.getEntities());
     mAudio.transferData(mScene.getEntities());
+    mPhysics.update(mScene.getEntities());
 
     this->onSystemTransferData();
 }
