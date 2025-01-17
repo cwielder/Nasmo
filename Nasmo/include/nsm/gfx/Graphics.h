@@ -36,6 +36,9 @@ namespace nsm {
         static glm::u32vec2 getFramebufferSize();
 
     private:
+        void drawComponentsDebug(const std::vector<Entity*>& entities);
+
+    private:
         Renderer* mRenderer;
         Window mWindow;
     };

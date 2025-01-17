@@ -42,7 +42,11 @@ void MissileEntity::onCreate(nsm::Entity::Properties &properties) {
     mTransform->setScale(glm::vec3(10.0f));
     this->addComponent<nsm::TransformComponent>(mTransform);
 
-    mCollider = new nsm::SphereColliderComponent(this, 20.0f, mTransform, [](nsm::ColliderComponent*){
+    mCollider = new nsm::SphereColliderComponent(this, 10.0f, mTransform, [](nsm::ColliderComponent* other) {
+        if (other->getOwner()->getIdentifier() != "PlayerEntity") {
+            return;
+        }
+
         nsm::info("Missile collided!");
     });
     this->addComponent<nsm::SphereColliderComponent>(mCollider);

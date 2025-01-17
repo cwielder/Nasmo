@@ -11,9 +11,12 @@
 #include <nsm/entity/component/DrawableComponent.h>
 #include <nsm/entity/component/CameraComponent.h>
 #include <nsm/entity/component/ModelComponent.h>
+#include <nsm/entity/component/SphereColliderComponent.h>
+#include <nsm/entity/component/TransformComponent.h>
 #include <nsm/app/Application.h>
 
-#include <glm/common.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 static void glErrorCallback(GLenum, GLenum, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*) {
     switch (severity) {
@@ -91,6 +94,57 @@ void nsm::Graphics::transferData(const std::vector<Entity*>& entities) {
     
         for (auto cameraComponent : entity->getComponents<nsm::CameraComponent>()) {
             mRenderer->applyCamera(cameraComponent);
+        }
+
+    }
+
+#ifdef NSM_DEV_MODE
+    this->drawComponentsDebug(entities);
+#endif
+}
+
+void nsm::Graphics::drawComponentsDebug(const std::vector<Entity*>& entities) {
+    struct SphereDebugDrawable : public DrawableComponent {
+        SphereDebugDrawable() { setTargetLayer("forward"); }
+
+        void drawOpaque(const RenderInfo& renderInfo) { }
+        void drawTranslucent(const RenderInfo& renderInfo) {
+            static ShaderProgram* shader = nullptr;
+            if (!shader) {
+                shader = new ShaderProgram("nsm/assets/shaders/debug.vsh", "nsm/assets/shaders/debug.fsh");
+            }
+
+            glm::mat4 mtx = glm::mat4(1.0f);
+            mtx = glm::translate(mtx, position);
+            mtx = glm::scale(mtx, glm::vec3(scale));
+
+            shader->bind();
+            shader->setMat4("uModelMtx", mtx);
+            shader->setMat4("uViewProjMtx", renderInfo.camera->getViewProjection());
+
+            PrimitiveShape::getSphereVAO().bind();
+            PrimitiveShape::getSphereIBO().draw();
+        }
+
+        glm::vec3 position;
+        f32 scale;
+    };
+
+    static std::vector<std::unique_ptr<SphereDebugDrawable>> sdds;
+    static std::vector<std::unique_ptr<SphereDebugDrawable>> toDelete; // defer deletion by one frame
+
+    toDelete.clear();
+    toDelete = std::move(sdds);
+    sdds.clear();
+
+    for (auto entity : entities) {
+        for (auto sphereColliderComponent : entity->getComponents<nsm::SphereColliderComponent>()) {
+            SphereDebugDrawable* sdd = new SphereDebugDrawable();
+            sdd->position = sphereColliderComponent->getTransform()->getPosition();
+            sdd->scale = sphereColliderComponent->getRadius();
+
+            mRenderer->pushDrawable(sdd);
+            sdds.push_back(std::unique_ptr<SphereDebugDrawable>(sdd));
         }
     }
 }
