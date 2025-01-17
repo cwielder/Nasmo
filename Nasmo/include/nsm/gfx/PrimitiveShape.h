@@ -17,6 +17,9 @@ namespace nsm {
         [[nodiscard]] static VertexArray& getCubeVAO() { return *sCubeVAO; }
         [[nodiscard]] static IndexBuffer& getCubeIBO() { return *sCubeIBO; }
 
+        [[nodiscard]] static VertexArray& getSphereVAO() { return *sSphereVAO; }
+        [[nodiscard]] static IndexBuffer& getSphereIBO() { return *sSphereIBO; }
+
     private:
         static VertexBuffer* sQuadVBO;
         static VertexArray* sQuadVAO;
@@ -25,6 +28,10 @@ namespace nsm {
         static VertexBuffer* sCubeVBO;
         static VertexArray* sCubeVAO;
         static IndexBuffer* sCubeIBO;
+
+        static VertexBuffer* sSphereVBO;
+        static VertexArray* sSphereVAO;
+        static IndexBuffer* sSphereIBO;
     };
 
 }
