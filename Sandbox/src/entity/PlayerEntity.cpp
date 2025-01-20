@@ -4,6 +4,7 @@
 #include <nsm/event/Events.h>
 #include <nsm/util/JsonHelpers.h>
 #include <nsm/entity/Scene.h>
+#include <nsm/util/Color.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -51,12 +52,16 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
     this->addComponent<nsm::DrawableComponent>(mExhaustParticleRight);
     CreateB2ExhaustParticle(mExhaustParticleRight);
 
+    mExhaustLight = new nsm::PointLightComponent(mTransform->getPosition(), nsm::Color{"#AE91F0"}.getRGBA(), 2000.0f);
+    mExhaustLight->setTargetLayer("lighting_point");
+    this->addComponent<nsm::DrawableComponent>(mExhaustLight);
+
     mAudio = new nsm::AudioComponent({ "SE_ENGINE", "SE_SHOOT" }, mTransform);
     this->addComponent<nsm::AudioComponent>(mAudio);
     mAudio->startSound("SE_ENGINE");
 
     mCollider = new nsm::SphereColliderComponent(this, 20.0f, mTransform, [](nsm::ColliderComponent*){
-        nsm::info("Player collided!");
+        //nsm::info("Player collided!");
     });
     this->addComponent<nsm::SphereColliderComponent>(mCollider);
 
@@ -76,7 +81,23 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
                 break;
             }
 
+            case GLFW_KEY_W:
+            case GLFW_KEY_UP: {
+                mForwardPressed = true;
+                break;
+            }
+
+            case GLFW_KEY_S:
+            case GLFW_KEY_DOWN: {
+                mBackwardPressed = true;
+                break;
+            }
+
             case GLFW_KEY_SPACE: {
+                if (mShootCooldown > 0.0f) {
+                    return;
+                }
+
                 this->spawnMissile();
                 mAudio->startSound("SE_SHOOT", nullptr, mRandom.getF32(1.0f, 1.3f));
                 break;
@@ -97,6 +118,18 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
                 mRightPressed = false;
                 break;
             }
+
+            case GLFW_KEY_W:
+            case GLFW_KEY_UP: {
+                mForwardPressed = false;
+                break;
+            }
+
+            case GLFW_KEY_S:
+            case GLFW_KEY_DOWN: {
+                mBackwardPressed = false;
+                break;
+            }
         }
     });
 
@@ -109,9 +142,9 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
 }
 
 void PlayerEntity::onUpdate(const f64 timeStep) {
-    nsm::ParticleEmitter& emitter = mExhaustParticleLeft->getEmitter();
+    mShootCooldown -= static_cast<f32>(timeStep);
 
-    static constexpr f32 cMaxVelocity = 0.06f;
+    static constexpr f32 cMaxVelocity = 0.1f;
     static constexpr f32 cAcceleration = 0.2f;
     static constexpr f32 cFriction = 0.1f;
 
@@ -121,6 +154,12 @@ void PlayerEntity::onUpdate(const f64 timeStep) {
         mAcceleration = cAcceleration;
     } else {
         mAcceleration = 0.0f;
+    }
+
+    if (mForwardPressed) {
+        mThrust = glm::min(mThrust + timeStep, 1.0);
+    } else if (mBackwardPressed) {
+        mThrust = glm::max(mThrust - timeStep, 0.45);
     }
 
     mVelocity += mAcceleration * timeStep;
@@ -154,10 +193,25 @@ void PlayerEntity::onUpdate(const f64 timeStep) {
 
     mExhaustParticleLeft->getEmitter().setPosition(glm::vec3(leftExhaustPos));
     mExhaustParticleRight->getEmitter().setPosition(glm::vec3(rightExhaustPos));
+
+    static constexpr glm::vec3 cExhaustLightOffset(-239.0f, 0.0f, 58.8f);
+
+    glm::vec4 exhaustLightPos = mtx * glm::vec4(cExhaustLightOffset, 1.0f);
+    mExhaustLight->setPosition(glm::vec3(exhaustLightPos));
+
+    if (position.z > 135.0f || position.z < -118.0f) {
+        this->kill();
+
+        for (const auto& callback : mDieCallbacks) {
+            callback();
+        }
+    }
 }
 
 void PlayerEntity::spawnMissile() {
     mCameraShootCallback();
+
+    mShootCooldown = 1.0f;
 
     f32 direction = glm::radians(-mVelocity * 500.0f);
 

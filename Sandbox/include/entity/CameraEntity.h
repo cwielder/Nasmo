@@ -15,7 +15,7 @@ public:
     void onUpdate(const f64 timeStep) override;
 
 private:
-    static constexpr glm::vec3 cOffset = glm::vec3(-54.0f, 64.0f, 0.0f);
+    static constexpr glm::vec3 cOffset = glm::vec3(-70.0f, 84.0f, 0.0f);
     static constexpr f32 cFollowSpeed = 1.0f;
 
 private:
@@ -26,4 +26,6 @@ private:
     f64 mQuakeBase = 2.0;
     f64 mQuake = 2.0;
     f64 mTime;
+    glm::vec3 mLastPlayerPosition;
+    bool mGameOver = false;
 };

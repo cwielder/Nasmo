@@ -1,6 +1,7 @@
 #include "entity/MissileEntity.h"
 
 #include <nsm/util/JsonHelpers.h>
+#include <nsm/util/Color.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -47,7 +48,7 @@ void MissileEntity::onCreate(nsm::Entity::Properties &properties) {
             return;
         }
 
-        nsm::info("Missile collided!");
+        //nsm::info("Missile collided!");
     });
     this->addComponent<nsm::SphereColliderComponent>(mCollider);
 
@@ -55,6 +56,10 @@ void MissileEntity::onCreate(nsm::Entity::Properties &properties) {
     mExhaustParticle->setTargetLayer("forward");
     this->addComponent<nsm::DrawableComponent>(mExhaustParticle);
     CreateMissileExhaustParticle(mExhaustParticle);
+
+    mExhaustLight = new nsm::PointLightComponent(mTransform->getPosition(), nsm::Color{"#E83800"}.getRGBA(), 1000.0f);
+    mExhaustLight->setTargetLayer("lighting_point");
+    this->addComponent<nsm::DrawableComponent>(mExhaustLight);
 
     mModel = new nsm::ModelComponent("models/missile.glb", "main");
     this->addComponent<nsm::DrawableComponent>(mModel);
@@ -70,7 +75,7 @@ void MissileEntity::onCreate(nsm::Entity::Properties &properties) {
 void MissileEntity::onUpdate(const f64 timeStep) {
     mLifeTime -= static_cast<f32>(timeStep);
     if (mLifeTime <= 0.0f) {
-        this->setAlive(false);
+        this->kill();
         return;
     }
 
@@ -93,6 +98,11 @@ void MissileEntity::onUpdate(const f64 timeStep) {
     glm::vec4 exhaustPos = mtx * exhaustOffset;
 
     mExhaustParticle->getEmitter().setPosition(glm::vec3(exhaustPos));
+
+    static constexpr glm::vec3 cExhaustLightOffset(0.0f, 0.0f, 2.5f);
+
+    glm::vec4 exhaustLightPos = mtx * glm::vec4(cExhaustLightOffset, 1.0f);
+    mExhaustLight->setPosition(glm::vec3(exhaustLightPos));
 }
 
 NSM_REGISTER_ENTITY(MissileEntity);

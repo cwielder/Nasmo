@@ -86,9 +86,10 @@ namespace nsm {
 
         [[nodiscard]] const std::string& getIdentifier() const { return mRegistry->getIdentifier(); }
         [[nodiscard]] std::size_t getIdentifierHash() const { return mRegistry->getIdentifierHash(); }
+        [[nodiscard]] bool isAlive() const { return mIsAlive; }
 
         bool hasTag(const std::string& tag);
-        void setAlive(const bool isAlive) { mIsAlive = isAlive; }
+        void kill() { mIsAlive = false; }
 
     protected:
         Scene* mScene = nullptr;

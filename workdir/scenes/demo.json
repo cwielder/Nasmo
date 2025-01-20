@@ -16,10 +16,14 @@
         {
             "type": "SunEntity",
             "properties": {
-                "intensity": 5.0,
-                "yaw": 338.602,
-                "pitch": 1714.471
+                "intensity": 1.0,
+                "yaw": 276.0,
+                "pitch": 0.0
             }
+        },
+        {
+            "type": "InfiniteTerrainEntity",
+            "properties": {}
         }
     ]
 }

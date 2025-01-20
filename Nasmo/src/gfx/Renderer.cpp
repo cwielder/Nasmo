@@ -13,7 +13,7 @@ nsm::Renderer::Renderer(const glm::u32vec2& size)
     , mRenderState()
     , mViewport(size)
 {
-    mFramebuffer.addTextureBuffer(Texture::Format::RGB16F, size);
+    mFramebuffer.addTextureBuffer(Texture::Format::RGB8, size);
     mFramebuffer.addTextureBuffer(Texture::Format::Depth24Stencil8, size);
     mFramebuffer.finalize();
 
@@ -50,6 +50,7 @@ void nsm::Renderer::applyCamera(CameraComponent* camera) {
 }
 
 void nsm::Renderer::render() {
+    // Prepare framebuffers
     mViewport.apply();
 
     Framebuffer::getBackbuffer()->clear(glm::f32vec4{ 0.0f }, Framebuffer::Type::Color);
@@ -59,13 +60,16 @@ void nsm::Renderer::render() {
     mFramebuffer.clear(glm::f32vec4{ 0.0f }, Framebuffer::Type::Color);
     mFramebuffer.clear(glm::f32vec4{ 1.0f }, Framebuffer::Type::Depth);
 
+    // Run the render pipeline
     mPipeline->render(&mFramebuffer);
 
+    // Clean up
     nsm::RenderPipeline::LayerContainer& layers = mPipeline->getLayers();
     for (auto& [hash, layer] : layers) {
         layer->clearDrawables();
     }
 
+    // Final render to screen
     mRenderState.apply();
 
     Framebuffer::getBackbuffer()->bind();
@@ -73,7 +77,6 @@ void nsm::Renderer::render() {
     mCompositorShader.bind();
     mFramebuffer.getTextureBuffer(0)->bind(0);
 
-    // final render to screen
     PrimitiveShape::getQuadVAO().bind();
     PrimitiveShape::getQuadIBO().draw();
 }

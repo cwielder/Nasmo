@@ -20,6 +20,7 @@ private:
     nsm::ModelComponent* mModel;
     nsm::ParticleComponent* mExhaustParticle;
     nsm::SphereColliderComponent* mCollider;
+    nsm::PointLightComponent* mExhaustLight;
 
     f32 mDirection;
     glm::vec3 mAcceleration;

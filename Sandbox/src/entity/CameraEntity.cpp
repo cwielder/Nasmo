@@ -27,6 +27,10 @@ void CameraEntity::onCreate(nsm::Entity::Properties& properties) {
                 mQuake = 70.0;
             });
 
+            mPlayerEntity->addDieCallback([this]() {
+                mGameOver = true;
+            });
+
             break;
         }
     }
@@ -35,7 +39,7 @@ void CameraEntity::onCreate(nsm::Entity::Properties& properties) {
 
     const glm::vec3 playerPosition = mPlayerEntity->getComponents<nsm::TransformComponent>()[0]->getPosition();
     mTargetPosition = playerPosition + cOffset;
-    const glm::vec3 initialPosition = playerPosition + glm::vec3(-228.0f, 88.0f, 0.0f);
+    const glm::vec3 initialPosition = playerPosition + glm::vec3(-2.0f, 128.0f, 0.0f);
 
     mTransform = new nsm::TransformComponent(initialPosition);
     this->addComponent<nsm::TransformComponent>(mTransform);
@@ -58,17 +62,21 @@ void CameraEntity::onCreate(nsm::Entity::Properties& properties) {
 }
 
 void CameraEntity::onUpdate(const f64 timeStep) {
-    const glm::vec3 playerPosition = mPlayerEntity->getComponents<nsm::TransformComponent>()[0]->getPosition();
-
-    mTargetPosition = playerPosition + cOffset;
+    if (!mGameOver) {
+        mLastPlayerPosition = mPlayerEntity->getComponents<nsm::TransformComponent>()[0]->getPosition();
+        mTargetPosition = mLastPlayerPosition + cOffset;
+    } else {
+        mQuake = glm::mix(mQuake, mQuakeBase, timeStep * 5.0);
+        mQuake = glm::mix(mQuake, mQuakeBase, timeStep * 5.0);
+    }
 
     const auto noise = [](f64 x, f64(*f)(f64)) -> f64 {
         return 0.3 * (-3.2 * f(-1.3 * x) - 1.2 * f(-1.7 * std::numbers::e * x) + 1.9 * f(0.7 * std::numbers::pi * x) );
     };
 
     mTime += timeStep;
-    f64 quakeX = noise(mTime * 25.0, glm::sin) * mQuake;
-    f64 quakeY = noise(mTime * 25.0, glm::cos) * mQuake;
+    f64 quakeX = noise(mTime * 25.0, std::sin) * mQuake;
+    f64 quakeY = noise(mTime * 25.0, std::cos) * mQuake;
 
     mTargetPosition.z += quakeX;
     mTargetPosition.y += quakeY;
@@ -84,7 +92,7 @@ void CameraEntity::onUpdate(const f64 timeStep) {
 
     mQuake = glm::mix(mQuake, mQuakeBase, timeStep * 5.0);
 
-    mCamera->setView(currentPosition, playerPosition + glm::vec3(24.0f, 0.0f, 0.0f));
+    mCamera->setView(currentPosition, mLastPlayerPosition + glm::vec3(24.0f, 0.0f, 0.0f));
 }
 
 NSM_REGISTER_ENTITY(CameraEntity);

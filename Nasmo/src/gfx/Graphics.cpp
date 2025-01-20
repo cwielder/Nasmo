@@ -104,6 +104,8 @@ void nsm::Graphics::transferData(const std::vector<Entity*>& entities) {
 }
 
 void nsm::Graphics::drawComponentsDebug(const std::vector<Entity*>& entities) {
+    return; // Remove this line to enable debug drawing
+
     struct SphereDebugDrawable : public DrawableComponent {
         SphereDebugDrawable() { setTargetLayer("forward"); }
 
