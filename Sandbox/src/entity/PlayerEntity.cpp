@@ -56,12 +56,14 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
     mExhaustLight->setTargetLayer("lighting_point");
     this->addComponent<nsm::DrawableComponent>(mExhaustLight);
 
-    mAudio = new nsm::AudioComponent({ "SE_ENGINE", "SE_SHOOT" }, mTransform);
+    mAudio = new nsm::AudioComponent({ "SE_ENGINE", "SE_SHOOT", "SE_EXPLODE" }, mTransform);
     this->addComponent<nsm::AudioComponent>(mAudio);
     mAudio->startSound("SE_ENGINE");
 
-    mCollider = new nsm::SphereColliderComponent(this, 20.0f, mTransform, [](nsm::ColliderComponent*){
-        //nsm::info("Player collided!");
+    mCollider = new nsm::SphereColliderComponent(this, 10.0f, mTransform, [this](nsm::ColliderComponent* other) {
+        if (other->getOwner()->getIdentifier() == "ShipEntity") {
+            this->explode();
+        }
     });
     this->addComponent<nsm::SphereColliderComponent>(mCollider);
 
@@ -187,12 +189,24 @@ void PlayerEntity::onUpdate(const f64 timeStep) {
     mModel->setTransformAll(mtx);
 
     static constexpr glm::vec4 cExhaustOffset(-72.0f, 0.0f, -38.4f, 1.0f);
+    static f32 cExhaustSpeed = mExhaustParticleLeft->getEmitter().getInitialVelocity().x;
+    static f32 cExhaustEmit = mExhaustParticleLeft->getEmitter().getEmitRate();
+
+    f32 angle = glm::radians(-mVelocity * 500.0f);
 
     glm::vec4 leftExhaustPos = mtx * cExhaustOffset;
     glm::vec4 rightExhaustPos = mtx * glm::vec4(cExhaustOffset.x, cExhaustOffset.y, -cExhaustOffset.z, cExhaustOffset.w);
 
-    mExhaustParticleLeft->getEmitter().setPosition(glm::vec3(leftExhaustPos));
-    mExhaustParticleRight->getEmitter().setPosition(glm::vec3(rightExhaustPos));
+    mExhaustParticleLeft->getEmitter()
+        .setPosition(glm::vec3(leftExhaustPos))
+        .setInitialVelocity(glm::vec3(cExhaustSpeed * mThrust * glm::cos(angle), 0.0f, cExhaustSpeed * mThrust * glm::sin(angle)))
+        .setEmitRate(cExhaustEmit * mThrust)
+    ;
+    mExhaustParticleRight->getEmitter()
+        .setPosition(glm::vec3(rightExhaustPos))
+        .setInitialVelocity(glm::vec3(cExhaustSpeed * mThrust, 0.0f, cExhaustSpeed * mThrust * glm::sin(angle)))
+        .setEmitRate(cExhaustEmit * mThrust)
+    ;
 
     static constexpr glm::vec3 cExhaustLightOffset(-239.0f, 0.0f, 58.8f);
 
@@ -200,11 +214,7 @@ void PlayerEntity::onUpdate(const f64 timeStep) {
     mExhaustLight->setPosition(glm::vec3(exhaustLightPos));
 
     if (position.z > 135.0f || position.z < -118.0f) {
-        this->kill();
-
-        for (const auto& callback : mDieCallbacks) {
-            callback();
-        }
+        this->explode();
     }
 }
 
@@ -220,10 +230,9 @@ void PlayerEntity::spawnMissile() {
     mtx = glm::rotate(mtx, glm::radians(-mVelocity * 500.0f), glm::vec3(-1.0f, 1.0f, 0.0f));
     mtx = glm::scale(mtx, mTransform->getScale());
 
-    constexpr glm::vec4 cMissileOffset(120.0f, -40.0f, -40.0f, 1.0f);
+    constexpr glm::vec4 cMissileOffset(120.0f, -40.0f, 0.0f, 1.0f);
 
     glm::vec4 leftMissilePos = mtx * cMissileOffset;
-    glm::vec4 rightMissilePos = mtx * glm::vec4(cMissileOffset.x, cMissileOffset.y, -cMissileOffset.z, cMissileOffset.w);
 
     std::string properties = R"({
         "position": [)" + std::to_string(leftMissilePos.x) + ", " + std::to_string(leftMissilePos.y) + ", " + std::to_string(leftMissilePos.z) + R"(],
@@ -232,14 +241,25 @@ void PlayerEntity::spawnMissile() {
     })";
 
     mScene->spawnEntity("MissileEntity", properties);
+}
 
-    properties = R"({
-        "position": [)" + std::to_string(rightMissilePos.x) + ", " + std::to_string(rightMissilePos.y) + ", " + std::to_string(rightMissilePos.z) + R"(],
-        "direction": )" + std::to_string(direction) + R"(,
-        "velocity": )" + std::to_string(mVelocity) + R"(
+void PlayerEntity::explode() {
+    const glm::vec3& position = mTransform->getPosition();
+    
+    this->kill();
+
+    mAudio->startSound("SE_EXPLODE", nullptr, mRandom.getF32(0.5f, 0.8f));
+
+    const std::string properties = R"({
+        "position": [)" + std::to_string(position.x) + ", " + std::to_string(position.y) + ", " + std::to_string(position.z) + R"(],
+        "scale": )" + std::to_string(2.0f) + R"(
     })";
 
-    mScene->spawnEntity("MissileEntity", properties);
+    mScene->spawnEntity("ExplosionEntity", properties);
+
+    for (const auto& callback : mDieCallbacks) {
+        callback();
+    }
 }
 
 NSM_REGISTER_ENTITY(PlayerEntity);

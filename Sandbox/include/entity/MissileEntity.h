@@ -6,6 +6,7 @@
 #include <nsm/entity/component/ParticleComponent.h>
 #include <nsm/entity/component/LightComponent.h>
 #include <nsm/entity/component/SphereColliderComponent.h>
+#include <nsm/util/RandomSource.h>
 
 class MissileEntity final : public nsm::Entity {
 public:
@@ -14,6 +15,9 @@ public:
 
     void onCreate(nsm::Entity::Properties& properties) override;
     void onUpdate(const f64 timeStep) override;
+
+private:
+    void explode();
 
 private:
     nsm::TransformComponent* mTransform;
@@ -27,4 +31,5 @@ private:
     glm::vec3 mVelocity;
 
     f32 mLifeTime;
+    nsm::RandomSource mRandom;
 };

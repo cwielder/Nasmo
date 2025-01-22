@@ -24,10 +24,11 @@ void CameraEntity::onCreate(nsm::Entity::Properties& properties) {
             mPlayerEntity = static_cast<PlayerEntity*>(entity);
 
             mPlayerEntity->setCameraShootCallback([this]() {
-                mQuake = 70.0;
+                mQuake = 100.0;
             });
 
             mPlayerEntity->addDieCallback([this]() {
+                mQuake = 540.0;
                 mGameOver = true;
             });
 
@@ -50,8 +51,8 @@ void CameraEntity::onCreate(nsm::Entity::Properties& properties) {
         glm::vec3(0.0f, 1.0f, 0.0f),
         45.0f,
         aspectRatio,
-        0.01f,
-        10000.0f
+        0.1f,
+        4000.0f
     );
 
     cameraComponent->addTargetLayer("main");
@@ -64,11 +65,16 @@ void CameraEntity::onCreate(nsm::Entity::Properties& properties) {
 void CameraEntity::onUpdate(const f64 timeStep) {
     if (!mGameOver) {
         mLastPlayerPosition = mPlayerEntity->getComponents<nsm::TransformComponent>()[0]->getPosition();
-        mTargetPosition = mLastPlayerPosition + cOffset;
+        mQuake = glm::mix(mQuake, mQuakeBase, timeStep * 5.0);
     } else {
-        mQuake = glm::mix(mQuake, mQuakeBase, timeStep * 5.0);
-        mQuake = glm::mix(mQuake, mQuakeBase, timeStep * 5.0);
+        mQuake = glm::mix(mQuake, 0.0, timeStep * 5.0);
+
+        if (mQuake < 0.1) {
+            mScene->reloadScene();
+        }
     }
+
+    mTargetPosition = mLastPlayerPosition + cOffset;
 
     const auto noise = [](f64 x, f64(*f)(f64)) -> f64 {
         return 0.3 * (-3.2 * f(-1.3 * x) - 1.2 * f(-1.7 * std::numbers::e * x) + 1.9 * f(0.7 * std::numbers::pi * x) );
@@ -89,8 +95,6 @@ void CameraEntity::onUpdate(const f64 timeStep) {
     currentPosition += smoothedStep;
 
     mTransform->setPosition(currentPosition);
-
-    mQuake = glm::mix(mQuake, mQuakeBase, timeStep * 5.0);
 
     mCamera->setView(currentPosition, mLastPlayerPosition + glm::vec3(24.0f, 0.0f, 0.0f));
 }

@@ -2,13 +2,14 @@
 
 #include <nsm/util/JsonHelpers.h>
 #include <nsm/util/Color.h>
+#include <nsm/entity/Scene.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <imgui.h>
 
 namespace {
-    static void CreateMissileExhaustParticle(nsm::ParticleComponent *ptcl) {
+    static void CreateMissileExhaustParticle(nsm::ParticleComponent* ptcl) {
         ptcl->getEmitter()
             .setEmitRadius(0.9f)
             .setEmitRate(980.0f)
@@ -24,31 +25,29 @@ namespace {
     }
 }
 
-MissileEntity::MissileEntity(nsm::Entity::Properties &properties)
+MissileEntity::MissileEntity(nsm::Entity::Properties& properties)
     : mTransform(nullptr)
     , mModel(nullptr)
 { }
 
-void MissileEntity::onCreate(nsm::Entity::Properties &properties) {
-    mLifeTime = 5.0f;
+void MissileEntity::onCreate(nsm::Entity::Properties& properties) {
+    mLifeTime = 1.35f;
 
     f32 direction = nsm::JsonHelpers::getFloat(properties, "direction");
 
     mDirection = direction;
     mVelocity = glm::vec3(glm::cos(mDirection), 0.0f, -glm::sin(mDirection) + nsm::JsonHelpers::getFloat(properties, "velocity") * 10.0f) * 10.0f;
-    mAcceleration = glm::vec3(12.0f, -9.81f, 0.0f) + glm::vec3(glm::cos(mDirection), 0.0f, -glm::sin(mDirection)) * 10.0f;
+    mAcceleration = glm::vec3(12.0f, -5.81f, 0.0f) + glm::vec3(glm::cos(mDirection), 0.0f, -glm::sin(mDirection)) * 10.0f;
 
     mTransform = new nsm::TransformComponent();
     mTransform->setPosition(nsm::JsonHelpers::getVec3(properties, "position"));
     mTransform->setScale(glm::vec3(10.0f));
     this->addComponent<nsm::TransformComponent>(mTransform);
 
-    mCollider = new nsm::SphereColliderComponent(this, 10.0f, mTransform, [](nsm::ColliderComponent* other) {
-        if (other->getOwner()->getIdentifier() != "PlayerEntity") {
-            return;
+    mCollider = new nsm::SphereColliderComponent(this, 10.0f, mTransform, [this](nsm::ColliderComponent* other) {
+        if (other->getOwner()->getIdentifier() == "ShipEntity") {
+            this->explode();
         }
-
-        //nsm::info("Missile collided!");
     });
     this->addComponent<nsm::SphereColliderComponent>(mCollider);
 
@@ -103,6 +102,23 @@ void MissileEntity::onUpdate(const f64 timeStep) {
 
     glm::vec4 exhaustLightPos = mtx * glm::vec4(cExhaustLightOffset, 1.0f);
     mExhaustLight->setPosition(glm::vec3(exhaustLightPos));
+
+    if (position.z > 135.0f || position.z < -118.0f) {
+        this->explode();
+    }
+}
+
+void MissileEntity::explode() {
+    this->kill();
+
+    const glm::vec3& position = mTransform->getPosition();
+
+    const std::string properties = R"({
+        "position": [)" + std::to_string(position.x) + ", " + std::to_string(position.y) + ", " + std::to_string(position.z) + R"(],
+        "scale": )" + std::to_string(0.5f) + R"(
+    })";
+
+    mScene->spawnEntity("ExplosionEntity", properties);
 }
 
 NSM_REGISTER_ENTITY(MissileEntity);

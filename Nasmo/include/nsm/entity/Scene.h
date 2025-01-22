@@ -19,10 +19,10 @@ namespace nsm {
         void onEvent(const Event* event);
 
         void switchScene(const std::string& path);
+        void reloadScene();
         void spawnEntity(const std::string_view type, const std::string& propertiesJson, Entity** out = nullptr);
 
         [[nodiscard]] const std::vector<Entity*>& getEntities() const { return mEntities; }
-
         [[nodiscard]] const std::string& getPath() const { return mPath; }
 
     private:

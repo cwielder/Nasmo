@@ -70,15 +70,28 @@ void nsm::ParticleEmitter::update(const f64 timeStep) {
         }
 
         particle.velocity = mInitialVelocity;
-
-        particle.velocity.x += mRandom.getF32(-mInitialVelocityVariance.x, mInitialVelocityVariance.x);
-        particle.velocity.y += mRandom.getF32(-mInitialVelocityVariance.y, mInitialVelocityVariance.y);
-        particle.velocity.z += mRandom.getF32(-mInitialVelocityVariance.z, mInitialVelocityVariance.z);
-
         particle.acceleration = mAcceleration;
-        particle.acceleration.x += mRandom.getF32(-mAccelerationVariance.x, mAccelerationVariance.x);
-        particle.acceleration.y += mRandom.getF32(-mAccelerationVariance.y, mAccelerationVariance.y);
-        particle.acceleration.z += mRandom.getF32(-mAccelerationVariance.z, mAccelerationVariance.z);
+
+        if (mDirectionMode) {
+            const f32 velocityMagnitude = glm::length(particle.velocity);
+            NSM_ASSERT(velocityMagnitude > std::numeric_limits<f32>::epsilon(), "Initial velocity must be non-zero for direction mode!");
+
+            particle.velocity.x = mRandom.getF32(-mInitialVelocityVariance.x, mInitialVelocityVariance.x);
+            particle.velocity.y = mRandom.getF32(-mInitialVelocityVariance.y, mInitialVelocityVariance.y);
+            particle.velocity.z = mRandom.getF32(-mInitialVelocityVariance.z, mInitialVelocityVariance.z);
+
+            particle.velocity = glm::normalize(particle.velocity) * velocityMagnitude;
+
+            // TODO: Acceleration
+        } else {
+            particle.velocity.x += mRandom.getF32(-mInitialVelocityVariance.x, mInitialVelocityVariance.x);
+            particle.velocity.y += mRandom.getF32(-mInitialVelocityVariance.y, mInitialVelocityVariance.y);
+            particle.velocity.z += mRandom.getF32(-mInitialVelocityVariance.z, mInitialVelocityVariance.z);
+        
+            particle.acceleration.x += mRandom.getF32(-mAccelerationVariance.x, mAccelerationVariance.x);
+            particle.acceleration.y += mRandom.getF32(-mAccelerationVariance.y, mAccelerationVariance.y);
+            particle.acceleration.z += mRandom.getF32(-mAccelerationVariance.z, mAccelerationVariance.z);
+        }
 
         particle.startSize = mStartSize;
         particle.startSize.x += mRandom.getF32(-mStartSizeVariance.x, mStartSizeVariance.x);

@@ -170,6 +170,11 @@ namespace nsm {
             return *this;
         }
 
+        ParticleEmitter& setDirectionMode(const bool directionMode) {
+            mDirectionMode = directionMode;
+            return *this;
+        }
+
         void update(const f64 timeStep);
         void render(const RenderInfo& renderInfo);
 
@@ -204,6 +209,7 @@ namespace nsm {
         bool mLocalSpace = false;
 
         // Motion
+        bool mDirectionMode = false;
         glm::vec3 mInitialVelocity;
         glm::vec3 mInitialVelocityVariance;
         glm::vec3 mAcceleration;

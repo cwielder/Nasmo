@@ -28,6 +28,7 @@ public:
 
 private:
     void spawnMissile();
+    void explode();
 
 private:
     nsm::TransformComponent* mTransform;
@@ -48,6 +49,6 @@ private:
     bool mForwardPressed = false, mBackwardPressed = false;
     f32 mAcceleration = 0.0f;
     f32 mVelocity = 0.0f;
-    f32 mThrust = 1.0f;
+    f32 mThrust = 0.7f;
     f32 mShootCooldown = 0.0f;
 };

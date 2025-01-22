@@ -89,6 +89,10 @@ void nsm::Scene::switchScene(const std::string& path) {
     nsm::Application::raiseEvent(new SceneSwitchEvent(path));
 }
 
+void nsm::Scene::reloadScene() {
+    nsm::Application::raiseEvent(new SceneSwitchEvent(mPath));
+}
+
 void nsm::Scene::spawnEntity(const std::string_view type, const std::string& propertiesJson, Entity** out) {
     mEntitiesToSpawn.push_back(std::make_tuple(std::string{type}, propertiesJson, out));
 }
