@@ -65,9 +65,9 @@ void CameraEntity::onCreate(nsm::Entity::Properties& properties) {
 void CameraEntity::onUpdate(const f64 timeStep) {
     if (!mGameOver) {
         mLastPlayerPosition = mPlayerEntity->getComponents<nsm::TransformComponent>()[0]->getPosition();
-        mQuake = glm::mix(mQuake, mQuakeBase, timeStep * 5.0);
+        mQuake = glm::mix(mQuake, mQuakeBase, timeStep * 15.0);
     } else {
-        mQuake = glm::mix(mQuake, 0.0, timeStep * 5.0);
+        mQuake = glm::mix(mQuake, 0.0, timeStep * 15.0);
 
         if (mQuake < 0.1) {
             mScene->reloadScene();
@@ -96,7 +96,7 @@ void CameraEntity::onUpdate(const f64 timeStep) {
 
     mTransform->setPosition(currentPosition);
 
-    mCamera->setView(currentPosition, mLastPlayerPosition + glm::vec3(24.0f, 0.0f, 0.0f));
+    mCamera->setView(currentPosition, mLastPlayerPosition + glm::vec3(90.0f, 0.0f, 0.0f));
 }
 
 NSM_REGISTER_ENTITY(CameraEntity);
