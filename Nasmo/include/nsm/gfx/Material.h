@@ -5,6 +5,7 @@
 #include <nsm/gfx/Texture2D.h>
 #include <nsm/gfx/Shader.h>
 
+#include <memory>
 #include <string>
 
 #include <glm/vec2.hpp>
@@ -65,23 +66,24 @@ namespace nsm {
         [[nodiscard]] static Material* get(const std::string& identifier, const fastgltf::Asset& asset, const fastgltf::Material& resource);
 
         void bind() const;
+        void setShader(const std::string& vshPath, const std::string& fshPath);
 
-        [[nodiscard]] ShaderProgram* getShader() const { return mShader; }
+        [[nodiscard]] ShaderProgram* getShader() const { return mShader.get(); }
         [[nodiscard]] const std::vector<Texture2D>& getTextures() const { return mTextures; }
-        [[nodiscard]] const std::vector<UniformVar>& getUniforms() const { return mUniforms; }
         [[nodiscard]] bool isTranslucent() const { return mIsTranslucent; }
+        [[nodiscard]] std::vector<UniformVar>& getUniforms() { return mUniforms; }
 
         static void clearCache();
 
     private:
         Material(const fastgltf::Asset& asset, const fastgltf::Material& resource);
-        ~Material();
+        ~Material() = default;
 
         void addTexture(const fastgltf::Asset& asset, const fastgltf::Texture& tex);
 
         static std::map<std::string, Material*> sMaterialCache;
 
-        ShaderProgram* mShader;
+        std::unique_ptr<ShaderProgram> mShader;
         std::vector<Texture2D> mTextures;
         std::vector<UniformVar> mUniforms;
         bool mIsTranslucent;

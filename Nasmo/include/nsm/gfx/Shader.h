@@ -73,6 +73,8 @@ namespace nsm {
         void setOptionalVec3(const std::string& name, const glm::vec3& value) const;
         void setOptionalVec4(const std::string& name, const glm::vec4& value) const;
         void setOptionalMat4(const std::string& name, const glm::mat4& value) const;
+        
+        [[nodiscard]] const std::string& getIdentifier() const { return mIdentifier; }
     
     private:
         void cacheUniforms();
@@ -86,6 +88,7 @@ namespace nsm {
 
         u32 mId;
         std::unordered_map<std::string /*name*/, i32 /*location*/> mUniformLocations;
+        std::string mIdentifier;
     };
 
 }

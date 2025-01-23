@@ -54,17 +54,22 @@ void main() {
         } else {
             normal = texture(tex0, vTexCoord).xyz * 2.0 - 1.0;
         }
+
+        // Normal is currently in tangent space, convert to world space
+        // TODO: Use proper tangent attributes from vertex data
+        normal = normalize(normal);
+        vec3 t = normalize(dFdx(vPosition));
+        vec3 b = normalize(dFdy(vPosition));
+        vec3 n = normalize(vNormal);
+        mat3 tbn = mat3(t, b, n);
+        normal = normalize(tbn * normal);
     } else {
-        normal = vNormal;
+        normal = normalize(vNormal);
     }
 
     vec2 uv = vTexCoord; // apply parallax mapping here
 
-    if (uv.x > 1.0 || uv.y > 1.0 || uv.x < 0.0 || uv.y < 0.0) {
-        discard;
-    }
-
-    oNormalMetallic.rgb = normalize(normal);
+    oNormalMetallic.rgb = normal;
     oNormalMetallic.a = metallic;
     oAlbedoRoughness.rgb = albedo.rgb;
     oAlbedoRoughness.a = roughness;

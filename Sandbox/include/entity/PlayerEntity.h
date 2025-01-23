@@ -7,7 +7,6 @@
 #include <nsm/entity/component/InputComponent.h>
 #include <nsm/entity/component/AudioComponent.h>
 #include <nsm/entity/component/SphereColliderComponent.h>
-#include <nsm/entity/component/LightComponent.h>
 #include <nsm/audio/SoundHandle.h>
 #include <nsm/util/RandomSource.h>
 
@@ -38,7 +37,6 @@ private:
     nsm::InputComponent* mInput;
     nsm::AudioComponent* mAudio;
     nsm::SphereColliderComponent* mCollider;
-    nsm::PointLightComponent* mExhaustLight;
 
     std::function<void()> mCameraShootCallback;
     std::vector<std::function<void()>> mDieCallbacks;

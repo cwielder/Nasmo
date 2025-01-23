@@ -38,7 +38,7 @@ namespace nsm {
 
                 void draw(const RenderInfo& renderInfo, const u32 count, const glm::mat4& localTransform);
 
-                [[nodiscard]] const Material* getMaterial() const { return mMaterial; }
+                [[nodiscard]] Material* getMaterial() const { return mMaterial; }
 
             private:
                 Material* mMaterial;
@@ -54,6 +54,8 @@ namespace nsm {
             void drawOpaque(const RenderInfo& renderInfo, const u32 count, const glm::mat4& localTransform);
             void drawTranslucent(const RenderInfo& renderInfo, const u32 count, const glm::mat4& localTransform);
 
+            [[nodiscard]] const std::vector<Shape*>& getShapes() const { return mShapes; }
+
         private:
             std::vector<Shape*> mShapes;
         };
@@ -67,13 +69,11 @@ namespace nsm {
             virtual void shrinkInstanceDataBuffer(const std::size_t newCount, const std::size_t missingIndex);
             virtual void setInstanceData(const void* data, const std::size_t index);
             virtual void setInstanceDataBufferEntrySize(const std::size_t) { }
+            virtual Mesh* getMesh() { return nullptr; }
 
             void growTransformBuffer();
             void shrinkTransformBuffer(const std::size_t missingIndex);
             void setTransform(const glm::mat4& transform, const std::size_t index);
-
-            virtual void drawOpaque(const RenderInfo& renderInfo, const std::size_t instanceCount);
-            virtual void drawTranslucent(const RenderInfo& renderInfo, const std::size_t instanceCount);
 
             [[nodiscard]] std::vector<Object*> getAllChildren() const;
             [[nodiscard]] const glm::mat4& getTransform() const { return mTransform; }
@@ -84,6 +84,12 @@ namespace nsm {
             [[nodiscard]] std::size_t getChildCount() const; // Includes children of children
             [[nodiscard]] std::size_t getChildMeshObjectCount() const; // Includes children of children
             [[nodiscard]] std::vector<glm::mat4>& getTransformBuffer() { return mTransformBuffer; }
+
+        protected:
+            friend class Model;
+
+            virtual void drawOpaque(const RenderInfo& renderInfo, const std::size_t instanceCount);
+            virtual void drawTranslucent(const RenderInfo& renderInfo, const std::size_t instanceCount);
 
         protected:
             glm::mat4 mTransform;
@@ -102,7 +108,9 @@ namespace nsm {
             void shrinkInstanceDataBuffer(const std::size_t newCount, const std::size_t missingIndex) override;
             void setInstanceData(const void* data, const std::size_t index) override;
             void setInstanceDataBufferEntrySize(const std::size_t entrySize) override;
+            Mesh* getMesh() override { return mMesh; }
 
+        protected:
             void drawOpaque(const RenderInfo& renderInfo, const std::size_t instanceCount) override;
             void drawTranslucent(const RenderInfo& renderInfo, const std::size_t instanceCount) override;
 
@@ -130,6 +138,8 @@ namespace nsm {
 
         void setTransformAll(const std::size_t instanceID, const glm::mat4& transform);
         void setTransform(const std::size_t instanceID, const std::string& objectName, const glm::mat4& transform);
+
+        void forEachMaterial(const std::function<void(Material*)>& func);
 
         [[nodiscard]] std::vector<Object*> getAllObjects() const;
 

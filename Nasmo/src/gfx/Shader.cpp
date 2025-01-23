@@ -75,6 +75,7 @@ nsm::ShaderProgram::ShaderProgram(const std::string& vshPath, const std::string&
 
             mId = id;
             mUniformLocations = uniformLocations;
+            mIdentifier = identifier;
 
             sProgramCacheRefCounter[mId]++;
             return;

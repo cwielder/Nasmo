@@ -22,7 +22,7 @@ namespace {
             .setStartSize(glm::vec3(0.8f))
             .setEndSize(glm::vec3(0.1f, 0.1f, 1.0f))
             .setTexture("textures/exhaust_b2.png")
-            .setEmission(0.75f)
+            .setEmission(1.5f)
             .setDepth(false)
         ;
     }
@@ -51,10 +51,6 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
     mExhaustParticleRight->setTargetLayer("forward");
     this->addComponent<nsm::DrawableComponent>(mExhaustParticleRight);
     CreateB2ExhaustParticle(mExhaustParticleRight);
-
-    mExhaustLight = new nsm::PointLightComponent(mTransform->getPosition(), nsm::Color{"#AE91F0"}.getRGBA(), 2000.0f);
-    mExhaustLight->setTargetLayer("lighting_point");
-    this->addComponent<nsm::DrawableComponent>(mExhaustLight);
 
     mAudio = new nsm::AudioComponent({ "SE_ENGINE", "SE_SHOOT", "SE_EXPLODE" }, mTransform);
     this->addComponent<nsm::AudioComponent>(mAudio);
@@ -207,11 +203,6 @@ void PlayerEntity::onUpdate(const f64 timeStep) {
         .setInitialVelocity(glm::vec3(cExhaustSpeed * mThrust, 0.0f, cExhaustSpeed * mThrust * glm::sin(angle)))
         .setEmitRate(cExhaustEmit * mThrust)
     ;
-
-    static constexpr glm::vec3 cExhaustLightOffset(-239.0f, 0.0f, 58.8f);
-
-    glm::vec4 exhaustLightPos = mtx * glm::vec4(cExhaustLightOffset, 1.0f);
-    mExhaustLight->setPosition(glm::vec3(exhaustLightPos));
 
     if (position.z > 135.0f || position.z < -118.0f) {
         this->explode();

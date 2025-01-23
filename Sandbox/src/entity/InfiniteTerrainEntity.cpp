@@ -6,6 +6,7 @@
 
 #include <nsm/util/JsonHelpers.h>
 #include <nsm/entity/Scene.h>
+#include <nsm/gfx/Graphics.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <imgui.h>
@@ -21,9 +22,39 @@ InfiniteTerrainEntity::InfiniteTerrainEntity(nsm::Entity::Properties& properties
 void InfiniteTerrainEntity::onCreate(nsm::Entity::Properties& properties) {
     mWater = new nsm::ModelComponent("models/water.glb", "main");
     this->addComponent<nsm::DrawableComponent>(mWater);
+    mWater->getModel()->forEachMaterial([](nsm::Material* material) {
+        material->setShader("nsm/assets/shaders/model.vsh", "shaders/water.fsh");
+
+        auto& uniforms = material->getUniforms();
+        bool has_uTime = false;
+        bool has_uScrollSpeed = false;
+        for (const auto& uniform : uniforms) {
+            if (uniform.name == "uTime") {
+                has_uTime = true;
+            } else if (uniform.name == "uScrollSpeed") {
+                has_uScrollSpeed = true;
+            }
+        }
+
+        if (!has_uTime) {
+            nsm::Material::UniformVar uTime;
+            uTime.type = nsm::Material::UniformVar::Type::Float;
+            uTime.name = "uTime";
+            uTime.value.f = 0.0f;
+            uniforms.push_back(uTime);
+        }
+
+        if (!has_uScrollSpeed) {
+            nsm::Material::UniformVar uScrollSpeed;
+            uScrollSpeed.type = nsm::Material::UniformVar::Type::Float;
+            uScrollSpeed.name = "uScrollSpeed";
+            uScrollSpeed.value.f = 0.0f;
+            uniforms.push_back(uScrollSpeed);
+        }
+    });
 
     const auto& entities = mScene->getEntities();
-    for (nsm::Entity* entity : entities) {
+    for (const auto entity : entities) {
         if (entity->getIdentifier() == "PlayerEntity") {
             mPlayer = static_cast<PlayerEntity*>(entity);
 
@@ -49,11 +80,30 @@ void InfiniteTerrainEntity::onCreate(nsm::Entity::Properties& properties) {
 }
 
 void InfiniteTerrainEntity::onUpdate(const f64 timeStep) {
+    static constexpr f32 cSpeed = 512.0f;
+
+    mWater->getModel()->forEachMaterial([timeStep](nsm::Material* material) {
+        for (auto& uniform : material->getUniforms()) {
+            if (uniform.name == "uTime") {
+                uniform.value.f += static_cast<f32>(timeStep);
+            }
+            if (uniform.name == "uScrollSpeed") {
+                uniform.value.f = 0.0f;
+            }
+        }
+    });
+
     if (mGameOver) {
         return;
     }
 
-    static constexpr f32 cSpeed = 512.0f;
+    mWater->getModel()->forEachMaterial([timeStep, this](nsm::Material* material) {
+        for (auto& uniform : material->getUniforms()) {
+            if (uniform.name == "uScrollSpeed") {
+                uniform.value.f = mPlayer->getThrust();
+            }
+        }
+    });
 
     bool spawn = false;
 
@@ -108,7 +158,7 @@ void InfiniteTerrainEntity::removeSelfBoat(nsm::Entity* entity) {
 void InfiniteTerrainEntity::spawnTerrainChunk(const f32 xMultiplier) {
     mTerrainChunks.push_back(nullptr);
     const std::string newProps = R"({
-        "position": [)" + std::to_string(cCreatePosition.x + 1173.0f * (xMultiplier-1)) + ", " + std::to_string(cCreatePosition.y) + ", " + std::to_string(cCreatePosition.z) + R"(],
+        "position": [)" + std::to_string(cCreatePosition.x + 1165.0f * (xMultiplier-1)) + ", " + std::to_string(cCreatePosition.y) + ", " + std::to_string(cCreatePosition.z) + R"(],
         "scale": )" + std::to_string(cCreateScale) + R"(,
         "rotation": [)" + std::to_string(cCreateRotation.x) + ", " + std::to_string(cCreateRotation.y) + ", " + std::to_string(cCreateRotation.z) + R"(]
     })";

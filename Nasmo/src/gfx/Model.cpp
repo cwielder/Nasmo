@@ -145,6 +145,27 @@ void nsm::Model::setTransform(const std::size_t instanceID, const std::string& o
     object->setTransform(transform, instanceID);
 }
 
+void nsm::Model::forEachMaterial(const std::function<void(Material*)>& func) {
+    const auto objects = this->getAllObjects();
+    for (const auto& object : objects) {
+        Mesh* mesh = object->getMesh();
+        if (!mesh) {
+            continue;
+        }
+
+        auto shapes = mesh->getShapes();
+        for (const auto& shape : shapes) {
+            Material* material = shape->getMaterial();
+         
+            if (!material) {
+                continue;
+            }
+
+            func(material);
+        }
+    }
+}
+
 std::size_t nsm::Model::getObjectCount() const {
     std::size_t count = mObjects.size();
     for (const auto& [_, object] : mObjects) {

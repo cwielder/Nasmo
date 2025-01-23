@@ -14,7 +14,7 @@ void main() {
 
     // if the pixel is luminous enough, add it to the emissive buffer
     float luminance = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
-    if (luminance > 0.5) {
+    if (luminance > 0.8) {
         oFragEmissive = vec4(color.rgb, 1.0);
     } else {
         oFragEmissive = vec4(0.0, 0.0, 0.0, 0.0);

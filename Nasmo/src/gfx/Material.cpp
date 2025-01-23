@@ -84,7 +84,7 @@ nsm::Material::Material(const fastgltf::Asset& asset, const fastgltf::Material& 
     , mUniforms()
     , mIsTranslucent(false)
 {
-    mShader = new ShaderProgram("nsm/assets/shaders/model.vsh", "nsm/assets/shaders/model.fsh");
+    mShader = std::make_unique<ShaderProgram>("nsm/assets/shaders/model.vsh", "nsm/assets/shaders/model.fsh");
 
     // Albedo
     UniformVar uAlbedoTexturePresent;
@@ -139,10 +139,6 @@ nsm::Material::Material(const fastgltf::Asset& asset, const fastgltf::Material& 
         uNormalTexturePresent.value.i = false;
     }
     mUniforms.push_back(uNormalTexturePresent);
-}
-
-nsm::Material::~Material() {
-    delete mShader;
 }
 
 void nsm::Material::addTexture(const fastgltf::Asset& asset, const fastgltf::Texture& tex) {
@@ -201,12 +197,20 @@ void nsm::Material::bind() const {
     mShader->bind();
 
     for (const UniformVar& uniform : mUniforms) {
-        uniform.apply(mShader);
+        uniform.apply(mShader.get());
     }
 
     for (std::size_t i = 0; i < mTextures.size(); ++i) {
         mTextures[i].bind(static_cast<u32>(i));
     }
+}
+
+void nsm::Material::setShader(const std::string& vshPath, const std::string& fshPath) {
+    if (mShader->getIdentifier() == vshPath + fshPath) {
+        return;
+    }
+
+    mShader = std::make_unique<ShaderProgram>(vshPath, fshPath);
 }
 
 void nsm::Material::clearCache() {

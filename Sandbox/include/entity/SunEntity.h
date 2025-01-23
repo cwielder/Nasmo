@@ -11,7 +11,6 @@ public:
     ~SunEntity() override = default;
 
     void onCreate(nsm::Entity::Properties&) override;
-    void onUpdate(const f64) override;
 
 private:
     f32 mIntensity, mYaw, mPitch;
