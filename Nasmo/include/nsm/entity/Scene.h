@@ -29,9 +29,23 @@ namespace nsm {
         Entity* spawnEntity(const std::string_view type, Entity::Properties& properties);
         void loadScene(const std::string& path);
 
+        class ResourceHolder {
+        public:
+            ResourceHolder() = default;
+            ~ResourceHolder() = default;
+
+            void scenePreload(const std::vector<std::string>& models);
+
+        private:
+            std::vector<std::string> mModels;
+            std::vector<std::string> mShaders;
+        };
+
+    private:
         std::vector<Entity*> mEntities;
         std::vector<std::tuple<std::string, std::string, Entity**>> mEntitiesToSpawn;
         std::string mPath;
+        ResourceHolder mResourceHolder;
     };
 
 }

@@ -40,7 +40,7 @@ void CameraEntity::onCreate(nsm::Entity::Properties& properties) {
 
     const glm::vec3 playerPosition = mPlayerEntity->getComponents<nsm::TransformComponent>()[0]->getPosition();
     mTargetPosition = playerPosition + cOffset;
-    const glm::vec3 initialPosition = playerPosition + glm::vec3(-2.0f, 128.0f, 0.0f);
+    const glm::vec3 initialPosition = playerPosition + glm::vec3(-100.0f, 24.0f, 0.0f);
 
     mTransform = new nsm::TransformComponent(initialPosition);
     this->addComponent<nsm::TransformComponent>(mTransform);

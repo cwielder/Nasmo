@@ -1,6 +1,7 @@
 #include <nsm/entity/Scene.h>
 
 #include <nsm/entity/component/TagComponent.h>
+#include <nsm/entity/component/ModelComponent.h>
 #include <nsm/debug/Assert.h>
 #include <nsm/event/Events.h>
 #include <nsm/app/Application.h>
@@ -75,12 +76,6 @@ void nsm::Scene::onEvent(const Event* event) {
     if (event->getType() == nsm::EventType::SceneSwitch) {
         const nsm::SceneSwitchEvent* sceneSwitchEvent = static_cast<const nsm::SceneSwitchEvent*>(event);
 
-        for (auto& entity : mEntities) {
-            delete entity;
-        }
-
-        mEntities.clear();
-
         this->loadScene(sceneSwitchEvent->getPath());
     }
 }
@@ -136,6 +131,22 @@ void nsm::Scene::loadScene(const std::string& path) {
     simdjson::ondemand::document document = parser.iterate(json);
 
     try {
+        auto resources = document["resources"].get_object();
+        auto models = resources["models"].get_array();
+
+        std::vector<std::string> modelPaths;
+        for (auto model : models) {
+            modelPaths.push_back(std::string{model.get_string().value()});
+        }
+
+        mResourceHolder.scenePreload(modelPaths);
+
+        for (auto& entity : mEntities) {
+            delete entity;
+        }
+
+        mEntities.clear();
+
         auto entities = document["entities"].get_array();
 
         for (auto entity : entities) {
@@ -150,3 +161,40 @@ void nsm::Scene::loadScene(const std::string& path) {
     }
 }
 
+void nsm::Scene::ResourceHolder::scenePreload(const std::vector<std::string>& models) {
+    std::vector<std::string> modelsToLoad;
+    std::vector<std::string> modelsToUnload;
+
+    for (const std::string& model : models) {
+        auto it = std::find(mModels.begin(), mModels.end(), model);
+        if (it == mModels.end()) {
+            modelsToLoad.push_back(model);
+        }
+    }
+
+    for (const std::string& model : mModels) {
+        auto it = std::find(models.begin(), models.end(), model);
+        if (it == models.end()) {
+            modelsToUnload.push_back(model);
+        }
+    }
+
+    // Load models
+    for (const std::string& model : modelsToLoad) {
+        auto it = ModelComponent::getModelsCache().find(model);
+        if (it == ModelComponent::getModelsCache().end()) {
+            ModelComponent::getModelsCache()[model] = new Model(model);
+        }
+    }
+
+    // Unload models
+    for (const std::string& model : modelsToUnload) {
+        auto it = ModelComponent::getModelsCache().find(model);
+        if (it != ModelComponent::getModelsCache().end()) {
+            delete it->second;
+            ModelComponent::getModelsCache().erase(it);
+        }
+    }
+
+    mModels = models;
+}

@@ -25,5 +25,14 @@
             "type": "InfiniteTerrainEntity",
             "properties": {}
         }
-    ]
+    ],
+    "resources": {
+        "models": [
+            "models/B2.glb",
+            "models/missile.glb",
+            "models/ship.glb",
+            "models/terrainOpen.glb",
+            "models/water.glb"
+        ]
+    }
 }

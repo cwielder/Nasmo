@@ -28,6 +28,7 @@ namespace nsm {
         [[nodiscard]] Model* getModel() const { return mModel; }
         
         static void clearModels();
+        static std::map<std::string, Model*>& getModelsCache() { return sModels; }
 
     private:
         static std::map<std::string, Model*> sModels;

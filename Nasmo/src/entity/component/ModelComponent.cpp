@@ -42,12 +42,6 @@ nsm::ModelComponent::ModelComponent(const std::string& path, const std::string& 
 
 nsm::ModelComponent::~ModelComponent() {
     mModel->removeInstance(mInstanceID);
-
-    if (mModel->getInstanceIDs().empty()) {
-        auto it = sModels.find(mModel->getPath());
-        delete (*it).second;
-        sModels.erase(it);
-    }
 }
 
 void nsm::ModelComponent::setInstanceDataDirty(const std::string& meshName) {
