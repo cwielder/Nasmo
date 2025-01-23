@@ -18,6 +18,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <tracy/TracyOpenGL.hpp>
+
 static void glErrorCallback(GLenum, GLenum, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*) {
     switch (severity) {
         case GL_DEBUG_SEVERITY_HIGH: NSM_ASSERT(false, message); break;
@@ -52,6 +54,10 @@ nsm::Graphics::Graphics(const GraphicsInfo& info)
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     #endif
 
+    #ifdef NSM_DEV_MODE
+        TracyGpuContext;
+    #endif
+
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     PrimitiveShape::init();
@@ -73,6 +79,10 @@ bool nsm::Graphics::update() {
 
     glfwPollEvents();
     glfwSwapBuffers(window);
+
+    #ifdef NSM_DEV_MODE
+        TracyGpuCollect;
+    #endif
 
     mRenderer->render();
 
