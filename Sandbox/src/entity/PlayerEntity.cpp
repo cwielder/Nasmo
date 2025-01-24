@@ -141,6 +141,7 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
 
 void PlayerEntity::onUpdate(const f64 timeStep) {
     mShootCooldown -= static_cast<f32>(timeStep);
+    mFuel -= static_cast<f32>(timeStep) * 0.1f;
 
     static constexpr f32 cMaxVelocity = 0.1f;
     static constexpr f32 cAcceleration = 0.2f;
@@ -204,7 +205,14 @@ void PlayerEntity::onUpdate(const f64 timeStep) {
         .setEmitRate(cExhaustEmit * mThrust)
     ;
 
-    if (position.z > 135.0f || position.z < -118.0f) {
+    if (mFuel <= 0.0f) {
+        mFuel = 0.0f;
+        mExhaustParticleLeft->getEmitter().setEmitRate(0.0f);
+        mExhaustParticleRight->getEmitter().setEmitRate(0.0f);
+        mTransform->setPosition(mTransform->getPosition() + glm::vec3(0.0f, -timeStep * 20.0f, 0.0f));
+    }
+
+    if (position.z > 135.0f || position.z < -118.0f || position.y < -90.0f) {
         this->explode();
     }
 }

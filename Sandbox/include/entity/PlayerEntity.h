@@ -24,6 +24,7 @@ public:
     void addDieCallback(const std::function<void()>& callback) { mDieCallbacks.push_back(callback); }
 
     [[nodiscard]] f32 getThrust() const { return mThrust; }
+    [[nodiscard]] f32 getFuel() const { return mFuel; }
 
 private:
     void spawnMissile();
@@ -49,4 +50,5 @@ private:
     f32 mVelocity = 0.0f;
     f32 mThrust = 0.7f;
     f32 mShootCooldown = 0.0f;
+    f32 mFuel = 1.0f;
 };

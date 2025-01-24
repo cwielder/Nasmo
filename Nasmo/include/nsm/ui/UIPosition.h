@@ -18,6 +18,8 @@ namespace nsm {
         [[nodiscard]] glm::vec2 getXY() const;
         [[nodiscard]] f32 getZ() const;
 
+        void setOffset(const glm::vec2& offset) { mOffset = offset; }
+
     private:
         const UIPosition* mAnchor;
         glm::vec2 mOffset;

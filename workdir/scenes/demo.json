@@ -24,6 +24,10 @@
         {
             "type": "InfiniteTerrainEntity",
             "properties": {}
+        },
+        {
+            "type": "HUDEntity",
+            "properties": {}
         }
     ],
     "resources": {
