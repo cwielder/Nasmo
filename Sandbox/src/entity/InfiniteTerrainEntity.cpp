@@ -27,12 +27,12 @@ void InfiniteTerrainEntity::onCreate(nsm::Entity::Properties& properties) {
 
         auto& uniforms = material->getUniforms();
         bool has_uTime = false;
-        bool has_uScrollSpeed = false;
+        bool has_uScroll = false;
         for (const auto& uniform : uniforms) {
             if (uniform.name == "uTime") {
                 has_uTime = true;
-            } else if (uniform.name == "uScrollSpeed") {
-                has_uScrollSpeed = true;
+            } else if (uniform.name == "uScroll") {
+                has_uScroll = true;
             }
         }
 
@@ -44,12 +44,12 @@ void InfiniteTerrainEntity::onCreate(nsm::Entity::Properties& properties) {
             uniforms.push_back(uTime);
         }
 
-        if (!has_uScrollSpeed) {
-            nsm::Material::UniformVar uScrollSpeed;
-            uScrollSpeed.type = nsm::Material::UniformVar::Type::Float;
-            uScrollSpeed.name = "uScrollSpeed";
-            uScrollSpeed.value.f = 0.0f;
-            uniforms.push_back(uScrollSpeed);
+        if (!has_uScroll) {
+            nsm::Material::UniformVar uScroll;
+            uScroll.type = nsm::Material::UniformVar::Type::Float;
+            uScroll.name = "uScroll";
+            uScroll.value.f = 0.0f;
+            uniforms.push_back(uScroll);
         }
     });
 
@@ -87,9 +87,6 @@ void InfiniteTerrainEntity::onUpdate(const f64 timeStep) {
             if (uniform.name == "uTime") {
                 uniform.value.f += static_cast<f32>(timeStep);
             }
-            if (uniform.name == "uScrollSpeed") {
-                uniform.value.f = 0.0f;
-            }
         }
     });
 
@@ -99,8 +96,8 @@ void InfiniteTerrainEntity::onUpdate(const f64 timeStep) {
 
     mWater->getModel()->forEachMaterial([timeStep, this](nsm::Material* material) {
         for (auto& uniform : material->getUniforms()) {
-            if (uniform.name == "uScrollSpeed") {
-                uniform.value.f = mPlayer->getThrust();
+            if (uniform.name == "uScroll") {
+                uniform.value.f += mPlayer->getThrust() * static_cast<f32>(timeStep);
             }
         }
     });

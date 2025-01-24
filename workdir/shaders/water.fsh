@@ -12,7 +12,7 @@ uniform float uRoughnessFactor;
 uniform int uNormalTexturePresent;
 
 uniform float uTime;
-uniform float uScrollSpeed;
+uniform float uScroll;
 
 in vec2 vTexCoord;
 in vec3 vPosition;
@@ -115,7 +115,7 @@ vec3 water(float time) {
     vec2 uv = vTexCoord.xy;
     uv *= 2.0;
 
-    uv.y += time * uScrollSpeed;
+    uv.y += uScroll;
     uv.x += time * 0.025;
 
     time *= 0.5;
