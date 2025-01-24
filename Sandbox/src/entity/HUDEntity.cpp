@@ -1,6 +1,7 @@
 #include <nsm/entity/Entity.h>
 
 #include "entity/PlayerEntity.h"
+#include "nsm/gfx/RenderInfo.h"
 
 #include <nsm/ui/UIElement.h>
 #include <nsm/gfx/Texture2D.h>
@@ -8,53 +9,40 @@
 #include <nsm/entity/Scene.h>
 
 namespace {
-    class TankBG : public nsm::UIElement {
+    class FuelTankElement : public nsm::UIElement {
     public:
-        TankBG(const glm::vec2& position, const f32 z)
+        FuelTankElement(const glm::vec2& position, const f32 z)
             : UIElement(position, z)
-            , mTexture("textures/tank_bg.png", false)
+            , mBackgroundTexture("textures/tank_bg.png", false)
+            , mIndicatorTexture("textures/tank_indicator.png", false)
         { }
-
+        
         void draw(const nsm::RenderInfo& renderInfo) override {
-            this->getRenderer().drawTexture(renderInfo, mTexture, 
+            this->getRenderer().drawTexture(renderInfo, mBackgroundTexture, 
                 glm::vec2(1.0f * 0.33f, 0.333f * 0.33f), 0.0f, glm::vec2(0.0f)
             );
-        }
-
-    private:
-        nsm::Texture2D mTexture;
-    };
-
-    class TankIndicator : public nsm::UIElement {
-    public:
-        TankIndicator(const UIElement* anchor, const glm::vec2& position, const f32 z)
-            : UIElement(anchor, position, z)
-            , mTexture("textures/tank_indicator.png", false)
-        { }
-
-        void draw(const nsm::RenderInfo& renderInfo) override {
-            this->getRenderer().drawTexture(renderInfo, mTexture,
-                glm::vec2(0.2f * 0.33f), 0.0f, glm::vec2(0.0f)
+            
+            this->getRenderer().drawTexture(renderInfo, mIndicatorTexture,
+                glm::vec2(0.2f * 0.33f), 0.0f, mFuelPosition
             );
         }
-
+        
         void setFuel(f32 fuel) {
-            glm::vec3 full = glm::vec3(-0.33f, 0.0f, 0.0f);
-            glm::vec3 empty = glm::vec3(0.29f, 0.0f, 0.0f);
+            constexpr glm::vec3 full = glm::vec3(-0.33f, 0.0f, 0.0f);
+            constexpr glm::vec3 empty = glm::vec3(0.29f, 0.0f, 0.0f);
 
-            mPosition.setOffset(glm::vec2(empty.x + (full.x - empty.x) * fuel, 0.255f * 0.33));
+            mFuelPosition = glm::vec2(empty.x + (full.x - empty.x) * fuel, 0.255f * 0.33);
         }
-
+        
     private:
-        nsm::Texture2D mTexture;
+        nsm::Texture2D mBackgroundTexture;
+        nsm::Texture2D mIndicatorTexture;
+        glm::vec2 mFuelPosition;
     };
 
-    void CreateHUDLayout(nsm::UIComponent* c) {       
-        TankBG* tank_bg = new TankBG({ -1.3f, -0.75f }, 0.0f);
-
+    void CreateHUDLayout(nsm::UIComponent* c) {
         c
-            ->addElement("tank_bg", tank_bg)
-            ->addElement("tank_indicator", new TankIndicator(tank_bg, { 0.0f, 0.0f }, -1.0f))
+            ->addElement("tank_indicator", new FuelTankElement(glm::vec2(-1.3f, -0.75f), 0.0f))
         ;
     }
 }
@@ -105,5 +93,5 @@ void HUDEntity::onUpdate(const f64) {
     }
 
     f32 fuel = mPlayer->getFuel();
-    static_cast<TankIndicator*>(mLayout->getElement("tank_indicator"))->setFuel(fuel);
+    static_cast<FuelTankElement*>(mLayout->getElement("tank_indicator"))->setFuel(fuel);
 }
