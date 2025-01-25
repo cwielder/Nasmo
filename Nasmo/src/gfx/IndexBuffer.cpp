@@ -50,3 +50,7 @@ void nsm::IndexBuffer::drawInstanced(const std::size_t instanceCount) const {
 
     glDrawElementsInstanced(static_cast<GLenum>(mPrimitiveType), mCount, GL_UNSIGNED_INT, nullptr, static_cast<u32>(instanceCount));
 }
+
+void nsm::IndexBuffer::setRestartIndex(const u32 index) {
+    glPrimitiveRestartIndex(index);
+}

@@ -1,3 +1,1 @@
 - Instead of takeDepthStencil to pass depthstencil between buffers to use the stencil, use GL_DEPTH_STENCIL_TEXTURE_MODE
-- gl primitive restart support
-- shader deletion refcount crash on exit

@@ -24,6 +24,8 @@ namespace nsm {
         [[nodiscard]] PrimitiveType getPrimitiveType() const { return mPrimitiveType; }
         [[nodiscard]] u32 getId() const { return mId; }
         [[nodiscard]] u32 getCount() const { return mCount; }
+        
+        static void setRestartIndex(const u32 index);
 
     private:
         u32 mId;
