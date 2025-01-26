@@ -18,6 +18,7 @@ public:
     void onUpdate(const f64 timeStep) override;
 
     void removeSelfBoat(nsm::Entity* entity);
+    void removeSelfFuel(nsm::Entity* entity);
 
 private:
     static constexpr glm::vec3 cCreatePosition = glm::vec3(286.0f, -79.3f, 0.0f);
@@ -26,13 +27,16 @@ private:
 
     void spawnTerrainChunk(const f32 xMultiplier);
     void spawnBoat();
+    void spawnFuel();
 
 private:
     std::list<nsm::Entity*> mTerrainChunks;
     std::list<nsm::Entity*> mBoats;
+    std::list<nsm::Entity*> mFuels;
     nsm::ModelComponent* mWater;
     PlayerEntity* mPlayer;
     f32 mBoatTimer = 0.0f;
+    f32 mFuelTimer = 4.0f;
     nsm::RandomSource mRandom;
     bool mGameOver;
 };

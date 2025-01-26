@@ -1,8 +1,6 @@
 #include "entity/InfiniteTerrainEntity.h"
 
-#include "entity/TerrainEntity.h"
 #include "entity/PlayerEntity.h"
-#include "entity/ShipEntity.h"
 
 #include <nsm/util/JsonHelpers.h>
 #include <nsm/entity/Scene.h>
@@ -146,10 +144,34 @@ void InfiniteTerrainEntity::onUpdate(const f64 timeStep) {
         position.x -= cSpeed * mPlayer->getThrust() * static_cast<f32>(timeStep);
         boat->getComponents<nsm::TransformComponent>()[0]->setPosition(position);
     }
+    
+    mFuelTimer -= static_cast<f32>(timeStep);
+    if (mFuelTimer <= 0.0f) {
+        mFuelTimer = mRandom.getF32(4.5f, 6.5f);
+        this->spawnFuel();
+    }
+    
+    mFuels.remove_if([](nsm::Entity* fuel) {
+        return (fuel != nullptr) && !fuel->isAlive();
+    });
+    
+    for (nsm::Entity* fuel : mFuels) {
+        if (fuel == nullptr) {
+            continue;
+        }
+        
+        glm::vec3 position = fuel->getComponents<nsm::TransformComponent>()[0]->getPosition();
+        position.x -= cSpeed * mPlayer->getThrust() * static_cast<f32>(timeStep);
+        fuel->getComponents<nsm::TransformComponent>()[0]->setPosition(position);
+    }
 }
 
 void InfiniteTerrainEntity::removeSelfBoat(nsm::Entity* entity) {
     mBoats.remove(entity);
+}
+
+void InfiniteTerrainEntity::removeSelfFuel(nsm::Entity* entity) {
+    mFuels.remove(entity);
 }
 
 void InfiniteTerrainEntity::spawnTerrainChunk(const f32 xMultiplier) {
@@ -171,4 +193,15 @@ void InfiniteTerrainEntity::spawnBoat() {
         "scale": )" + std::to_string(8.5f) + R"(
     })";
     mScene->spawnEntity("ShipEntity", newProps, &mBoats.back());
+}
+
+void InfiniteTerrainEntity::spawnFuel() {
+    const f32 zPos = mRandom.getF32(-45.0f, 52.0f);
+
+    mFuels.push_back(nullptr);
+    const std::string newProps = R"({
+        "position": [)" + std::to_string(1111.0f) + ", " + std::to_string(-88.0f) + ", " + std::to_string(zPos) + R"(],
+        "scale": )" + std::to_string(50.5f) + R"(
+    })";
+    mScene->spawnEntity("FuelEntity", newProps, &mFuels.back());
 }

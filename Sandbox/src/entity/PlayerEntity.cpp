@@ -10,6 +10,8 @@
 
 #include <imgui.h>
 
+NSM_REGISTER_ENTITY(PlayerEntity);
+
 namespace {
     static void CreateB2ExhaustParticle(nsm::ParticleComponent* ptcl) {
         ptcl->getEmitter()
@@ -52,13 +54,16 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
     this->addComponent<nsm::DrawableComponent>(mExhaustParticleRight);
     CreateB2ExhaustParticle(mExhaustParticleRight);
 
-    mAudio = new nsm::AudioComponent({ "SE_ENGINE", "SE_SHOOT", "SE_EXPLODE" }, mTransform);
+    mAudio = new nsm::AudioComponent({ "SE_ENGINE", "SE_SHOOT", "SE_EXPLODE", "SE_FUEL" }, mTransform);
     this->addComponent<nsm::AudioComponent>(mAudio);
     mAudio->startSound("SE_ENGINE");
 
     mCollider = new nsm::SphereColliderComponent(this, 10.0f, mTransform, [this](nsm::ColliderComponent* other) {
         if (other->getOwner()->getIdentifier() == "ShipEntity") {
             this->explode();
+        } else if (other->getOwner()->getIdentifier() == "FuelEntity") {
+            mFuel = 1.0f;
+            this->spawnFuelCollectParticle();
         }
     });
     this->addComponent<nsm::SphereColliderComponent>(mCollider);
@@ -141,7 +146,7 @@ void PlayerEntity::onCreate(nsm::Entity::Properties& properties) {
 
 void PlayerEntity::onUpdate(const f64 timeStep) {
     mShootCooldown -= static_cast<f32>(timeStep);
-    mFuel -= static_cast<f32>(timeStep) * 0.1f;
+    mFuel -= static_cast<f32>(timeStep) * 0.12f;
 
     static constexpr f32 cMaxVelocity = 0.1f;
     static constexpr f32 cAcceleration = 0.2f;
@@ -261,4 +266,15 @@ void PlayerEntity::explode() {
     }
 }
 
-NSM_REGISTER_ENTITY(PlayerEntity);
+void PlayerEntity::spawnFuelCollectParticle() {
+    mAudio->startSound("SE_FUEL");
+    
+    const glm::vec3& position = mTransform->getPosition();
+    
+    const std::string properties = R"({
+        "position": [)" + std::to_string(position.x) + ", " + std::to_string(position.y) + ", " + std::to_string(position.z - 8.0f) + R"(],
+        "scale": )" + std::to_string(2.0f) + R"(
+    })";
+
+    mScene->spawnEntity("FuelCollectParticleEntity", properties);
+}

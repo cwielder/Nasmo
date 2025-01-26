@@ -29,6 +29,7 @@ public:
 private:
     void spawnMissile();
     void explode();
+    void spawnFuelCollectParticle();
 
 private:
     nsm::TransformComponent* mTransform;

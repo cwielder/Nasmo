@@ -45,7 +45,7 @@ void MissileEntity::onCreate(nsm::Entity::Properties& properties) {
     this->addComponent<nsm::TransformComponent>(mTransform);
 
     mCollider = new nsm::SphereColliderComponent(this, 10.0f, mTransform, [this](nsm::ColliderComponent* other) {
-        if (other->getOwner()->getIdentifier() == "ShipEntity") {
+        if (other->getOwner()->getIdentifier() == "ShipEntity" || other->getOwner()->getIdentifier() == "FuelEntity") {
             this->explode();
         }
     });
